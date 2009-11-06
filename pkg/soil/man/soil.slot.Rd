@@ -9,42 +9,41 @@ Soil Profile Slotting
 Align soil properties to a user-defined basis.
 }
 \usage{
-soil.slot(data, seg_size = NA, seg_vect = NA, return_raw = FALSE, use.wts = FALSE)
+soil.slot(data, seg_size = NA, seg_vect = NA, return_raw = FALSE, use.wts = FALSE, compute.depth.prob = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{data}{
-%%     ~~Describe \code{data} here~~
+A dataframe representing a 'stack' of soil profiles and having the following format:
+\item{id}{An id that is unique across soil profiles within the dataframe.}
+\item{top}{The horizon top boundary.}
+\item{bottom}{The horizon bottom boundary.}
+\item{prop}{A property to be aggregated. If numeric mean and standard deviation are returned, if character class-wise probabilities are returned.}
 }
   \item{seg_size}{
-%%     ~~Describe \code{seg_size} here~~
+User-degined segment size, default is 1.
 }
   \item{seg_vect}{
-%%     ~~Describe \code{seg_vect} here~~
+User-degined segment structure (needs work)
 }
   \item{return_raw}{
-%%     ~~Describe \code{return_raw} here~~
+If TRUE, un-aggregated data will be returned by depth-slice. Useful for debugging, or for the generation of box and whisker plots.
 }
   \item{use.wts}{
-%%     ~~Describe \code{use.wts} here~~
+If TRUE, then a column called 'wt' should be present in the source dataframe, and must make sense within the context of the data. Weighted means and standard deviations will be returned by depth-slice.
+}
+  \item{compute.depth.prob}{
+If TRUE, depth probability is computed and returned. Setting a dummy 'prop' column to 1 in the source dataframe is suggested. See examples below.
 }
 }
 \details{
-%%  ~~ If necessary, more details than the description above ~~
+See the documentation for the sample dataset 'sp1' for further examples.
 }
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+A dataframe with slice-wise aggregation, weighted aggregation, class probabilities, or depth probabilities.
 }
-\references{
-%% ~put references to the literature/web site here ~
-}
-\author{
-%%  ~~who you are~~
-}
+\references{http://casoilresource.lawr.ucdavis.edu/}
+\author{Dylan E Beaudette}
 \note{
 %%  ~~further notes~~
 }
@@ -52,7 +51,7 @@ soil.slot(data, seg_size = NA, seg_vect = NA, return_raw = FALSE, use.wts = FALS
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-\code{\link{unroll}}
+\code{\link{sp1}, \link{unroll}}
 }
 \examples{
 # setup environment
@@ -100,6 +99,27 @@ ylim=c(150, -5), type='S', horizontal=TRUE, layout=c(4,1), col=1 )
 y <- with(sp1, data.frame(id=id, top=top, bottom=bottom, prop=1))
 a <- soil.slot(y, compute.depth.prob=TRUE)
 xyplot(top ~ p.prop, data=a, ylim=c(250, -5), type='S', horizontal=TRUE, asp=4)
+
+
+#
+# 3. standard aggregation, by grouping variable
+#
+require(plyr)
+# try str(sp1) for hints
+a <- ddply(sp1, .(group), .fun=soil.slot.vec)
+
+# manually add mean +/- SD
+a$upper <- with(a, p.mean+p.sd)
+a$lower <- with(a, p.mean-p.sd)
+
+xyplot(top ~ p.mean, data=a, ylim=c(250, -5), groups=group, type='l', horizontal=TRUE, asp=4)
+
+
+# not quite correct...
+xyplot(top ~ p.mean, data=a, ylim=c(250,-5), groups=group, subscripts=TRUE, lower=a$lower, upper=a$upper, panel=panel.depth_function)
+
+
+
 
 
 }
