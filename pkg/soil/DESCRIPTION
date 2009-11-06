@@ -1,5 +1,5 @@
 Package: soil
-Version: 0.1
+Version: 0.2
 Date: 2009-09-15
 Title: R package for working with and plotting soil profile data.
 Author: Dylan Beaudette <debeaudette@ucdavis.edu>

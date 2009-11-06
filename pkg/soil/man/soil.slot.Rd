@@ -52,7 +52,7 @@ soil.slot(data, seg_size = NA, seg_vect = NA, return_raw = FALSE, use.wts = FALS
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+\code{\link{unroll}}
 }
 \examples{
 # setup environment

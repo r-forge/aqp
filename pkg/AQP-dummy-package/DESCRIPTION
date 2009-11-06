@@ -1,0 +1,10 @@
+Package: Package Name
+Version: x.xx
+Date: xxxxxxxxxx
+Title: xxxxxxxxxx
+Author: xxxxxxxxxxx
+Maintainer: xxxxxxxxxx
+Depends: R
+Description: xxxxxxxxxxxx
+License: xxxxxxxxx
+Packaged: xxxxxxxxx
