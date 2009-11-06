@@ -48,14 +48,13 @@ auto.key=list(columns=4, lines=TRUE, points=FALSE, title="k", cex=0.8, size=3)
 data(sp1)
 d <- profile_compare(sp1, vars=c('prop','group'), max_d=100, k=0.01)
 
-# get a list of the 'group' property by pedon
-tp <- as.numeric(aggregate(sp1$group, by=list(sp1$id), FUN=unique)[,2])
-
 # better plotting with ape package:
 require(ape)
+require(cluster)
+h <- diana(d)
 p <- as.phylo(as.hclust(h))
-plot(p, cex=0.75, label.offset=1, no.margin=TRUE)
-tiplabels(col=tp, pch=15)
+plot(ladderize(p), cex=0.75, label.offset=1, no.margin=TRUE)
+tiplabels(col=cutree(h, 3), pch=15)
 
 ## 3. other uses of the dissimilarity matrix
 require(MASS)
@@ -64,7 +63,7 @@ d.sam <- sammon(d)
 
 # simple plot
 plot(d.sam$points, type = "n", xlim=range(d.sam$points[,1] * 1.5))
-text(d.sam$points, labels=row.names(d.sam$points), cex=0.5, col=tp)
+text(d.sam$points, labels=row.names(d.sam$points), cex=0.5, col=cutree(h, 3))
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
