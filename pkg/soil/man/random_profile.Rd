@@ -34,6 +34,7 @@ random_profile(id, n = c(3, 4, 5, 6), min_thick = 5, max_thick = 30, n_prop = 5)
 }
 \seealso{ ~~objects to See Also as \code{\link{help}}, ~~~ }
 \examples{
+# need this
 library(soil)
 
 # generate 10 random profiles with default settings:
