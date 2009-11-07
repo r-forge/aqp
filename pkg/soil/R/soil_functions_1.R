@@ -123,22 +123,25 @@ plot_slices <- function(slices, region_outline, contours=NA, depths, variable, p
 # using top and bottom boundaries, annotating with name
 # optionally color with vector that is the same length as number of horizons
 # behavior not defined for horizons with an indefinate lower boundary
-profile_plot <- function(top, bottom, name, cols=NA, width=1)
+profile_plot <- function(top, bottom, name, max_depth, cols=NA, width=1, ...)
 	{
 	
-	# get the range of depths
-	r <- range(c(top, bottom))
-	
+	if(missing(max_depth))
+		{
+		# get the range of depths
+		max_depth <- max(bottom, na.rm=TRUE)
+		}
+		
 	# start a new plot:
-	par(mar=c(0,2,0,1))
-	plot(0,0, type='n', xlim=c(0,width+0.25), ylim=c(r[2]+2, 0), axes=FALSE, xlab='', ylab='')
+	par(mar=c(1,0,0,1))
+	plot(0,0, type='n', xlim=c(0,2*width), ylim=c(max_depth+2, 0), axes=FALSE, ...)
 	
 	# add horizons
 	rect(0, bottom, width, top, col=cols)
 	
 	# annotate with names
-	text(width, d$top, d$name, adj=c(-1,1), cex=0.75)
-	
+	mid <- (top+bottom)/2
+	text(width, mid, name, pos=4, offset=0.25, cex=0.6)
 	}
 
 

@@ -1,22 +1,60 @@
 
-## needs some work for profile-aggregated data
+# used to pre-compute wider xlim range based on upper/lower values
+prepanel.depth_function <- function(x, y, upper, lower, subscripts=NULL, groups=NULL, ...) {
+
+# working with grouped data and paneled data
+if(!missing(groups) & !missing(subscripts))
+	{
+	d <- data.frame(yhat=x, top=y, upper=upper[subscripts], lower=lower[subscripts], groups=groups[subscripts])
+	
+	# levels in the groups, for color matching
+	ll <- levels(d$groups)
+	}
+
+# no grouping, add a fake group for compatiblity
+if(missing(groups))
+	{
+	d <- data.frame(yhat=x, top=y, upper=upper[subscripts], lower=lower[subscripts], groups=factor(1))
+	# levels in the groups, for color matching
+	ll <- levels(d$groups)
+	}
+
+# compute better xlim based on range of confidence band 
+the_range <- c(min(d$lower, na.rm=TRUE), max(d$upper, na.rm=TRUE))
+return(list(xlim=the_range))
+}
 
 
-panel.depth_function <- function(x, y, subscripts, groups, upper, lower, ...) {
+# note: confidence bands not defined when NA is present
+panel.depth_function <- function(x, y, upper, lower, subscripts=NULL, groups=NULL, ...) {
 
-# extract this panel's data
-d <- data.frame(yhat=x, top=y, upper=upper[subscripts], lower=lower[subscripts], groups=groups[subscripts])
+# working with grouped data and paneled data
+if(!missing(groups) & !missing(subscripts))
+	{
+	d <- data.frame(yhat=x, top=y, upper=upper[subscripts], lower=lower[subscripts], groups=groups[subscripts])
+	
+	# levels in the groups, for color matching
+	ll <- levels(d$groups)
+	}
 
-# levels in the groups, for color matching
-ll <- levels(d$groups)
+# no grouping, add a fake group for compatiblity
+if(missing(groups))
+	{
+	d <- data.frame(yhat=x, top=y, upper=upper[subscripts], lower=lower[subscripts], groups=factor(1))
+	# levels in the groups, for color matching
+	ll <- levels(d$groups)
+	}
 
 # add grid
 panel.grid(h=-1, v=-1, lty=3, col=1)
 
-# add conf. intervals
+# add conf. intervals / aggregation uncertainty
 by(d, d$groups, function(d_i) {
+# cannot have NA in values that define polygon boundaries
+d_i <- subset(d_i, subset=is.na(d_i$upper) == FALSE & is.na(d_i$lower) == FALSE)
+
 # make conf.int polygon
-panel.polygon(x=c(d_i$lower, rev(d_i$upper)), y=c(d_i$top, rev(d_i$top)), col=grey(0.7), border=NA, alpha=0.5)
+panel.polygon(x=c(d_i$lower, rev(d_i$upper)), y=c(d_i$top, rev(d_i$top)), col=grey(0.7), border=NA, ...)
 })
 
 # add main lines

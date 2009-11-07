@@ -102,7 +102,24 @@ xyplot(top ~ p.prop, data=a, ylim=c(250, -5), type='S', horizontal=TRUE, asp=4)
 
 
 #
-# 3. standard aggregation, by grouping variable
+# 3.1 standard aggregation
+#
+a <- soil.slot(sp1)
+
+# manually add mean +/- SD
+a$upper <- with(a, p.mean+p.sd)
+a$lower <- with(a, p.mean-p.sd)
+
+# use custom plotting function for uncertainty viz.
+xyplot(top ~ p.mean, data=a, 
+lower=a$lower, upper=a$upper, ylim=c(250,-5), alpha=0.5, 
+panel=panel.depth_function, 
+prepanel=prepanel.depth_function
+)
+
+
+#
+# 3.2 standard aggregation, by grouping variable
 #
 require(plyr)
 # try str(sp1) for hints
@@ -112,12 +129,13 @@ a <- ddply(sp1, .(group), .fun=soil.slot.vec)
 a$upper <- with(a, p.mean+p.sd)
 a$lower <- with(a, p.mean-p.sd)
 
-xyplot(top ~ p.mean, data=a, ylim=c(250, -5), groups=group, type='l', horizontal=TRUE, asp=4)
-
-
-# not quite correct...
-xyplot(top ~ p.mean, data=a, ylim=c(250,-5), groups=group, subscripts=TRUE, lower=a$lower, upper=a$upper, panel=panel.depth_function)
-
+# use custom plotting function for uncertainty viz.
+xyplot(
+top ~ p.mean, data=a, groups=group, subscripts=TRUE, 
+lower=a$lower, upper=a$upper, ylim=c(250,-5), alpha=0.5,
+panel=panel.depth_function, 
+prepanel=prepanel.depth_function
+)
 
 
 
