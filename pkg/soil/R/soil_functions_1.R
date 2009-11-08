@@ -141,7 +141,7 @@ profile_plot <- function(top, bottom, name, max_depth, cols=NA, width=1, ...)
 	
 	# annotate with names
 	mid <- (top+bottom)/2
-	text(width, mid, name, pos=4, offset=0.25, cex=0.6)
+	text(width, mid, name, pos=4, offset=0.25, cex=0.5)
 	}
 
 

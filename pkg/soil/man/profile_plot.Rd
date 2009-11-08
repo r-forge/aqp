@@ -66,30 +66,38 @@ with(i, profile_plot(top, bottom, name, max_depth=250, col=color))
 #
 # 3. add to bottom of dendrogram
 #
+require(plotrix)
 require(TeachingDemos)
 require(ape)
 require(cluster)
 
 data(sp1)
-d <- profile_compare(sp1, vars=c('prop','group'), max_d=100, k=0.01)
+# assign color scale
+sp1$color <- color.scale(sp1$prop, extremes=c('white','Royalblue'))
 
+# perform comparison of profiles
+d <- profile_compare(sp1, vars=c('prop','group'), max_d=100, k=0.01)
 h <- diana(d)
 p <- ladderize(as.phylo(as.hclust(h)))
 
+# setup plot
 par(mar=c(1,1,1,1))
 p.plot <- plot(p, cex=0.5, label.offset=-3, direction='down', y.lim=c(200,0))
 tiplabels(col=cutree(h, 3), pch=15)
-edgelabels(1:16, cex=0.5)
 
-# how can we place these?
-# see package 'geiger'
-# see which.edge()
+# get the last plot
+lastPP <- get("last_plot.phylo", envir = .PlotPhyloEnv)
 
-# for first tip label
-which.edge(p, 1) # ---> edge 8
+# the order of pedons in dendrogram
+new_order <- lastPP$xx[1:lastPP$Ntip]
 
-subplot(profile_plot(top=tops, bottom=bottoms, name=hz, max_depth=200), 1.5, 80, size=c(0.75,3), type='fig', vadj=1)
+# add each profile image
+for(i in new_order)
+{
+pedon_i <- subset(sp1, subset=id == levels(sp1$id)[i])
 
+subplot(with(pedon_i, profile_plot(top, bottom, name, max_depth=250, col=color)), i, 80, size=c(0.75,3.5), type='fig', vadj=1)
+}
 
 
 
