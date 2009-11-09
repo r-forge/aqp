@@ -134,14 +134,14 @@ profile_plot <- function(top, bottom, name, max_depth, cols=NA, width=1, ...)
 		
 	# start a new plot:
 	par(mar=c(1,0,0,1))
-	plot(0,0, type='n', xlim=c(0,2*width), ylim=c(max_depth+2, 0), axes=FALSE, ...)
+	plot(0,0, type='n', xlim=c(0,2.5*width), ylim=c(max_depth+2, 0), axes=FALSE, ...)
 	
 	# add horizons
 	rect(0, bottom, width, top, col=cols)
 	
 	# annotate with names
 	mid <- (top+bottom)/2
-	text(width, mid, name, pos=4, offset=0.25, cex=0.5)
+	text(width, mid, name, pos=4, offset=0.1, cex=0.5)
 	}
 
 
