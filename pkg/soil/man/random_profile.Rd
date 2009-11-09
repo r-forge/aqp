@@ -1,38 +1,31 @@
 \name{random_profile}
 \alias{random_profile}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{ ~~function to do ... ~~ }
+\title{Random Profile}
 \description{
-  ~~ A concise (1-5 lines) description of what the function does. ~~
+Generate a random soil profile according to set criteria, with correlated depth trends.
 }
 \usage{
 random_profile(id, n = c(3, 4, 5, 6), min_thick = 5, max_thick = 30, n_prop = 5)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{id}{ ~~Describe \code{id} here~~ }
-  \item{n}{ ~~Describe \code{n} here~~ }
-  \item{min_thick}{ ~~Describe \code{min_thick} here~~ }
-  \item{max_thick}{ ~~Describe \code{max_thick} here~~ }
-  \item{n_prop}{ ~~Describe \code{n_prop} here~~ }
+  \item{id}{a character or numeric id used for this profile}
+  \item{n}{vector of possible number of horizons}
+  \item{min_thick}{minimum thickness criteria for a simulated horizon}
+  \item{max_thick}{maximum thickness criteria for a simulated horizon}
+  \item{n_prop}{number of simulated soil properties (columns in the returned dataframe)}
 }
 \details{
   ~~ If necessary, more details than the description above ~~
 }
 \value{
-  ~Describe the value returned
-  If it is a LIST, use
-  \item{comp1 }{Description of 'comp1'}
-  \item{comp2 }{Description of 'comp2'}
-  ...
+A dataframe with the simulated profile.
 }
-\references{ ~put references to the literature/web site here ~ }
-\author{ ~~who you are~~ }
-\note{ ~~further notes~~ 
-
- ~Make other sections like Warning with \section{Warning }{....} ~
-}
-\seealso{ ~~objects to See Also as \code{\link{help}}, ~~~ }
+\references{http://casoilresource.lawr.ucdavis.edu/}
+\author{Dylan E. Beaudette}
+\note{See examples for ideas on simulating several profiles at once.}
+\seealso{\code{\link{profile_plot}}}
 \examples{
 # need this
 library(soil)

@@ -1,10 +1,10 @@
 Package: soil
-Version: 0.2
-Date: 2009-09-15
+Version: 0.3
+Date: 2009-10-08
 Title: R package for working with and plotting soil profile data.
 Author: Dylan Beaudette <debeaudette@ucdavis.edu>
 Maintainer: Dylan Beaudette <debeaudette@ucdavis.edu>
 Depends: R (>= 2.8.0), cluster, RColorBrewer, sp, maptools
 Description: Set of functions for working with and plotting soil profile data.
 License: GPL (>= 2)
-Packaged: 2009-09-14 11:00:00 UTC; dylan
+Packaged: 2009-10-08 11:00:00 UTC; dylan

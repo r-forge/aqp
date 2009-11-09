@@ -1,37 +1,59 @@
 \name{profile_plot}
+\Rdversion{1.1}
 \alias{profile_plot}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{ ~~function to do ... ~~ }
+\title{
+Profile Plot
+}
 \description{
-  ~~ A concise (1-5 lines) description of what the function does. ~~
+Generate a simple diagram of a soil profile, with annotated horizon names.
 }
 \usage{
-profile_plot(b, v, df = 2, ...)
+profile_plot(top, bottom, name, max_depth, cols = NA, width = 1, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{b}{ ~~Describe \code{b} here~~ }
-  \item{v}{ ~~Describe \code{v} here~~ }
-  \item{df}{ ~~Describe \code{df} here~~ }
-  \item{\dots}{ ~~Describe \code{\dots} here~~ }
+  \item{top}{
+vector of horizon top boundaries
+}
+  \item{bottom}{
+vector of horizon bottom boundaries
+}
+  \item{name}{
+vector of horizon names
+}
+  \item{max_depth}{
+used for scaling several adjacent plots, in same units as horizon boundaries
+}
+  \item{cols}{
+vector of R-readable colors, used to fill horizons
+}
+  \item{width}{
+relative width of soil profile diagram
+}
+  \item{\dots}{
+other arguments to pass on to low-level plotting functions
+}
 }
 \details{
-  ~~ If necessary, more details than the description above ~~
+%%  ~~ If necessary, more details than the description above ~~
 }
 \value{
-  ~Describe the value returned
-  If it is a LIST, use
-  \item{comp1 }{Description of 'comp1'}
-  \item{comp2 }{Description of 'comp2'}
-  ...
+A plot of the soil profile is added to the current graphics device, nothing is returned.
 }
-\references{ ~put references to the literature/web site here ~ }
-\author{ ~~who you are~~ }
-\note{ ~~further notes~~ 
+\references{
+http://casoilresource.lawr.ucdavis.edu/
+}
+\author{
+Dylan E. Beaudette
+}
+\note{
+%%  ~~further notes~~
+}
 
- ~Make other sections like Warning with \section{Warning }{....} ~
+\seealso{
+\code{\link{subplot}}
 }
-\seealso{ ~~objects to See Also as \code{\link{help}}, ~~~ }
 \examples{
 library(soil)
 
@@ -64,7 +86,7 @@ with(i, profile_plot(top, bottom, name, max_depth=250, col=color))
 
 
 #
-# 3. add to bottom of dendrogram
+# 3. add to bottom of dendrogram (requires R >= 2.9)
 #
 require(plotrix)
 require(TeachingDemos)
