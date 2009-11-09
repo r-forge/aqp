@@ -1,9 +1,9 @@
 \name{unroll}
 \alias{unroll}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{ ~~function to do ... ~~ }
+\title{Unroll Genetic Horizons}
 \description{
-  ~~ A concise (1-5 lines) description of what the function does. ~~
+Generate a descretized vector of genetic horizons along a user-defined pattern.
 }
 \usage{
 unroll(top, bottom, prop, max_depth, segment_size = NA, bottom_padding_value = NA)
@@ -18,7 +18,7 @@ unroll(top, bottom, prop, max_depth, segment_size = NA, bottom_padding_value = N
   \item{bottom_padding_value}{ ~~Describe \code{bottom_padding_value} here~~ }
 }
 \details{
-  ~~ If necessary, more details than the description above ~~
+This function is used internally by several higher-level components of the soil package.
 }
 \value{
   ~Describe the value returned
@@ -27,48 +27,11 @@ unroll(top, bottom, prop, max_depth, segment_size = NA, bottom_padding_value = N
   \item{comp2 }{Description of 'comp2'}
   ...
 }
-\references{ ~put references to the literature/web site here ~ }
-\author{ ~~who you are~~ }
-\note{ ~~further notes~~ 
+\references{http://casoilresource.lawr.ucdavis.edu/}
+\author{Dylan E. Beaudette}
 
- ~Make other sections like Warning with \section{Warning }{....} ~
-}
-\seealso{ ~~objects to See Also as \code{\link{help}}, ~~~ }
-\examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
+\seealso{\code{\link{soil.slot}}}
 
-## The function is currently defined as
-function(top, bottom, prop, max_depth, segment_size=NA, bottom_padding_value=NA)
-	{
-	
-	# inverse RLE, to generate repeating sequence of property, n times
-	p <- inverse.rle(list(lengths=bottom-top, values=prop))
-	
-	# total depth, in unit length
-	p.len <- length(p)
-	
-	# number of NAs to prepend, in case our profile does not start at 0
-	num.NA.prepend <- abs(0 - min(top))
-	
-	# number of NAs we need to append to match the deepest profile
-	num.NA.append <- max_depth - (p.len + num.NA.prepend)
-	
-	# debug
-	# print(paste(max_depth, num.NA.prepend, p.len, num.NA.append))
-	
-	# padd the result with NA: from the top down
-	p.pad <- c(rep(NA, times=num.NA.prepend), p)
-	
-	# but only if the number of NA to append is positive
-	if(sign(num.NA.append) == 1)
-	p.pad <- c(p.pad, rep(bottom_padding_value, times=num.NA.append))
-	
-	# return vector, padded to max_depth
-	return(as.vector(p.pad))
-	}
-}
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{ ~kwd1 }
