@@ -34,6 +34,26 @@ library(soil)
 d.list <- lapply(1:10, function(i) random_profile(i))
 d <- do.call('rbind', d.list)
 
+# plot them
+par(mfcol=c(1,10))
+by(d, d$id, function(i) {
+with(i, profile_plot(top, bottom, name, max_depth=max(d$bottom)))
+})
+
+# plot profiles using PCA of properties
+require(MASS)
+require(plotrix)
+d.pca <- princomp(~ p1 + p2 + p3, data=d, cor=TRUE)
+d$pca1 <- predict(d.pca)[,1]
+cols <- color.scale(d$pca1, extremes=c('white','Royalblue'))
+
+
+par(mfcol=c(1,10))
+by(d, d$id, function(i) {
+with(i, profile_plot(top, bottom, name, max_depth=max(d$bottom), col=cols, cex.names=0.75))
+})
+
+
 # simple cluster analysis:
 p <- profile_compare(d, vars=c('p1','p2','p3'), max_d=50, k=0)
 plot(hclust(p))
