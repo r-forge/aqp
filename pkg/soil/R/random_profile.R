@@ -28,7 +28,7 @@ tops <- c(0, tops)
 bottoms <- c(tops[-1], sample(min_thick:max_thick, 1))
 
 # combine into a df
-d <- data.frame(id=id, top=cumsum(tops), bottom=cumsum(bottoms))
+d <- data.frame(id=id, top=cumsum(tops), bottom=cumsum(bottoms), name=paste('H',1:n_hz,sep=''))
 
 # generate several properties
 # with different means / sd

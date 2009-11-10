@@ -9,7 +9,7 @@ Profile Plot
 Generate a simple diagram of a soil profile, with annotated horizon names.
 }
 \usage{
-profile_plot(top, bottom, name, max_depth, cols = NA, width = 1, ...)
+profile_plot(top, bottom, name, max_depth, cols = NA, width = 1, cex.names = 0.5, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -30,6 +30,9 @@ vector of R-readable colors, used to fill horizons
 }
   \item{width}{
 relative width of soil profile diagram
+}
+  \item{cex.names}{
+character scaling for horizon names
 }
   \item{\dots}{
 other arguments to pass on to low-level plotting functions
@@ -111,13 +114,13 @@ tiplabels(col=cutree(h, 3), pch=15)
 lastPP <- get("last_plot.phylo", envir = .PlotPhyloEnv)
 
 # the order of pedons in dendrogram
-D.labels <- attr(D, 'Labels')
+d.labels <- attr(d, 'Labels')
 new_order <- lastPP$xx[1:lastPP$Ntip]
 
 # add each profile image
 for(i in 1:lastPP$Ntip)
 {
-pedon_i <- subset(sp1, subset=id == D.labels[which(new_order == i)])
+pedon_i <- subset(sp1, subset=id == d.labels[which(new_order == i)])
 
 subplot(with(pedon_i, profile_plot(top, bottom, name, max_depth=250, col=color)), i, 80, size=c(0.75,3.5), type='fig', vadj=1)
 }
