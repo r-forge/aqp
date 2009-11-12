@@ -80,12 +80,23 @@ require(plotrix)
 data(sp1)
 
 # assign color scale
-sp1$color <- color.scale(sp1$prop, extremes=c('white','Royalblue'))
+sp1$color <- color.scale(sp1$prop, c(0,1,1),c(1,1,0),0)
 
-par(mfcol=c(1,9))
+# setup layout
+layout(matrix(c(1,10,2,10,3,10,4,10,5,10,6,10,7,10,8,10,9,10),2,9,byrow=FALSE), heights=c(0.9,0.1))
+
+# plot each profile
 by(sp1, sp1$id, function(i) {
-with(i, profile_plot(top, bottom, name, max_depth=250, col=color))
+with(i, profile_plot(top, bottom, name, max_depth=250, col=color, cex.names=0.7))
 })
+
+# make an axis along the bottom
+vals <- with(sp1, seq(min(prop), max(prop), length=10))
+par(mar=c(1,4,0,4))
+image(x=vals, y=1, z=matrix(vals), col=color.scale(vals, c(0,1,1),c(1,1,0),0), axes=FALSE, ylab='', xlab='')
+box(col='grey')
+axis(side=3, at=quantile(sp1$prop), cex.axis=0.9)
+
 
 
 #
