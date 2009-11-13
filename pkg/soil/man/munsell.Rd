@@ -21,7 +21,7 @@ A lookup table of interpolated Munsell color chips for common soil colors.
   }
 }
 \details{
-See \link{\code{munsell2rgb}} for conversion examples.
+See \code{munsell2rgb} for conversion examples.
 }
 \source{
 \item{http://www.cis.rit.edu/mcsl/online/munsell.php}{Color chip XYZ values}
