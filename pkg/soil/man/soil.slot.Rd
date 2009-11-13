@@ -123,11 +123,14 @@ prepanel=prepanel.depth_function
 #
 require(plyr)
 # try str(sp1) for hints
+sp1$group <- with(sp1, factor(group))
 a <- ddply(sp1, .(group), .fun=soil.slot.vec)
 
 # manually add mean +/- SD
 a$upper <- with(a, p.mean+p.sd)
 a$lower <- with(a, p.mean-p.sd)
+
+
 
 # use custom plotting function for uncertainty viz.
 xyplot(
