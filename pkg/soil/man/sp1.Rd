@@ -10,14 +10,29 @@ Soil profile data from Pinnacles National Monument, CA.
 }
 \usage{data(sp1)}
 \format{
-  A data frame with 59 observations on the following 6 variables.
+  A data frame with 60 observations on the following 21 variables.
   \describe{
-    \item{\code{top}}{horizon upper boundary (inches)} 
-    \item{\code{bottom}}{horizon lower boundary (inches)}
-    \item{\code{name}}{horizon name}
-    \item{\code{prop}}{field-estimated clay content of <2mm fraction}
-    \item{\code{id}}{soil id}
-    \item{\code{group}}{grouping label}
+    \item{\code{group}}{a numeric vector}
+    \item{\code{id}}{a character vector}
+    \item{\code{top}}{a numeric vector}
+    \item{\code{bottom}}{a numeric vector}
+    \item{\code{bound_distinct}}{a character vector}
+    \item{\code{bound_topography}}{a character vector}
+    \item{\code{name}}{a character vector}
+    \item{\code{texture}}{a character vector}
+    \item{\code{prop}}{a numeric vector}
+    \item{\code{structure_grade}}{a character vector}
+    \item{\code{structure_size}}{a character vector}
+    \item{\code{structure_type}}{a character vector}
+    \item{\code{stickiness}}{a character vector}
+    \item{\code{plasticity}}{a character vector}
+    \item{\code{field_ph}}{a numeric vector}
+    \item{\code{hue}}{a character vector}
+    \item{\code{value}}{a numeric vector}
+    \item{\code{chroma}}{a numeric vector}
+    \item{\code{r}}{a numeric vector}
+    \item{\code{g}}{a numeric vector}
+    \item{\code{b}}{a numeric vector}
   }
 }
 \details{
