@@ -73,8 +73,32 @@ hz <- c('Oi','A','Bw','Bt','Cr')
 # make plot
 profile_plot(top=tops, bottom=bottoms, name=hz)
 
+
 #
-# 2. several profiles
+# 2.1 several profiles, with depth scale
+#
+
+# use transformed soil colors
+missing.colors.idx <- which(is.na(sp1$r))
+sp1$soil_color <- NA
+sp1$soil_color[-missing.colors.idx] <- with(sp1[-missing.colors.idx,], rgb(r, g, b, max=0.7) )
+
+setup layout
+layout(matrix(c(1,2,3,4,5,6,7,8,9,10),1,10,byrow=FALSE), widths=c(rep(0.1, 9), 0.05))
+
+# add profiles
+by(sp1, sp1$id, function(i) {
+with(i, profile_plot(top, bottom, name, max_depth=250, col=soil_color, cex.names=1))
+})
+
+# add depth scale
+par(mar=c(0,0,0,3))
+plot(1,1, type='n', xlab='', ylab='', axes=FALSE, ylim=c(250,0))
+axis(side=4)
+
+
+#
+# 2.2 several profiles, colored by some property
 #
 require(plotrix)
 data(sp1)

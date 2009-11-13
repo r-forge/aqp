@@ -1,0 +1,10 @@
+
+-- sp1
+SELECT CASE WHEN substring(pedon_id, 17)::integer > 5 THEN 1 ELSE 2 END as group, substring(pedon_id, 16) as id, top, bottom, bound_distinct, bound_topography, name, texture, field_pct_clay as prop, structure_grade_1 as structure_grade, structure_size_1 as structure_size, structure_type_1 as structure_type, stickiness, plasticity, field_ph, matrix_wet_color_hue as hue, matrix_wet_color_value as value, matrix_wet_color_chroma as chroma, r, g, b 
+FROM 
+horizon 
+LEFT JOIN 
+munsell_lookup_v4 
+ON matrix_wet_color_hue = hue AND matrix_wet_color_value = value AND matrix_wet_color_chroma = chroma 
+WHERE pedon_id ~~ 'SSGG%' 
+ORDER BY pedon_id, top ASC;
