@@ -45,6 +45,7 @@ auto.key=list(columns=4, lines=TRUE, points=FALSE, title="k", cex=0.8, size=3)
 )
 
 ## 2. basic implementation, requires at least two properties
+library(soil)
 data(sp1)
 d <- profile_compare(sp1, vars=c('prop','group'), max_d=100, k=0.01)
 
