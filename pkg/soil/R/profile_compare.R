@@ -17,6 +17,16 @@ profile_compare <- function(s, vars, max_d, k, replace_na=FALSE, add_soil_flag=F
 	if(is.null(s$id))
 		stop("'s' must contain a column named 'id' ")
 	
+	# if the id column is not a factor, convert it to one:
+	if(class(s$id) != 'factor')
+		s$id <- factor(s$id)
+	
+	# identify the number of profiles
+	n.profiles <- length(levels(s$id))
+	
+	# number of variables
+	n.vars <- length(vars)
+	
 	# compute a weighting vector based on k	
 	w <- 1 * exp(-k*1:max_d)
 	
@@ -55,7 +65,6 @@ profile_compare <- function(s, vars, max_d, k, replace_na=FALSE, add_soil_flag=F
 		}
 	)
 	
-# 	return(s.unrolled)
 	
 	# init a list to store distance matrices, one for each depth interval
 	d <- list()
@@ -69,10 +78,33 @@ profile_compare <- function(s, vars, max_d, k, replace_na=FALSE, add_soil_flag=F
 		
 		# compute distance metric for this depth
 		# distance metric has large effect on results
-		# Gower's distance gives the best looking results...
-		# figure out how to deal with soil_flag variable:
-		# 		binary variable(s) 9 treated as interval scaled
-		d[[i]] <- daisy(sp, metric='gower')
+		# Gower's distance gives the best looking results, and automatically standardizes variables
+		
+		# compute the proportion of cases where NA occurs
+		proportion_non_NA <- 1 - (length(which(is.na(sp))) / (n.profiles * n.vars))
+		
+		# use some criteria for deciding when to keep the dissimilarities for this slice
+		if(proportion_non_NA >= 0.5)
+			{
+			d[[i]] <- daisy(sp, metric='gower')
+			}
+		
+		# otherwise contribute no dissimilarity to the total
+		else
+			{
+			print(paste(round(proportion_non_NA, 2), 'non-missing in slice', i))
+			
+			# generate an appropriately formatted dissimilarity matrix, full of NA
+			m.ref <- lower.tri(matrix(ncol=n.profiles,nrow=n.profiles), diag=FALSE)
+			m <- m.ref
+			m[which(m.ref == FALSE)] <- NA
+			
+			# assign to this slice
+			d[[i]] <- as.dist(m)
+			
+			# clean-up
+			rm(m,m.ref)
+			}
 	}
 	
 	
@@ -100,8 +132,6 @@ profile_compare <- function(s, vars, max_d, k, replace_na=FALSE, add_soil_flag=F
 	# consider using mean diss, or something different that total
 	d.vect <- apply(t(sapply(d, '[')), 2, sum, na.rm=TRUE)
 	
-	# identify the number of profiles
-	n.profiles <- length(unique(as.numeric(s$id)))
 	
 	# now make into a combined distance matrix
 	m.ref <- lower.tri(matrix(ncol=n.profiles,nrow=n.profiles), diag=FALSE)
