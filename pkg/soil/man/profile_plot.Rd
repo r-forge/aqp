@@ -115,11 +115,11 @@ with(i, profile_plot(top, bottom, name, max_depth=250, col=color, cex.names=0.7)
 })
 
 # make an axis along the bottom
-vals <- with(sp1, seq(min(prop), max(prop), length=10))
+vals <- with(sp1, seq(min(prop, na.rm=TRUE), max(prop, na.rm=TRUE), length=10))
 par(mar=c(1,4,0,4))
 image(x=vals, y=1, z=matrix(vals), col=color.scale(vals, c(0,1,1),c(1,1,0),0), axes=FALSE, ylab='', xlab='')
 box(col='grey')
-axis(side=3, at=quantile(sp1$prop), cex.axis=0.9)
+axis(side=3, at=quantile(sp1$prop, na.rm=TRUE), cex.axis=0.9)
 
 
 
@@ -153,6 +153,7 @@ d.labels <- attr(d, 'Labels')
 new_order <- lastPP$xx[1:lastPP$Ntip]
 
 # add each profile image
+# note figure must be large enough to accomodate results...
 for(i in 1:lastPP$Ntip)
 {
 pedon_i <- subset(sp1, subset=id == d.labels[which(new_order == i)])
