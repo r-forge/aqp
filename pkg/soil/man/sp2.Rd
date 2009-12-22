@@ -6,7 +6,7 @@
 Soil Profile Data Example 2
 }
 \description{
-Soil horizonation and clay content for 617 soil profile from the Soil-Veg project.
+Soil horizonation and total carbon content for 617 soil profile from the Soil-Veg project.
 }
 \usage{data(sp2)}
 \format{
@@ -15,7 +15,7 @@ Soil horizonation and clay content for 617 soil profile from the Soil-Veg projec
     \item{\code{id}}{soil id}
     \item{\code{top}}{horizon upper boundary (inches)} 
     \item{\code{bottom}}{horizon lower boundary (inches)}
-    \item{\code{prop}}{clay content of the <2mm fraction, measured by hydrometer}
+    \item{\code{prop}}{total carbon content of the <2mm fraction}
   }
 }
 \details{
