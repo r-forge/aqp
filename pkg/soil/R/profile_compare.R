@@ -4,7 +4,7 @@
 ##############################################################
 
 
-
+# Seems to scale to 1000 profiles with 5 variables, could use optimization
 # TODO: convert soil_flag into a factor
 # function requires at least two attributes
 # hard coded reference to id
