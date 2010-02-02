@@ -8,3 +8,17 @@ munsell_lookup_v4
 ON matrix_wet_color_hue = hue AND matrix_wet_color_value = value AND matrix_wet_color_chroma = chroma 
 WHERE pedon_id ~~ 'SSGG%' 
 ORDER BY pedon_id, top ASC;
+
+
+-- sp3
+SELECT a.*, matrix_dry_color_hue as hue, matrix_dry_color_value as value, matrix_dry_color_chroma as chroma
+FROM
+(
+SELECT 'sjer' as site, pedon_id, top, bottom, clay, cec, ph, tc, x, y, z from deb_lab_data 
+UNION
+SELECT 'sfrec' as site, 'S07CASFREC-' || pedon_id as pedon_id, top, bottom, clay, cec, ph, tc, x, y, z from sfrec_lab_combined where clay is not NULL
+) as a
+LEFT JOIN horizon
+ON lower(a.pedon_id) = lower(horizon.pedon_id) and a.top = horizon.top
+ORDER by pedon_id, top ASC
+;
