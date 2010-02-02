@@ -65,8 +65,10 @@ d <- do.call('rbind', d.list)
 rm(d.list)
 
 # 120 seconds on 1.3 Ghz Intel Mac Mini
-# 788 Max Mb required
-system.time(p <- profile_compare(d, vars=c('p1','p2','p3','p4','p5'), max_d=50, k=0))
+Rprof(memory.profiling=TRUE)
+p <- profile_compare(d, vars=c('p1','p2','p3','p4','p5'), max_d=50, k=0)
+Rprof(NULL)
+
 # very fast
 h <- hclust(p)
 
