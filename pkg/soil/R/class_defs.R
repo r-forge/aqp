@@ -38,7 +38,14 @@ initProfileList <- function(d, depth_units='cm', idcol="id")
 		stop('Please install the "plyr" package.')
 	
 	# init list of SoilProfile
-	d.list <- dlply(.data=d, .variables=idcol, .fun=initProfile, depth_units=depth_units, idcol=idcol)
+	d.list <- list()
+	d.list$data <- dlply(.data=d, .variables=idcol, .fun=initProfile, depth_units=depth_units, idcol=idcol)
+	
+	# add the max depth for the entire list
+	d.list$max_depth <- max(sapply(d.list$data, max), na.rm=TRUE)
+	
+	# add the depth units for the entire list
+	d.list$depth_units <- depth_units
 	
 	# set class membership
 	class(d.list) <- c('SoilProfileList','list')
@@ -49,6 +56,14 @@ initProfileList <- function(d, depth_units='cm', idcol="id")
 # try it out:
 # sp1.list <- initProfileList(sp1)
 
+
+# default max() operator on SoilProfile class
+# just an extractor method for the 
+# max depth of the bottom-most horizon property
+max.SoilProfile <- function(x, ...)
+	{
+	return(x$max_depth)
+	}
 
 
 # default square bracket subsetting
@@ -68,7 +83,7 @@ print.SoilProfile <- function(x, ...)
 # very basic, could use some work
 print.SoilProfileList <- function(x, ...) 
 	{
-	cat("\nList of ", length(x) , " SoilProfile objects\n\n", sep='')
+	cat("\nList of ", length(x$data) , " SoilProfile objects, maximum depth ", x$max_depth, " (", x$depth_units, ")\n\n", sep='')
 	}
 
 # default plot method, could use some work...
