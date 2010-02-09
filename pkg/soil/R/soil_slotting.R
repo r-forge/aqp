@@ -29,7 +29,7 @@ unroll <- function(top, bottom, prop, max_depth, segment_size=NA, bottom_padding
 	
 	# but only if the number of NA to append is positive
 	if(sign(num.NA.append) == 1)
-	p.pad <- c(p.pad, rep(bottom_padding_value, times=num.NA.append))
+		p.pad <- c(p.pad, rep(bottom_padding_value, times=num.NA.append))
 	
 	# return vector, padded to max_depth
 	return(as.vector(p.pad))

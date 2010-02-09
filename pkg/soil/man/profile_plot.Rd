@@ -79,6 +79,7 @@ profile_plot(top=tops, bottom=bottoms, name=hz)
 #
 
 # use transformed soil colors
+data(sp1)
 missing.colors.idx <- which(is.na(sp1$r))
 sp1$soil_color <- NA
 sp1$soil_color[-missing.colors.idx] <- with(sp1[-missing.colors.idx,], rgb(r, g, b, max=0.7) )
@@ -94,7 +95,7 @@ with(i, profile_plot(top, bottom, name, max_depth=250, col=soil_color, cex.names
 # add depth scale
 par(mar=c(0,0,0,3))
 plot(1,1, type='n', xlab='', ylab='', axes=FALSE, ylim=c(250,0))
-axis(side=4)
+axis(side=4, line=-1, las=2, at=pretty(c(0,250)), labels=paste(pretty(c(0,250)), 'cm'))
 
 
 #
