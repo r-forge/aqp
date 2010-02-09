@@ -47,6 +47,9 @@ initProfileList <- function(d, depth_units='cm', idcol="id")
 	# add the depth units for the entire list
 	d.list$depth_units <- depth_units
 	
+	# keep count of number of profiles for later
+	d.list$num_profiles <- length(d.list$data)
+	
 	# set class membership
 	class(d.list) <- c('SoilProfileList','list')
 	
@@ -67,11 +70,13 @@ max.SoilProfile <- function(x, ...)
 
 
 # default square bracket subsetting
-# not sure if this is quite right
+# not sure if this is quite right, as the $ operator does not work as expected
 "[.SoilProfile" <- function(x, ...)
 	{
 	"[.data.frame"(x$data, ...)
 	}
+
+
 
 # default print method for a single profile object
 print.SoilProfile <- function(x, ...) 
@@ -83,7 +88,7 @@ print.SoilProfile <- function(x, ...)
 # very basic, could use some work
 print.SoilProfileList <- function(x, ...) 
 	{
-	cat("\nList of ", length(x$data) , " SoilProfile objects, maximum depth ", x$max_depth, " (", x$depth_units, ")\n\n", sep='')
+	cat("\nList of ", x$num_profiles , " SoilProfile objects, maximum depth ", x$max_depth, " (", x$depth_units, ")\n\n", sep='')
 	}
 
 # default plot method, could use some work...
