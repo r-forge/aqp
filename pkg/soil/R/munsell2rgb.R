@@ -1,6 +1,7 @@
 
 # convert munsell Hue, Value, Chroma into RGB
-munsell2rgb <- function(the_hue, the_value, the_chroma)
+# user can adjust how rgb() function will return and R-friendly color
+munsell2rgb <- function(the_hue, the_value, the_chroma, alpha=1, maxColorValue=1, return_triplets=FALSE)
 	{
 	# check for missing data
 	if(missing(the_hue) | missing(the_chroma) | missing(the_value))
@@ -29,7 +30,22 @@ munsell2rgb <- function(the_hue, the_value, the_chroma)
 			s[[i]] <- s.i
 		}
 	
-	# return mathching RGB values as a data frame
-	return(do.call('rbind', s))	
+	# convert to DF
+	s.df <- do.call('rbind', s)
+	
+	# if the user wants the raw RGB triplets, give those back
+	if(return_triplets)
+		return(s.df)
+	
+	# keep track of NA values
+	s.na <- which(is.na(s.df$r))
+	
+	# convert to R color
+	s.df$soil_color <- NA
+	s.df$soil_color[-s.na] <- with(s.df[-s.na,], rgb(r, g, b, alpha=alpha, maxColorValue=maxColorValue) )
+	
+	return(s.df$soil_color)
 	}
+	
+	
 	
