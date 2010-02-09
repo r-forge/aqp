@@ -7,7 +7,7 @@
 # generic function prototype
 profile_plot <- function(x, ...) UseMethod("profile_plot")
 
-# default method
+# default method, i.e. for a dataframe
 profile_plot.default <- function(top, bottom, name, max_depth, cols=NA, width=1, cex.names=0.5, ...)
 	{
 	
@@ -32,7 +32,8 @@ profile_plot.default <- function(top, bottom, name, max_depth, cols=NA, width=1,
 
 
 # method for a SoilProfile class
-profile_plot.SoilProfile <- function(d, color_col, width=1, cex.names=0.5, ...)
+# not finished
+profile_plot.SoilProfile <- function(d, color='soil_color', width=1, cex.names=0.5, ...)
 	{
 	# start a new plot:
 	par(mar=c(1,0,0,1))
@@ -49,36 +50,42 @@ profile_plot.SoilProfile <- function(d, color_col, width=1, cex.names=0.5, ...)
 	
 	
 # method for SoilProfileList class
-# not finished: needs to be further generalized... geometry calcs are not standardized
-profile_plot.SoilProfileList <- function(d, color_col, width=1, cex.names=0.5, ...)
+profile_plot.SoilProfileList <- function(d, color='soil_color', width=0.25, cex.names=0.5, ...)
 	{
+	# fudge factors
+	extra_x_space <- 1
+	extra_y_space <- 2
 	
-	par(mar=c(1,0,0,1))
-	plot(0, 0, type='n', xlim=c(1,width*(d$num_profiles+1.5)), ylim=c(d$max_depth+2, -2), axes=FALSE, ...)
+	# pre-compute nice range for depth axis, also used for plot init
+	depth_axis_intervals <- pretty(seq(from=0, to=d$max_depth, by=10))
+	
+	# set margins... consider moving outside of function
+	par(mar=c(0.5,0,0,1))
+	
+	# init plotting region
+	plot(0, 0, type='n', xlim=c(1, d$num_profiles+extra_x_space), ylim=c(max(depth_axis_intervals), -2), axes=FALSE)
 	
 	# add horizons
 	for(i in 1:d$num_profiles)
 		{
-		rect(i-(width/4), d$data[[i]][,'bottom'], i + (width/4), d$data[[i]][,'top'], col=d$data[[i]][, color_col])
+		rect(i-width, d$data[[i]][,'bottom'], i + width, d$data[[i]][,'top'], col=d$data[[i]][, color])
 	
 		# annotate with names
 		mid <- (d$data[[i]][, 'top'] + d$data[[i]][, 'bottom'])/2
-		text(i + (width/4), mid, d$data[[i]][,'name'], pos=4, offset=0.1, cex=cex.names)
+		text(i + width, mid, d$data[[i]][,'name'], pos=4, offset=0.1, cex=cex.names)
 		
 		# ID
 		text(i, -1, d$data[[i]]$id, pos=3, font=2, cex=cex.names)
 		}
 	
 	# axis:
-	axis(side=4, line=-3, las=2, at=pretty(c(0,d$max_depth)), labels=paste(pretty(c(0,d$max_depth)), 'cm'), cex.axis=0.75)
-	
-	
-	
-# 	debugging:
-# 	abline(v=1:d$num_profiles, lty=2)
-	
+	depth_axis_labels <- paste(depth_axis_intervals, d$depth_units)
+	axis(side=4, line=-2, las=2, at=depth_axis_intervals, labels=depth_axis_labels, cex.axis=cex.names)
+		
+ 	# debugging:
+ 	# abline(v=1:d$num_profiles, lty=2)
 	}
 	
-# profile_plot(sp1.list, color_col='soil_color')	
+# profile_plot(sp1.list, color='soil_color')	
 	
 	

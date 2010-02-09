@@ -1,6 +1,6 @@
-\name{initProfile}
+\name{initProfileList}
 \Rdversion{1.1}
-\alias{initProfile}
+\alias{initProfileList}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 %%  ~~function to do ... ~~
@@ -9,7 +9,7 @@
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
 }
 \usage{
-initProfile(d, depth_units = "cm", idcol = "id")
+initProfileList(d, depth_units = "cm", idcol = "id")
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -56,23 +56,27 @@ initProfile(d, depth_units = "cm", idcol = "id")
 ## The function is currently defined as
 function(d, depth_units='cm', idcol="id")
 	{
+	# need to 
+	if(!require(plyr))
+		stop('Please install the "plyr" package.')
 	
-	# probably want to do some kind of checking depth logic here
+	# init list of SoilProfile
+	d.list <- list()
+	d.list$data <- dlply(.data=d, .variables=idcol, .fun=initProfile, depth_units=depth_units, idcol=idcol)
 	
-	# possibly some automatic color conversion here 
+	# add the max depth for the entire list
+	d.list$max_depth <- max(sapply(d.list$data, max), na.rm=TRUE)
 	
-	# using a list to store parts
-	d.temp <- list(
-	id=unique(as.character(d[, idcol])),
-	depth_units=depth_units,
-	nhz=nrow(d),
-	max_depth=max(c(d$top, d$bottom), na.rm=TRUE),
-	data=d
-	)
+	# add the depth units for the entire list
+	d.list$depth_units <- depth_units
 	
-	# set class membership and inheritance
-	class(d.temp) <- c('SoilProfile','data.frame')
-	return(d.temp)
+	# keep count of number of profiles for later
+	d.list$num_profiles <- length(d.list$data)
+	
+	# set class membership
+	class(d.list) <- c('SoilProfileList','list')
+	
+	return(d.list)
 	}
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
