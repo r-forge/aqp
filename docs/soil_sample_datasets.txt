@@ -9,6 +9,18 @@ ON matrix_wet_color_hue = hue AND matrix_wet_color_value = value AND matrix_wet_
 WHERE pedon_id ~~ 'SSGG%' 
 ORDER BY pedon_id, top ASC;
 
+-- sp2
+SELECT description.pedon_id as id, top, bottom, bound_distinct, bound_topography, name, texture, field_pct_clay as prop, structure_grade_1 as structure_grade, structure_size_1 as structure_size, structure_type_1 as structure_type, stickiness, plasticity, field_ph, matrix_wet_color_hue as hue, matrix_wet_color_value as value, matrix_wet_color_chroma as chroma, r, g, b 
+FROM 
+description
+JOIN
+horizon USING (pedon_id)
+LEFT JOIN 
+munsell_lookup_v4 
+ON matrix_wet_color_hue = hue AND matrix_wet_color_value = value AND matrix_wet_color_chroma = chroma 
+WHERE project_id = 9
+ORDER BY pedon_id, top ASC;
+
 
 -- sp3
 SELECT a.*, matrix_dry_color_hue as hue, matrix_dry_color_value as value, matrix_dry_color_chroma as chroma
@@ -22,3 +34,4 @@ LEFT JOIN horizon
 ON lower(a.pedon_id) = lower(horizon.pedon_id) and a.top = horizon.top
 ORDER by pedon_id, top ASC
 ;
+

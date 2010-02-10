@@ -62,5 +62,12 @@ cols=c(1,1,1,1), layout=c(4,1),
 xlab='Property', ylab='Depth (cm)', 
 main='Soil Profile Averaging by Slotting')
 
+
+# plot profiles
+sp2$soil_color <- with(sp2, munsell2rgb(hue, value, chroma))
+sp2.list <- initProfileList(sp2)
+profile_plot(sp2.list, color="soil_color")
+
+
 }
 \keyword{datasets}
