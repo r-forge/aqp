@@ -76,6 +76,13 @@ max.SoilProfile <- function(x, ...)
 	"[.data.frame"(x$data, ...)
 	}
 
+# interesting effect:
+# sp.list[1,] --> returns the first horizon from all objects
+# sp.list[,1] --> returns all horizons from the first object
+"[.SoilProfileList" <- function(x, ...)
+	{
+	"[.data.frame"(x$data, ...)
+	}
 
 
 # default print method for a single profile object

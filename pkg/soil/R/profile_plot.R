@@ -8,6 +8,7 @@
 profile_plot <- function(x, ...) UseMethod("profile_plot")
 
 # default method, i.e. for a dataframe
+# depreciated
 profile_plot.default <- function(top, bottom, name, max_depth, cols=NA, width=1, cex.names=0.5, ...)
 	{
 	
@@ -50,7 +51,7 @@ profile_plot.SoilProfile <- function(d, color='soil_color', width=1, cex.names=0
 	
 	
 # method for SoilProfileList class
-profile_plot.SoilProfileList <- function(d, color='soil_color', width=0.25, cex.names=0.5, ...)
+profile_plot.SoilProfileList <- function(d, color='soil_color', width=0.25, cex.names=0.5, plot.order=1:d$num_profiles, add=FALSE, scaling.factor=1, y.offset=0, ...)
 	{
 	# fudge factors
 	extra_x_space <- 1
@@ -62,25 +63,35 @@ profile_plot.SoilProfileList <- function(d, color='soil_color', width=0.25, cex.
 	# set margins... consider moving outside of function
 	par(mar=c(0.5,0,0,1))
 	
-	# init plotting region
-	plot(0, 0, type='n', xlim=c(1, d$num_profiles+extra_x_space), ylim=c(max(depth_axis_intervals), -2), axes=FALSE)
+	# init plotting region, unless we are appending to an existing plot
+	if(!add)
+		plot(0, 0, type='n', xlim=c(1, d$num_profiles+extra_x_space), ylim=c(max(depth_axis_intervals), -2), axes=FALSE)
 	
-	# add horizons
+	# add horizons in specified order	
 	for(i in 1:d$num_profiles)
 		{
-		rect(i-width, d$data[[i]][,'bottom'], i + width, d$data[[i]][,'top'], col=d$data[[i]][, color])
+		# convert linear sequence into plotting order
+		profile_i <- plot.order[i]
+		
+		# generate rectangle geometry
+		y0 <- (d$data[[profile_i]][,'bottom'] * scaling.factor) + y.offset
+		y1 <- (d$data[[profile_i]][,'top'] * scaling.factor) + y.offset
+		
+		# make rectangles (horizons)
+		rect(i-width, y0, i + width, y1, col=d$data[[profile_i]][, color])
 	
 		# annotate with names
-		mid <- (d$data[[i]][, 'top'] + d$data[[i]][, 'bottom'])/2
-		text(i + width, mid, d$data[[i]][,'name'], pos=4, offset=0.1, cex=cex.names)
+		mid <- ( y1 + y0 )/2
+		text(i + width, mid, d$data[[profile_i]][,'name'], pos=4, offset=0.1, cex=cex.names)
 		
 		# ID
-		text(i, -1, d$data[[i]]$id, pos=3, font=2, cex=cex.names)
+		text(i, y.offset-1, d$data[[profile_i]]$id, pos=3, font=2, cex=cex.names+(0.2*cex.names))
 		}
 	
 	# axis:
+	depth_axis_tick_locations <- (depth_axis_intervals * scaling.factor) + y.offset
 	depth_axis_labels <- paste(depth_axis_intervals, d$depth_units)
-	axis(side=4, line=-2, las=2, at=depth_axis_intervals, labels=depth_axis_labels, cex.axis=cex.names)
+	axis(side=4, line=-2, las=2, at=depth_axis_tick_locations, labels=depth_axis_labels, cex.axis=cex.names)
 		
  	# debugging:
  	# abline(v=1:d$num_profiles, lty=2)

@@ -3,31 +3,24 @@
 \alias{profile_plot.SoilProfileList}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-%%  ~~function to do ... ~~
+Plot a collection of SoilProfile objects.
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+...
 }
 \usage{
-profile_plot.SoilProfileList(d, color = "soil_color", width = 0.25, cex.names = 0.5, ...)
+profile_plot.SoilProfileList(d, color = "soil_color", width = 0.25, cex.names = 0.5, plot_order=1:d$num_profiles, add=FALSE, scaling.factor=1, y.offset=0, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{d}{
-%%     ~~Describe \code{d} here~~
-}
-  \item{color}{
-%%     ~~Describe \code{color} here~~
-}
-  \item{width}{
-%%     ~~Describe \code{width} here~~
-}
-  \item{cex.names}{
-%%     ~~Describe \code{cex.names} here~~
-}
-  \item{\dots}{
-%%     ~~Describe \code{\dots} here~~
-}
+  \item{d}{a SoilProfileList object}
+  \item{color}{the name of the column containing R-compatible color descriptions}
+  \item{width}{scaling of profile widths}
+  \item{cex.names}{character scaling applied to horizon names}
+  \item{plot.order}{a vector describing the order in which individual SoilProfile objects from the parent should be plotted}
+  \item{add}{add to an existing figure} 
+  \item{scaling.factor}{vertical scaling of the profile heights} 
+  \item{y.offset}{vertical offset for top of profiles} 
 }
 \details{
 %%  ~~ If necessary, more details than the description above ~~
@@ -52,49 +45,22 @@ profile_plot.SoilProfileList(d, color = "soil_color", width = 0.25, cex.names = 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+\code{\link{initProfileList}}
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
+library(soil)
+data(sp1)
 
-## The function is currently defined as
-function(d, color='soil_color', width=0.25, cex.names=0.5, ...)
-	{
-	# fudge factors
-	extra_x_space <- 1
-	extra_y_space <- 2
-	
-	# pre-compute nice range for depth axis, also used for plot init
-	depth_axis_intervals <- pretty(seq(from=0, to=d$max_depth, by=10))
-	
-	# set margins... consider moving outside of function
-	par(mar=c(0.5,0,0,1))
-	
-	# init plotting region
-	plot(0, 0, type='n', xlim=c(1, d$num_profiles+extra_x_space), ylim=c(max(depth_axis_intervals), -2), axes=FALSE)
-	
-	# add horizons
-	for(i in 1:d$num_profiles)
-		{
-		rect(i-width, d$data[[i]][,'bottom'], i + width, d$data[[i]][,'top'], col=d$data[[i]][, color])
-	
-		# annotate with names
-		mid <- (d$data[[i]][, 'top'] + d$data[[i]][, 'bottom'])/2
-		text(i + width, mid, d$data[[i]][,'name'], pos=4, offset=0.1, cex=cex.names)
-		
-		# ID
-		text(i, -1, d$data[[i]]$id, pos=3, font=2, cex=cex.names)
-		}
-	
-	# axis:
-	depth_axis_labels <- paste(depth_axis_intervals, d$depth_units)
-	axis(side=4, line=-2, las=2, at=depth_axis_intervals, labels=depth_axis_labels, cex.axis=cex.names)
-		
- 	# debugging:
- 	# abline(v=1:d$num_profiles, lty=2)
-	}
+# add color vector
+missing.colors.idx <- which(is.na(sp1$r))
+sp1$soil_color <- NA
+sp1$soil_color[-missing.colors.idx] <- with(sp1[-missing.colors.idx,], rgb(r, g, b, max=0.7) )
+
+# convert to SoilPofileList class object
+sp1.list <- initProfileList(sp1)
+
+# plot
+profile_plot(sp1.list)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
