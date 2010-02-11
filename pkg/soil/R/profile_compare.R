@@ -32,6 +32,7 @@ profile_compare <- function(s, vars, max_d, k, replace_na=FALSE, add_soil_flag=F
 	
 	
 	# this approach requires a named list of soil properties
+	cat(paste("Unrolling ", length(levels(s$id)), " Profiles\n", sep=""))
 	s.unrolled <- by(s, s$id, function(di, p=vars, d=max_d) 
 		{
 		# init a temp list
@@ -68,6 +69,10 @@ profile_compare <- function(s, vars, max_d, k, replace_na=FALSE, add_soil_flag=F
 	
 	# init a list to store distance matrices, one for each depth interval
 	d <- list()
+	
+	# init a progress bar
+	pb <- txtProgressBar(min=1, max=max_d, style=3)
+	cat("Computing Dissimilarity Matrices\n")
 	for(i in 1:max_d)
 	{
 		# for each z, generate distance matrix
@@ -105,8 +110,11 @@ profile_compare <- function(s, vars, max_d, k, replace_na=FALSE, add_soil_flag=F
 			# clean-up
 			rm(m,m.ref)
 			}
+	# update progress bar
+	setTxtProgressBar(pb, i)
 	}
-	
+	# finish progress bar	
+	close(pb)
 	
 	if(replace_na)
 		{
