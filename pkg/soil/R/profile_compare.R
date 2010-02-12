@@ -3,6 +3,8 @@
 ## profile classification functions ##
 ##############################################################
 
+## consider using 'ff' package for file-based storage of VERY large objects. Probably just the dissimilarity matrix
+
 
 # Seems to scale to 1000 profiles with 5 variables, could use optimization
 # TODO: convert soil_flag into a factor
@@ -101,15 +103,18 @@ profile_compare <- function(s, vars, max_d, k, replace_na=FALSE, add_soil_flag=F
 			
 			# generate an appropriately formatted dissimilarity matrix, full of NA
 			m.ref <- lower.tri(matrix(ncol=n.profiles,nrow=n.profiles), diag=FALSE)
-			m <- m.ref
-			m[which(m.ref == FALSE)] <- NA
+			m.ref[which(m.ref == FALSE)] <- NA
 			
 			# assign to this slice
-			d[[i]] <- as.dist(m)
+			d[[i]] <- as.dist(m.ref)
 			
 			# clean-up
-			rm(m,m.ref)
+			rm(m.ref)
 			}
+			
+	# cleanup: not sure if this helps... seems to
+	gc()
+		
 	# update progress bar
 	setTxtProgressBar(pb, i)
 	}
@@ -128,8 +133,6 @@ profile_compare <- function(s, vars, max_d, k, replace_na=FALSE, add_soil_flag=F
 		d[[i]] <- d[[i]] * w[i]
 	
 	
-	
-	
 	# optionally return the distances for each depth, after weighting
 	if(return_depth_distances)
 		return(d)
@@ -138,17 +141,16 @@ profile_compare <- function(s, vars, max_d, k, replace_na=FALSE, add_soil_flag=F
 	# compute the total distance, for all dept intervals,
 	# by pedon:
 	# consider using mean diss, or something different that total
+	cat("Computing Profile Total Dissimilarities\n")
 	d.vect <- apply(t(sapply(d, '[')), 2, sum, na.rm=TRUE)
 	
-	
 	# now make into a combined distance matrix
-	m.ref <- lower.tri(matrix(ncol=n.profiles,nrow=n.profiles), diag=FALSE)
-	m <- m.ref
-	m[which(m.ref == FALSE)] <- NA
-	m[which(m.ref)] <- d.vect
+	m.ref <- lower.tri(matrix(ncol=n.profiles, nrow=n.profiles), diag=FALSE)
+	m.ref[which(m.ref == FALSE)] <- NA
+	m.ref[which(m.ref)] <- d.vect
 	
 	# coerce to 'dist' class
-	D <- as.dist(m)
+	D <- as.dist(m.ref)
 	
 	# update labels from our list of hz-dissimilarities
 	attr(D, 'Labels') <- attr(d[[1]], 'Labels')
