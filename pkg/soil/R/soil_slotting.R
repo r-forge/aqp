@@ -6,6 +6,7 @@
 # convert a set of horizon depths and property into a continuous sequence
 # returning a vector of standardized length
 # suitable for slotting
+## segment_size argument does nothing
 unroll <- function(top, bottom, prop, max_depth, segment_size=NA, bottom_padding_value=NA)
 	{
 	

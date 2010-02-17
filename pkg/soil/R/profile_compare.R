@@ -12,7 +12,7 @@
 # hard coded reference to id
 # seems to work with different total depths... need to check
 # set k to 0 for no depth weighting 
-profile_compare <- function(s, vars, max_d, k, replace_na=FALSE, add_soil_flag=FALSE, return_depth_distances=FALSE)
+profile_compare <- function(s, vars, max_d, k, sample_interval=NA, replace_na=FALSE, add_soil_flag=FALSE, return_depth_distances=FALSE)
 	{
 	
 	# check to make sure that there is an 'id' column
@@ -29,8 +29,17 @@ profile_compare <- function(s, vars, max_d, k, replace_na=FALSE, add_soil_flag=F
 	# number of variables
 	n.vars <- length(vars)
 	
+	# sequence describing depth slice indices	
+	# use a sequence from 1 ... max depth
+	depth_slice_seq <- 1:max_d
+	
+	# use decimated sampling if requested
+	if(!is.na(sample_interval) & sample_interval != 1)
+		depth_slice_seq <- depth_slice_seq[depth_slice_seq %% sample_interval == 1]
+		
+		
 	# compute a weighting vector based on k	
-	w <- 1 * exp(-k*1:max_d)
+	w <- 1 * exp(-k * depth_slice_seq)
 	
 	
 	# this approach requires a named list of soil properties
@@ -73,14 +82,16 @@ profile_compare <- function(s, vars, max_d, k, replace_na=FALSE, add_soil_flag=F
 	d <- list()
 	
 	# init a progress bar
-	pb <- txtProgressBar(min=1, max=max_d, style=3)
+	pb <- txtProgressBar(min=1, max=max(seq_along(depth_slice_seq)), style=3)
 	cat("Computing Dissimilarity Matrices\n")
-	for(i in 1:max_d)
+	
+	# 'i' is not the depth slice, rather, the index
+	for(i in seq_along(depth_slice_seq))
 	{
 		# for each z, generate distance matrix
 		# note that we have to pass in variable 'i', as this is the 
 		# current depth segment
-		ps <- sapply(s.unrolled, function(dz, z_i=i) { dz[z_i,] })
+		ps <- sapply(s.unrolled, function(dz, z_i=depth_slice_seq[i]) { dz[z_i,] })
 		sp <- t(ps)
 		
 		# compute distance metric for this depth
@@ -102,7 +113,7 @@ profile_compare <- function(s, vars, max_d, k, replace_na=FALSE, add_soil_flag=F
 		# otherwise contribute no dissimilarity to the total
 		else
 			{
-			print(paste(round(proportion_non_NA, 2), 'non-missing in slice', i))
+			print(paste(round(proportion_non_NA, 2), 'non-missing in slice', depth_slice_seq[i]))
 			
 			# generate an appropriately formatted dissimilarity matrix, full of NA
 			m.ref <- lower.tri(matrix(ncol=n.profiles,nrow=n.profiles), diag=FALSE)
@@ -125,7 +136,7 @@ profile_compare <- function(s, vars, max_d, k, replace_na=FALSE, add_soil_flag=F
 	
 	
 	# debugging information on memory consumption
-	cat(paste(" [size of d:", round(object.size(d) / 1024^2), "Mb]"))
+	cat(paste(" [size of d:", round(object.size(d) / 1024^2, 1), "Mb] "))
 	
 	}
 	# finish progress bar	
@@ -139,7 +150,7 @@ profile_compare <- function(s, vars, max_d, k, replace_na=FALSE, add_soil_flag=F
 		}
 		
 	# perform depth-weighting 	
-	for(i in 1:max_d)
+	for(i in seq_along(depth_slice_seq))
 		d[[i]] <- d[[i]] * w[i]
 	
 	
@@ -171,3 +182,5 @@ profile_compare <- function(s, vars, max_d, k, replace_na=FALSE, add_soil_flag=F
 	# return the distance matrix, class = 'dist'
 	return(D)	
 	}
+	
+	
