@@ -5,6 +5,8 @@
 
 ## consider using 'ff' package for file-based storage of VERY large objects. Probably just the dissimilarity matrix
 
+## soil.slot() would be a better approach than using every nth depth slice
+
 
 # Seems to scale to 1000 profiles with 5 variables, could use optimization
 # TODO: convert soil_flag into a factor
@@ -136,7 +138,7 @@ profile_compare <- function(s, vars, max_d, k, sample_interval=NA, replace_na=FA
 	
 	
 	# debugging information on memory consumption
-	cat(paste(" [size of d:", round(object.size(d) / 1024^2, 1), "Mb] "))
+	cat(paste(" [size of D:", round(object.size(d) / 1024^2, 1), "Mb] "))
 	
 	}
 	# finish progress bar	

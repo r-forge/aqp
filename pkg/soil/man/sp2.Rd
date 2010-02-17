@@ -1,72 +1,59 @@
 \name{sp2}
-\Rdversion{1.1}
 \alias{sp2}
 \docType{data}
-\title{
-Soil Profile Data Example 2
-}
-\description{
-Soil horizonation and total carbon content for 617 soil profile from the Soil-Veg project.
-}
+\title{Honcut Creek Soil Profile Data}
+\description{A collection of 18 soil profiles, consisting of select soil morphologic attributes, associated with a stratigraphic study conducted near Honcut Creek, California.}
 \usage{data(sp2)}
 \format{
-  A data frame with 2614 observations on the following 4 variables.
+  A data frame with 154 observations on the following 21 variables.
   \describe{
-    \item{\code{id}}{soil id}
-    \item{\code{top}}{horizon upper boundary (inches)} 
-    \item{\code{bottom}}{horizon lower boundary (inches)}
-    \item{\code{prop}}{total carbon content of the <2mm fraction}
+    \item{\code{id}}{profile id}
+    \item{\code{top}}{horizon top in cm}
+    \item{\code{bottom}}{horizon bottom in cm}
+    \item{\code{bound_distinct}}{horizon lower boundary distinctness class}
+    \item{\code{bound_topography}}{horizon lower boundary topography class}
+    \item{\code{name}}{horizon name}
+    \item{\code{texture}}{USDA soil texture class}
+    \item{\code{prop}}{field-estimated clay content}
+    \item{\code{structure_grade}}{soil structure grade}
+    \item{\code{structure_size}}{soil structure size}
+    \item{\code{structure_type}}{soil structure type}
+    \item{\code{stickiness}}{stickiness}
+    \item{\code{plasticity}}{plasticity}
+    \item{\code{field_ph}}{field-measured pH}
+    \item{\code{hue}}{Munsell hue}
+    \item{\code{value}}{Munsell value}
+    \item{\code{chroma}}{Munsell chroma}
+    \item{\code{r}}{RGB red component}
+    \item{\code{g}}{RGB green component}
+    \item{\code{b}}{RGB blue component}
+    \item{\code{soil_color}}{R-friendly encoding of soil color}
   }
 }
-\details{
-%%  ~~ If necessary, more details than the __description__ above ~~
-}
+\details{}
 \source{
-%%  ~~ reference to a publication or URL from which the data were obtained ~~
+Busacca, Alan J.; Singer, Michael J.; Verosub, Kenneth L. 1989. Late Cenozoic stratigraphy of the Feather and Yuba rivers area, California, with a section on soil development in mixed alluvium at Honcut Creek. USGS Bulletin 1590-G.
 }
-\references{
-%%  ~~ possibly secondary sources and usages ~~
-}
+\references{}
 \examples{
-# prep environment
-require(lattice)
-require(soil)
+library(soil)
 data(sp2)
 
-
-# slot all profiles into 1cm depth slices
-s1 <- soil.slot(data=sp2)
-
-# check
-xyplot(top ~ p.mean + I(p.mean + p.sd) + I(p.mean - p.sd), 
-data=s1, type='S', horizontal=TRUE, col=1, lty=c(1,2,2), 
-panel=panel.superpose, ylim=c(110,-5))
-
-# other segment sizes
-# 5cm
-s5 <- soil.slot(data=sp2, seg_size=5)
-
-# 10cm segments:
-s10 <- soil.slot(data=sp2, seg_size=10)
-
-# 20cm
-s20 <- soil.slot(data=sp2, seg_size=20)
-
-# combined viz
-g2 <- make.groups(s1, s5, s10, s20)
-
-xyplot(cbind(top,bottom) ~ p.mean | which, groups=which, data=g2, 
-ylim=c(120,-5), as.table=TRUE, 
-panel=panel.soil_profile, scales=list(y=list(tick.number=10)),
-cols=c(1,1,1,1), layout=c(4,1), 
-xlab='Property', ylab='Depth (cm)', 
-main='Soil Profile Averaging by Slotting')
-
-
-# plot profiles
-sp2$soil_color <- with(sp2, munsell2rgb(hue, value, chroma))
+# convert into SoilProfileList and plot
 sp2.list <- initProfileList(sp2)
-profile_plot(sp2.list, color="soil_color")
+profile_plot(sp2.list)
+
+
+# look at numerical distances between profiles
+d <- profile_compare(sp2, vars=c('prop','field_ph','stickiness','plasticity'), max_d=100, k=0.01)
+
+# better plotting with ape package:
+require(ape)
+require(cluster)
+h <- diana(d)
+p <- as.phylo(as.hclust(h))
+plot(ladderize(p), cex=0.75, label.offset=1, no.margin=TRUE)
+tiplabels(col=cutree(h, 3), pch=15)
 
 
 }
