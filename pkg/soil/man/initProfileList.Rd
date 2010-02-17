@@ -2,9 +2,7 @@
 \Rdversion{1.1}
 \alias{initProfileList}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{
-%%  ~~function to do ... ~~
-}
+\title{Intitalize a SoilProfileList Object}
 \description{
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
 }

@@ -2,9 +2,7 @@
 \Rdversion{1.1}
 \alias{panel.soil_profile}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{
-%%  ~~function to do ... ~~
-}
+\title{Panel Functions for Plotting Soil Profile Data}
 \description{
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
 }

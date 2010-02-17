@@ -27,7 +27,6 @@ If the resulting SPDF are to be used for geostatistical interpolation or simulat
 \author{Dylan E Beaudette}
 \note{ ~~further notes~~ 
 
- ~Make other sections like Warning with \section{Warning }{....} ~
 }
 \seealso{\code{\link{plot_slices}}}
 \examples{

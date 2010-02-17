@@ -24,12 +24,13 @@ A lookup table of interpolated Munsell color chips for common soil colors.
 See \code{munsell2rgb} for conversion examples.
 }
 \source{
-\item{http://www.cis.rit.edu/mcsl/online/munsell.php}{Color chip XYZ values}
+Color chip XYZ values: http://www.cis.rit.edu/mcsl/online/munsell.php
 }
 \references{
-\item{http://www.brucelindbloom.com/index.html?ColorCalcHelp.html}{Color conversion equations}
-\item{http://casoilresource.lawr.ucdavis.edu/drupal/node/201}{Methods used to generate this table}
-
+	\describe{
+		\item{http://www.brucelindbloom.com/index.html?ColorCalcHelp.html}{Color conversion equations}
+		\item{http://casoilresource.lawr.ucdavis.edu/drupal/node/201}{Methods used to generate this table}
+	}
 }
 \examples{
 data(munsell)

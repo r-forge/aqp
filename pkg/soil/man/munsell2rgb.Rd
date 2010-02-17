@@ -17,7 +17,7 @@ munsell2rgb(the_hue, the_value, the_chroma, alpha=1, maxColorValue=1, return_tri
   \item{the_value}{a vector of one or more values}
   \item{the_chroma}{a vector of one or more chromas}
   \item{alpha}{alpha channel value (for transparency effects)}
-  \item{maxColorValue}{maximum RGB color value (see\code{\link{rgb()})}
+  \item{maxColorValue}{maximum RGB color value (see\code{\link{rgb})}}
   	\item{return_triplets}{should the function return raw RGB triplets instead of an R color}
 }
 \details{This function generalizes to vectorized usage, as long as the lenght of each argument is the same.}
