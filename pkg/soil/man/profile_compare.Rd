@@ -6,8 +6,9 @@
 Performs a numerical comparison of soil profiles using named properties, based on a weighted, summed, depth-segment-aligned dissimilarity calculation.
 }
 \usage{
-profile_compare(s, vars, max_d, k, replace_na = FALSE, 
-add_soil_flag = FALSE, return_depth_distances = FALSE)
+profile_compare(s, vars, max_d, k, sample_interval=NA, 
+replace_na = FALSE, add_soil_flag = FALSE, 
+return_depth_distances = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -15,13 +16,12 @@ add_soil_flag = FALSE, return_depth_distances = FALSE)
   \item{vars}{a vector with named properties that will be used in the comparison}
   \item{max_d}{depth-slices up to this depth are considered in the comparison}
   \item{k}{a depth-weighting coeficient, use '0' for no depth-weighting (see examples below)}
+  \item{sample_interval}{use every n-th depth slice instead of every depth slice, useful for working with > 1000 profiles at a time}
   \item{replace_na}{if TRUE, missing data are replaced by maximum dissimilarity (FALSE)}
   \item{add_soil_flag}{(experimental) addition of 'soil'/'non-soil' flag for use when comparing soil profiles with large differences in depth (FALSE)}
   \item{return_depth_distances}{return intermediate, depth-wise dissimilarity results (FALSE)}
 }
-\details{
-  ~~ If necessary, more details than the description above ~~
-}
+\details{}
 \value{
 a dissimilarity matrix object of class 'dist'
 }
@@ -65,6 +65,57 @@ d.sam <- sammon(d)
 # simple plot
 plot(d.sam$points, type = "n", xlim=range(d.sam$points[,1] * 1.5))
 text(d.sam$points, labels=row.names(d.sam$points), cex=0.5, col=cutree(h, 3))
+
+
+## 4. try out the 'sample_interval' argument
+# compute using sucessively larger sampling intervals
+d <- profile_compare(sp1, vars=c('prop','group'), max_d=100, k=0.01)
+d.2 <- profile_compare(sp1, vars=c('prop','group'), max_d=100, k=0.01, sample_interval=2)
+d.10 <- profile_compare(sp1, vars=c('prop','group'), max_d=100, k=0.01, sample_interval=10)
+d.20 <- profile_compare(sp1, vars=c('prop','group'), max_d=100, k=0.01, sample_interval=20)
+
+# check the results via hclust / dendrograms
+oldpar <- par(mfcol=c(1,4))
+plot(as.dendrogram(hclust(d)), main='No Sampling')
+plot(as.dendrogram(hclust(d.2)), main='Every 2nd Depth')
+plot(as.dendrogram(hclust(d.10)), main='Every 10th Depth')
+plot(as.dendrogram(hclust(d.20)), main='Every 20th Depth')
+par(oldpar)
+
+# check results via MDS
+library(MASS)
+s <- sammon(d)
+s.2 <- sammon(d.2)
+s.10 <- sammon(d.10)
+s.20 <- sammon(d.20)
+
+# check
+plot(s$points, axes=FALSE, xlab='', ylab='') ; box()
+points(s.2$points, col=2, cex=0.75)
+points(s.10$points, col=4, cex=0.5)
+points(s.20$points, col=5, cex=0.25)
+
+# convert to mostly consistent scale
+sp <- scale(s$points)
+sp.2 <- scale(s.2$points)
+sp.10 <- scale(s.10$points)
+sp.20 <- scale(s.20$points)
+
+# label mid-points
+label.pos <- rbind(
+(sp.2 + sp) / 2,
+(sp.10 + sp.2) / 2,
+(sp.20 + sp.10) / 2
+)
+
+# check
+plot(rbind(sp,sp.2,sp.10,sp.20), type='n', axes=FALSE, xlab='', ylab='') ; box()
+points(rbind(sp,sp.2,sp.10,sp.20), pch=15, col=rep(1:4, each=9), cex=0.75)
+text(label.pos, label=rep(1:3, each=9), cex=0.75, pos=1)
+arrows(sp[,1], sp[,2], sp.2[,1], sp.2[,2], len=0.08, col='grey')
+arrows(sp.2[,1], sp.2[,2], sp.10[,1], sp.10[,2], len=0.08, col='grey')
+arrows(sp.10[,1], sp.10[,2], sp.20[,1], sp.20[,2], len=0.08, col='grey')
+
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
