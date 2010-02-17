@@ -51,6 +51,7 @@ profile_plot.SoilProfile <- function(d, color='soil_color', width=1, cex.names=0
 	
 	
 # method for SoilProfileList class
+## TODO: add a ylim argument to truncate very deep soil profiles
 profile_plot.SoilProfileList <- function(d, color='soil_color', width=0.25, cex.names=0.5, plot.order=1:d$num_profiles, add=FALSE, scaling.factor=1, y.offset=0, ...)
 	{
 	# fudge factors
