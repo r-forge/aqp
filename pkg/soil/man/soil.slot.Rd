@@ -15,10 +15,12 @@ soil.slot(data, seg_size = NA, seg_vect = NA, return_raw = FALSE, use.wts = FALS
 \arguments{
   \item{data}{
 A dataframe representing a 'stack' of soil profiles and having the following format:
-\item{id}{An id that is unique across soil profiles within the dataframe.}
-\item{top}{The horizon top boundary.}
-\item{bottom}{The horizon bottom boundary.}
-\item{prop}{A property to be aggregated. If numeric mean and standard deviation are returned, if character class-wise probabilities are returned.}
+	\describe{
+		\item{id}{An id that is unique across soil profiles within the dataframe.}
+		\item{top}{The horizon top boundary.}
+		\item{bottom}{The horizon bottom boundary.}
+		\item{prop}{A property to be aggregated. If numeric mean and standard deviation are returned, if character class-wise probabilities are returned.}
+	}
 }
   \item{seg_size}{
 User-degined segment size, default is 1.

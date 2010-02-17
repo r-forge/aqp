@@ -93,6 +93,9 @@ profile_compare <- function(s, vars, max_d, k, replace_na=FALSE, add_soil_flag=F
 		# use some criteria for deciding when to keep the dissimilarities for this slice
 		if(proportion_non_NA >= 0.5)
 			{
+			## this is where we run into memory-size limitations
+			## an ff object would help here... however it can not preserve all of the information 
+			## that a list can... we would need to store these data as raw matrices
 			d[[i]] <- daisy(sp, metric='gower')
 			}
 		
@@ -105,6 +108,7 @@ profile_compare <- function(s, vars, max_d, k, replace_na=FALSE, add_soil_flag=F
 			m.ref <- lower.tri(matrix(ncol=n.profiles,nrow=n.profiles), diag=FALSE)
 			m.ref[which(m.ref == FALSE)] <- NA
 			
+			## this is where we run into memory-size limitations
 			# assign to this slice
 			d[[i]] <- as.dist(m.ref)
 			
@@ -117,6 +121,12 @@ profile_compare <- function(s, vars, max_d, k, replace_na=FALSE, add_soil_flag=F
 		
 	# update progress bar
 	setTxtProgressBar(pb, i)
+	
+	
+	
+	# debugging information on memory consumption
+	cat(paste(" [size of d:", round(object.size(d) / 1024^2), "Mb]"))
+	
 	}
 	# finish progress bar	
 	close(pb)
