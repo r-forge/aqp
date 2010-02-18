@@ -81,10 +81,10 @@ profile_compare <- function(s, vars, max_d, k, sample_interval=NA, replace_na=FA
 	
 	
 	# init a list to store distance matrices, one for each depth interval
-	d <- list()
+	d <- vector('list', max(seq_along(depth_slice_seq)))
 	
 	# init a progress bar
-	pb <- txtProgressBar(min=1, max=max(seq_along(depth_slice_seq)), style=3)
+	pb <- txtProgressBar(min=1, max=max(seq_along(depth_slice_seq)), style=3, width=40)
 	cat("Computing Dissimilarity Matrices\n")
 	
 	# 'i' is not the depth slice, rather, the index
