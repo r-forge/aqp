@@ -36,16 +36,19 @@ Busacca, Alan J.; Singer, Michael J.; Verosub, Kenneth L. 1989. Late Cenozoic st
 }
 \references{}
 \examples{
-library(soil)
 data(sp2)
 
 # convert into SoilProfileList and plot
+# plotting order, based on the dated surface each soil was described on
+p.surface <- as.numeric(aggregate(sp2$surface, by=list(sp2$id), unique)$x)
+p.order <- order(p.surface)
+
 sp2.list <- initProfileList(sp2)
-profile_plot(sp2.list)
+profile_plot(sp2.list, plot.order=p.order)
 
 
 # look at numerical distances between profiles
-d <- profile_compare(sp2, vars=c('prop','field_ph','stickiness','plasticity'), max_d=100, k=0.01)
+d <- profile_compare(sp2, vars=c('prop','field_ph','hue','value'), max_d=100, k=0.01)
 
 # better plotting with ape package:
 require(ape)
@@ -53,7 +56,12 @@ require(cluster)
 h <- diana(d)
 p <- as.phylo(as.hclust(h))
 plot(ladderize(p), cex=0.75, label.offset=1, no.margin=TRUE)
-tiplabels(col=cutree(h, 3), pch=15)
+
+# add in the dated surface type via color
+tiplabels(col=p.surface, pch=15)
+
+# based on distance matrix values, YMMV
+legend(x=-0.36, y=6.1, legend=levels(sp2$surface), col=1:6, pch=15, bty='n', bg='white')
 
 
 }
