@@ -46,6 +46,9 @@ p.order <- order(p.surface)
 sp2.list <- initProfileList(sp2)
 profile_plot(sp2.list, plot.order=p.order)
 
+# truncate plot to 200 cm depth
+profile_plot(sp2.list, plot.order=p.order, max.depth=200)
+
 
 # look at numerical distances between profiles
 d <- profile_compare(sp2, vars=c('prop','field_ph','hue','value'), max_d=100, k=0.01)
