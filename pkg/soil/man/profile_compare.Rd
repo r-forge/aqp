@@ -45,7 +45,6 @@ auto.key=list(columns=4, lines=TRUE, points=FALSE, title="k", cex=0.8, size=3)
 )
 
 ## 2. basic implementation, requires at least two properties
-library(soil)
 data(sp1)
 d <- profile_compare(sp1, vars=c('prop','group'), max_d=100, k=0.01)
 
@@ -69,17 +68,18 @@ text(d.sam$points, labels=row.names(d.sam$points), cex=0.5, col=cutree(h, 3))
 
 ## 4. try out the 'sample_interval' argument
 # compute using sucessively larger sampling intervals
-d <- profile_compare(sp1, vars=c('prop','group'), max_d=100, k=0.01)
-d.2 <- profile_compare(sp1, vars=c('prop','group'), max_d=100, k=0.01, sample_interval=2)
-d.10 <- profile_compare(sp1, vars=c('prop','group'), max_d=100, k=0.01, sample_interval=10)
-d.20 <- profile_compare(sp1, vars=c('prop','group'), max_d=100, k=0.01, sample_interval=20)
+data(sp3)
+d <- profile_compare(sp3, vars=c('clay','cec','ph'), max_d=100, k=0.01)
+d.2 <- profile_compare(sp3, vars=c('clay','cec','ph'), max_d=100, k=0.01, sample_interval=2)
+d.10 <- profile_compare(sp3, vars=c('clay','cec','ph'), max_d=100, k=0.01, sample_interval=10)
+d.20 <- profile_compare(sp3, vars=c('clay','cec','ph'), max_d=100, k=0.01, sample_interval=20)
 
 # check the results via hclust / dendrograms
-oldpar <- par(mfcol=c(1,4))
-plot(as.dendrogram(hclust(d)), main='No Sampling')
-plot(as.dendrogram(hclust(d.2)), main='Every 2nd Depth')
-plot(as.dendrogram(hclust(d.10)), main='Every 10th Depth')
-plot(as.dendrogram(hclust(d.20)), main='Every 20th Depth')
+oldpar <- par(mfcol=c(1,4), mar=c(2,1,2,2))
+plot(as.dendrogram(hclust(d)), horiz=TRUE, main='Every Depth Slice')
+plot(as.dendrogram(hclust(d.2)), horiz=TRUE, main='Every 2nd Depth Slice')
+plot(as.dendrogram(hclust(d.10)), horiz=TRUE, main='Every 10th Depth Slice')
+plot(as.dendrogram(hclust(d.20)), horiz=TRUE, main='Every 20th Depth Slice')
 par(oldpar)
 
 # check results via MDS
