@@ -6,11 +6,11 @@
 Soil Profile Data Example 3
 }
 \description{
-Soil samples from 10 soil profiles, excavated from the Sierra Foothill Region of California.
+Soil samples from 10 soil profiles, taken from the Sierra Foothill Region of California.
 }
 \usage{data(sp3)}
 \format{
-  A data frame with 46 observations on the following 18 variables.
+  A data frame with 46 observations on the following 15 variables.
   \describe{
     \item{\code{id}}{soil id}
     \item{\code{top}}{horizon upper boundary (cm)} 
@@ -19,9 +19,6 @@ Soil samples from 10 soil profiles, excavated from the Sierra Foothill Region of
     \item{\code{cec}}{CEC by amonium acetate at pH 7}
     \item{\code{ph}}{pH in 1:1 water-soil mixture}
     \item{\code{tc}}{total carbon percent}
-    \item{\code{x}}{color: x-coordinate, XYZ colorspace}
-    \item{\code{y}}{color: y-coordinate, XYZ colorspace}
-    \item{\code{z}}{color: z-coordinate, XYZ colorspace}
     \item{\code{hue}}{Munsell hue (dry)}
     \item{\code{value}}{Munsell value (dry)}
     \item{\code{chroma}}{Munsell chroma (dry)}

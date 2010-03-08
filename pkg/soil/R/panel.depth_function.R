@@ -1,6 +1,7 @@
-
+# TODO : this function doesn't help when the upper/lower CI limits aren't defined
+# revert to standard pre-panel function in that case
 # used to pre-compute wider xlim range based on upper/lower values
-prepanel.depth_function <- function(x, y, upper, lower, subscripts=NULL, groups=NULL, ...) {
+prepanel.depth_function <- function(x, y, upper, lower, subscripts, groups=NULL, ...) {
 
 # working with grouped data and paneled data
 if(!missing(groups) & !missing(subscripts))
