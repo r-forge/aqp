@@ -1,6 +1,8 @@
 
 # convert munsell Hue, Value, Chroma into RGB
 # user can adjust how rgb() function will return and R-friendly color
+# TODO if alpha is greater than maxColorValue, there will be an error
+# looks like our database is missing colors with value|chroma of 1
 munsell2rgb <- function(the_hue, the_value, the_chroma, alpha=1, maxColorValue=1, return_triplets=FALSE)
 	{
 	# check for missing data
@@ -40,10 +42,21 @@ munsell2rgb <- function(the_hue, the_value, the_chroma, alpha=1, maxColorValue=1
 	# keep track of NA values
 	s.na <- which(is.na(s.df$r))
 	
-	# convert to R color
-	s.df$soil_color <- NA
-	s.df$soil_color[-s.na] <- with(s.df[-s.na,], rgb(r, g, b, alpha=alpha, maxColorValue=maxColorValue) )
+	# not really an ideal solution, but seems to work
+	# if alpha > maxColorValue -- clamp alpha at maxColorValue
+	if(alpha > maxColorValue)
+		alpha <- maxColorValue
 	
+	# convert to R color
+	# init an empy column
+	s.df$soil_color <- NA
+	
+	# account for missing values if present
+	if(length(s.na > 0))
+		s.df$soil_color[-s.na] <- with(s.df[-s.na,], rgb(red=r, green=g, blue=b, alpha=alpha, maxColorValue=maxColorValue) )
+	else
+		s.df$soil_color <- with(s.df, rgb(red=r, green=g, blue=b, alpha=alpha, maxColorValue=maxColorValue) )
+		
 	return(s.df$soil_color)
 	}
 	
