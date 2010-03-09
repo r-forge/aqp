@@ -63,7 +63,7 @@ by(d, d$groups, function(d_i) {
 # lookup color
 m <- match(unique(d_i$group), ll)
 # add line
-panel.lines(d_i$yhat, d_i$top, lwd=trellis.par.get('superpose.line')$lwd, col=trellis.par.get('superpose.line')$col[m])
+panel.lines(d_i$yhat, d_i$top, lwd=trellis.par.get('superpose.line')$lwd, col=trellis.par.get('superpose.line')$col[m], lty=trellis.par.get('superpose.line')$lty[m])
 })
 
 
