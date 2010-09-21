@@ -43,6 +43,10 @@ echo $contents; } ?>
 
 <!-- end of project description -->
 
+<img src="aqp_profile_plot_example_sjer.png" border="0">
+
+<img src="aqp_profile_plot_example_sfrec.png" border="0">
+
 <img src="dend_with_profiles.png" border="0">
 
 
