@@ -47,6 +47,13 @@ echo $contents; } ?>
 
 <img src="aqp_profile_plot_example_sfrec.png" border="0">
 
+<img src="weighted_depth_func_aggregation.png" border="0">
+
+<img src="categorical_depth_function.png" border="0">
+
+<img src="classification_comparison.png" border="0">
+
+
 <img src="dend_with_profiles.png" border="0">
 
 
