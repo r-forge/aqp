@@ -53,6 +53,7 @@ echo $contents; } ?>
 
 <img src="classification_comparison.png" border="0">
 
+<img src="dend_with_profiles-SJER.png" border="0">
 
 <img src="dend_with_profiles.png" border="0">
 
