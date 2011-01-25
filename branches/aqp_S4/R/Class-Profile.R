@@ -1,8 +1,8 @@
 setClass(
   Class="Profile", 
   representation=representation(
-    depths='matrix',
-    horizons='data.frame',
+    depths='matrix', # 2-col matrix with top and bottom horizon depths
+    horizons='data.frame', # the data for each horizon
     id='character', # change it to profile_id ??
     depth_units='character'
   ), 
