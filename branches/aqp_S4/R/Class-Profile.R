@@ -2,23 +2,23 @@ setClass(
   Class="Profile", 
   representation=representation(
     depths='matrix', # 2-col matrix with top and bottom horizon depths
-    horizons='data.frame', # the data for each horizon
+#     horizons='data.frame', # the data for each horizon
     id='character', # change it to profile_id ??
     depth_units='character'
   ), 
   prototype=prototype(
     depths=matrix(ncol=2),
-    horizons=data.frame(),
+#     horizons=data.frame(),
     id=as.character(NA),
     depth_units=as.character(NA)
   ),
   validity=function(object) {
-    # If there is horizon data available
-    if (length(object@horizons) > 0 ) {
-      # number of horizon and number of horizon data must match
-      if (nrow(object@horizons) != nrow(object@depths))
-        stop("number of horizons and number of samples along the profile do not match")
-    }
+#     # If there is horizon data available
+#     if (length(object@horizons) > 0 ) {
+#       # number of horizon and number of horizon data must match
+#       if (nrow(object@horizons) != nrow(object@depths))
+#         stop("number of horizons and number of samples along the profile do not match")
+#     }
      # Number of user_id must equals one (one per profile)
     if (length(object@id) != 1)
       stop("profile id must be unique")
