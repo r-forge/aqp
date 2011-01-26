@@ -6,7 +6,7 @@
 #'
 "SoilProfileCollection" <- function(profiles=list(SoilProfile()), site=data.frame(), ids=as.character(NA)){
   # default is that the ids are the id of the SoilProfile objects
-  if (is.na(ids))
+  if (all(is.na(ids)))
     ids <- sapply(profiles, profile_id)
   names(profiles) <- ids
   # creation of the object (includes a validity check)
@@ -50,10 +50,13 @@ summary.SoilProfileCollection <- function (object, ...){
     if (length(profiles(object)) > 0) {
       # on how many profiles do we have horizon data?
       is.SoilProfile <- laply(profiles(object), function(x){'horizons' %in% slotNames(x)})
-      obj[["horizons"]] <- length(which(is.SoilProfile))
+      obj[["n_horizons_data"]] <- length(which(is.SoilProfile))
+      if (obj[["n_horizons_data"]] > 0) { # if data is availbale we store its summary
+	obj[['horizons']] <- summary(horizons(object))
+      }
     }
-    else
-      obj[["horizons"]] <- NA
+    else # no profile in the collection
+      obj[["n_horizons_data"]] <- NA
     if (length(site(object)) > 0)
       obj[["site"]] <- summary(site(object))
     else
@@ -70,12 +73,16 @@ print.summary.SoilProfileCollection = function(x, ...) {
   cat("Number of profiles: ", x[["n_profiles"]], "\n", sep="")
   if (x[["n_profiles"]] > 0)
     cat("Depth range: ", x[["depth_range"]][1], "-", x[["depth_range"]][2], " ", x[["units"]], "\n", sep="")
-  if (!all(is.na(x[["horizons"]]))) {
-    if (x[["horizons"]] > 0)
-      if (x[["horizons"]] < x[["n_profiles"]])
-	cat("Horizon data available on ", x[["horizons"]], " out of ", x[["n_profiles"]], " profiles in the collection.\n")
-      else
-	cat("Horizon data available on every profile in the collection.\n")
+  if (!all(is.na(x[["n_horizons_data"]]))) {
+    if (x[["n_horizons_data"]] > 0) {
+      if (x[["n_horizons_data"]] < x[["n_profiles"]]) {
+	cat("Horizon data available on ", x[["n_horizons_data"]], " out of ", x[["n_profiles"]], " profiles in the collection:\n")
+      }
+      else {
+	cat("Horizon data available on every profile in the collection:\n")
+      }
+      print(x[["horizons"]])
+    }
     else
       cat("No horizon data available in the collection.\n")
   }
@@ -115,8 +122,7 @@ if (!isGeneric("horizons"))
 
 setMethod(f='horizons', signature='SoilProfileCollection',
   function(object ,id=as.numeric(NA)){
-    # if no profile id, the data for every profile is returned
-    if (all(is.na(id)))
+    if (all(is.na(id)))  # if no profile id, the data for every profile is returned
       res <- ldply(profiles(object), horizons)
     else {
       if (!is.numeric(id))
