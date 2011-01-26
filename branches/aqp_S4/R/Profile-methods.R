@@ -167,6 +167,42 @@ setMethod("depths_units", "Profile",
     object@depth_units
 )
 
+## horizon and site accessors are stored here so that those 
+## methods could be applied on Profile objects too
+## (for inheritance)
+
+if (!isGeneric("horizons"))
+  setGeneric("horizons", function(object, ...)
+    standardGeneric("horizons"))
+
+setMethod("horizons", "Profile",
+#' Retrieves the horizon information within a profile
+#'
+  function(object) {
+    if ("horizons" %in% slotNames(object))
+      res <- data.frame(profile_id=profile_id(object), object@horizons)
+    else
+      res <- data.frame()
+    res
+  }
+)
+
+if (!isGeneric("site"))
+  setGeneric("site", function(object, ...)
+    standardGeneric("site"))
+
+setMethod("site", "Profile",
+#' Retrieves the horizon information within a profile
+#'
+  function(object) {
+    if ("site" %in% slotNames(object))
+      res <- object@site
+    else
+      res <- data.frame()
+    res
+  }
+)
+
 ## overloads
 
 # overload min() to give us the min depth within a profile
