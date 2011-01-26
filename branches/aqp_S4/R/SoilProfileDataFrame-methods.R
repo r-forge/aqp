@@ -30,16 +30,3 @@
   # creation of the object (includes a validity check)
   new("SoilProfileDataFrame", depths, site=site)
 }
-
-## accessors
-
-if (!isGeneric("site"))
-  setGeneric("site", function(object, ...)
-    standardGeneric("site"))
-
-setMethod("site", "SoilProfileDataFrame",
-#' Retrieves the horizon information within a profile
-#'
-  function(object)
-    object@site
-)
