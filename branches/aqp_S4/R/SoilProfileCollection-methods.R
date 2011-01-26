@@ -8,7 +8,6 @@
   # if all the ids are undefined, the are given an arbitrary id
   if (all(is.na(ids)))
     ids <- as.character(1:length(ids))
-
   # creation of the object (includes a validity check)
   new("SoilProfileCollection", profiles=profiles, site=site, ids=ids)
 }
@@ -21,6 +20,11 @@ setMethod(
   definition=function(object){
     cat("Object of class ", class(object), "\n", sep = "")
     cat("Number of profiles: ", length(object), "\n", sep="")
+    cat("\nAvailable profiles:\n")
+    print(profiles(object))
+    if (length(site(object)) > 0)
+      cat("\nSampling sites attributes:\n")
+      print(site(object))
   }
 )
 
