@@ -20,13 +20,57 @@ setMethod(
   definition=function(object){
     cat("Object of class ", class(object), "\n", sep = "")
     cat("Number of profiles: ", length(object), "\n", sep="")
-    cat("\nAvailable profiles:\n")
-    print(profiles(object))
-    if (length(site(object)) > 0)
+    if (length(object) > 0) {
+      cat("Depth range: ", min(object), "-", max(object), " ", depths_units(object), "\n", sep="")
+      cat("\nAvailable profiles:\n")
+      print(profiles(object))
+    }
+    if (length(site(object)) > 0) {
       cat("\nSampling sites attributes:\n")
       print(site(object))
+    }
   }
 )
+
+## summary
+
+if (!isGeneric("summary"))
+  setGeneric("summary", function(object, ...)
+    standardGeneric("summary"))
+
+summary.SoilProfileCollection <- function (object, ...){
+    obj <- list()
+    obj[["class"]] = class(object)
+    obj[["n_profiles"]] <- length(object)
+    if (length(object) > 0)
+      obj[["depth_range"]] <- c(min(object), max(object))
+    else
+      obj[["depth_range"]] <- NA
+    if (length(site(object)) > 0)
+      obj[["site"]] <- summary(site(object))
+    else
+      obj[["site"]] <- NA
+    obj[["units"]] <- depths_units(object)
+    class(obj) <- "summary.SoilProfileCollection"
+    obj
+}
+
+setMethod("summary", "summary.SoilProfileCollection", summary.SoilProfileCollection)
+
+print.summary.SoilProfileCollection = function(x, ...) {
+  cat(paste("Object of class ", x[["class"]], "\n", sep = ""))
+  cat("Number of profiles: ", x[["n_profiles"]], "\n", sep="")
+  if (x[["n_profiles"]] > 0)
+    cat("Depth range: ", x[["depth_range"]][1], "-", x[["depth_range"]][2], " ", x[["units"]], "\n", sep="")
+  if (!all(is.na(x[["site"]]))) {
+    cat("\nSampling sites attributes:\n")
+    print(x[["site"]])
+  }
+
+  invisible(x)
+}
+
+setMethod("print", "summary.SoilProfileCollection", print.summary.SoilProfileCollection)
 
 ## accessors
 
@@ -57,6 +101,15 @@ setMethod("profiles", "SoilProfileCollection",
       res <- res[[1]]
     res
   }
+)
+
+if (!isGeneric("depths_units"))
+  setGeneric("depths_units", function(object, ...)
+    standardGeneric("depths_units"))
+
+setMethod("depths_units", "SoilProfileCollection",
+  function(object)
+    unique(sapply(profiles(object), depths_units))
 )
 
 if (!isGeneric("ids"))
