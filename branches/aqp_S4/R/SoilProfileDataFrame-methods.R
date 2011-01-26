@@ -9,7 +9,7 @@
 #' @param id a unique identification of the profile
 #' @param depth_units the unit in which horizon depths are expressed
 #'
-"SoilProfileDataFrame" <- function(depths=matrix(ncol=2), id=as.character(NA), depth_units="cm", horizons=data.frame(), site=data.frame()){
+"SoilProfileDataFrame" <- function(depths=matrix(ncol=2), site=data.frame(), horizons=data.frame(), id=as.character(NA), depth_units="cm"){
   # if the first argument is NOT a *Profile object, we build the object from scratch
   if (!inherits(depths, "Profile")) {
     depths <- Profile(depths,  id=id, depth_units=depth_units)
