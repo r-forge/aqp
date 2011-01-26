@@ -47,6 +47,13 @@ summary.SoilProfileCollection <- function (object, ...){
       obj[["depth_range"]] <- c(min(object), max(object))
     else
       obj[["depth_range"]] <- NA
+    if (length(profiles(object)) > 0) {
+      # on how many profiles do we have horizon data?
+      is.SoilProfile <- laply(profiles(object), function(x){'horizons' %in% slotNames(x)})
+      obj[["horizons"]] <- length(which(is.SoilProfile))
+    }
+    else
+      obj[["horizons"]] <- NA
     if (length(site(object)) > 0)
       obj[["site"]] <- summary(site(object))
     else
@@ -63,10 +70,21 @@ print.summary.SoilProfileCollection = function(x, ...) {
   cat("Number of profiles: ", x[["n_profiles"]], "\n", sep="")
   if (x[["n_profiles"]] > 0)
     cat("Depth range: ", x[["depth_range"]][1], "-", x[["depth_range"]][2], " ", x[["units"]], "\n", sep="")
+  if (!all(is.na(x[["horizons"]]))) {
+    if (x[["horizons"]] > 0)
+      if (x[["horizons"]] < x[["n_profiles"]])
+	cat("Horizon data available on ", x[["horizons"]], " out of ", x[["n_profiles"]], " profiles in the collection.\n")
+      else
+	cat("Horizon data available on every profile in the collection.\n")
+    else
+      cat("No horizon data available in the collection.\n")
+  }
   if (!all(is.na(x[["site"]]))) {
-    cat("\nSampling sites attributes:\n")
+    cat("Sampling sites attributes:\n")
     print(x[["site"]])
   }
+  else 
+    cat("No sampling sites data available in the collection.\n")
 
   invisible(x)
 }
