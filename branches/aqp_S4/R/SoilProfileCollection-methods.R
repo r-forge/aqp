@@ -8,6 +8,7 @@
   # if all the ids are undefined, the are given an arbitrary id
   if (all(is.na(ids)))
     ids <- as.character(1:length(ids))
+  names(profiles) <- ids
   # creation of the object (includes a validity check)
   new("SoilProfileCollection", profiles=profiles, site=site, ids=ids)
 }
@@ -80,8 +81,32 @@ if (!isGeneric("site"))
 
 # retrieves the site data frame
 setMethod("site", "SoilProfileCollection",
-  function(object) 
-    object@site
+  function(object) {
+    res <- object@site
+    if (length(res) > 0)
+      rownames(res) <- profile_id(object)
+    res
+  }
+)
+
+# horizons data accessor
+
+if (!isGeneric("horizons"))
+  setGeneric("horizons", function(object, ...)
+    standardGeneric("horizons"))
+
+setMethod(f='horizons', signature='SoilProfileCollection',
+  function(object ,id=as.numeric(NA)){
+    # if no profile id, the data for every profile is returned
+    if (all(is.na(id)))
+      res <- ldply(profiles(object), horizons)
+    else {
+      if (!is.numeric(id))
+	id <- which(profile_id(object) %in% id)
+      res <- ldply(profiles(object)[id], horizons)
+    }
+    res
+  }
 )
 
 if (!isGeneric("profiles"))
@@ -91,11 +116,11 @@ if (!isGeneric("profiles"))
 # retrieves the SoilProfile objects - all or one in particular, specified by its index or its id
 setMethod("profiles", "SoilProfileCollection",
   function(object, id=as.numeric(NA)) {
-    if (is.na(id))
+    if (all(is.na(id)))
       id <- 1:length(object@profiles)
     else
       if (!is.numeric(id))
-	id <- which(ids(object) %in% id)
+	id <- which(profile_id(object) %in% id)
     res <- object@profiles[id]
     if (length(res) == 1)
       res <- res[[1]]
@@ -112,12 +137,12 @@ setMethod("depths_units", "SoilProfileCollection",
     unique(sapply(profiles(object), depths_units))
 )
 
-if (!isGeneric("ids"))
-  setGeneric("ids", function(object, ...)
-    standardGeneric("ids"))
+if (!isGeneric("profile_id"))
+  setGeneric("profile_id", function(object, ...)
+    standardGeneric("profile_id"))
 
 # retrieves the ids
-setMethod("ids", "SoilProfileCollection",
+setMethod("profile_id", "SoilProfileCollection",
   function(object) 
     object@ids
 )
