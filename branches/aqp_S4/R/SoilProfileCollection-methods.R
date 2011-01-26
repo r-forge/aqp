@@ -5,9 +5,10 @@
 #' @param depth_units the unit in which horizon depths are expressed
 #'
 "SoilProfileCollection" <- function(profiles=list(SoilProfile()), site=data.frame(), ids=rep(as.character(NA), length.out=length(profiles))){
-  # if all the ids are undefined, the are given an arbitrary id
+  # idefault is that the ids are the id of the SoilProfile objects
   if (all(is.na(ids)))
-    ids <- as.character(1:length(ids))
+    ids <- sapply(profiles, profile_id)
+    #     ids <- as.character(1:length(ids))
   names(profiles) <- ids
   # creation of the object (includes a validity check)
   new("SoilProfileCollection", profiles=profiles, site=site, ids=ids)
