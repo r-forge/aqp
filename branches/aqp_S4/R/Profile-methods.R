@@ -61,7 +61,7 @@ summary.Profile <- function (object, ...){
     if (length(object) > 0)
       obj[["depths"]] <- depths(object)
     else
-      obj[["depths"]] <- NULL
+      obj[["depths"]] <- NA
     obj[["n_depths"]] <- length(object)
     if (length(object) > 0) {
       depth_classes <- aaply(depths(object), 1, function(x){paste(x[1], '-', x[2], ' ', depths_units(object), sep='')}, .expand=FALSE)
@@ -80,20 +80,20 @@ summary.Profile <- function (object, ...){
 	else
 	  obj[["horizons"]] <- summary(horizons(object)[[1]])
       else
-	obj[["horizons"]] <- NULL
+	obj[["horizons"]] <- NA
     }
     else 
-      obj[["horizons"]] <- NULL
+      obj[["horizons"]] <- NA
 
     # If there are site data in the object (SoilProfileDataFrame class)
     if ("site" %in% slotNames(object)) {
       if (ncol(object@site) > 0) 
 	obj[["site"]] <- summary(object@site)
       else 
-	obj[["site"]] <- NULL
+	obj[["site"]] <- NA
     }
     else 
-      obj[["site"]] <- NULL
+      obj[["site"]] <- NA
 
     class(obj) <- "summary.Profile"
     obj
@@ -109,11 +109,11 @@ print.summary.Profile = function(x, ...) {
     cat("Available depths:\n")
     sapply(x[['depth_classes']], function(x){cat(x, '\n', sep='')})
   }
-  if (!is.null(x[["horizons"]])) {
+  if (!is.na(x[["horizons"]])) {
     cat("\nHorizons attributes:\n")
     print(x[["horizons"]])
   }
-  if (!is.null(x[["site"]])) {
+  if (!is.na(x[["site"]])) {
     cat("\nSampling site attributes:\n")
     print(x[["site"]])
   }
