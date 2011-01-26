@@ -18,16 +18,3 @@
   # creation of the object (includes a validity check)
   new("SoilProfile", as(depths, "Profile"), horizons=horizons)
 }
-
-## accessors
-
-if (!isGeneric("horizons"))
-  setGeneric("horizons", function(object, ...)
-    standardGeneric("horizons"))
-
-setMethod("horizons", "SoilProfile",
-#' Retrieves the horizon information within a profile
-#'
-  function(object)
-    data.frame(profile_id=profile_id(object), object@horizons)
-)
