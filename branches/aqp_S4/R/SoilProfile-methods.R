@@ -29,5 +29,5 @@ setMethod("horizons", "SoilProfile",
 #' Retrieves the horizon information within a profile
 #'
   function(object)
-    object@horizons
+    data.frame(profile_id=profile_id(object), object@horizons)
 )
