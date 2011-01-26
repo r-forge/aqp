@@ -172,7 +172,7 @@ setMethod("depths_units", "Profile",
 # overload min() to give us the min depth within a profile
 setMethod(f='min', signature='Profile',
 definition=function(x)
-    max(sapply(x@depths, min, na.rm=TRUE))
+    min(sapply(x@depths, min, na.rm=TRUE))
 )
 
 # overload max() to give us the max depth within a profile
