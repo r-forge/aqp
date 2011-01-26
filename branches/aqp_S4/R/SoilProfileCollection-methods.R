@@ -76,10 +76,10 @@ print.summary.SoilProfileCollection = function(x, ...) {
   if (!all(is.na(x[["n_horizons_data"]]))) {
     if (x[["n_horizons_data"]] > 0) {
       if (x[["n_horizons_data"]] < x[["n_profiles"]]) {
-	cat("Horizon data available on ", x[["n_horizons_data"]], " out of ", x[["n_profiles"]], " profiles in the collection:\n")
+	cat("\nHorizon data available on ", x[["n_horizons_data"]], " out of ", x[["n_profiles"]], " profiles in the collection:\n")
       }
       else {
-	cat("Horizon data available on every profile in the collection:\n")
+	cat("\nHorizon data available on every profile in the collection:\n")
       }
       print(x[["horizons"]])
     }
@@ -87,7 +87,7 @@ print.summary.SoilProfileCollection = function(x, ...) {
       cat("No horizon data available in the collection.\n")
   }
   if (!all(is.na(x[["site"]]))) {
-    cat("Sampling sites attributes:\n")
+    cat("\nSampling sites attributes:\n")
     print(x[["site"]])
   }
   else 
@@ -114,8 +114,18 @@ setMethod("site", "SoilProfileCollection",
   }
 )
 
-# horizons data accessor
+# retrieves list of profiles horizons depths 
+if (!isGeneric("depths"))
+  setGeneric("depths", function(object, ...)
+    standardGeneric("depths"))
 
+setMethod("depths", "SoilProfileCollection",
+  function(object, na.rm=TRUE){
+    llply(profiles(v), depths, na.rm=na.rm)
+  }
+)
+
+# returns a data.frame aggregating horizons data
 if (!isGeneric("horizons"))
   setGeneric("horizons", function(object, ...)
     standardGeneric("horizons"))
@@ -133,11 +143,12 @@ setMethod(f='horizons', signature='SoilProfileCollection',
   }
 )
 
+# retrieves the SoilProfile objects - all or one in particular, 
+# if specified by its index or its id
 if (!isGeneric("profiles"))
   setGeneric("profiles", function(object, ...)
     standardGeneric("profiles"))
 
-# retrieves the SoilProfile objects - all or one in particular, specified by its index or its id
 setMethod("profiles", "SoilProfileCollection",
   function(object, id=as.numeric(NA)) {
     if (all(is.na(id)))
@@ -161,11 +172,11 @@ setMethod("depths_units", "SoilProfileCollection",
     unique(sapply(profiles(object), depths_units))
 )
 
+# retrieves the ids
 if (!isGeneric("profile_id"))
   setGeneric("profile_id", function(object, ...)
     standardGeneric("profile_id"))
 
-# retrieves the ids
 setMethod("profile_id", "SoilProfileCollection",
   function(object) 
     object@ids
