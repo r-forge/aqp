@@ -30,22 +30,16 @@ setReplaceMethod("depths", "data.frame",
 	if (nrow(horizon_data) > 0) # if theres data left, we create a SoilProfile object
 	  res <- SoilProfile(res, horizons=horizon_data)	  
       }
-
-      # otherwise, we have a collection -> SoilProfileCollection
-      else {
-# MUST BE HANDLED DURING THE INSTALL OF THE PACKAGE
-# 	if(!require(plyr)) # check for dependencies
-# 	  stop('Please install the "plyr" package.')
-	  
+      else { # otherwise, we have a collection -> SoilProfileCollection
 	  # nm contains names for profiles_ids, top, bottom
 	  SP_list <- dlply(.data=object, .variables=nm[1],
-		  .fun=function(profile_i) {
+		  .fun=function(x) {
 		    # get current user_id
-		    profile_id_i <- unique(as.character(profile_i[, idx[1]]))
+		    profile_id_i <- unique(as.character(x[, idx[1]]))
 		    # extract depths
-		    depths <- as.matrix(profile_i[, idx[2:3]])
+		    depths <- as.matrix(x[, idx[2:3]])
 		    # make a copy of the horizon data, with id, top, and bottom removed
-		    horizon_data <- profile_i[, -idx]
+		    horizon_data <- x[, -idx]
 		    # assemble object and return
 		    SoilProfile(depths=depths, horizons=horizon_data, id=profile_id_i)
 		  }
