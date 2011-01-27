@@ -108,42 +108,46 @@ setReplaceMethod("site", "Profile",
   }
 )
 
+# function to generate a random char string
+.createCharHash <- function(n, prefix=""){
+  require(stringr)
+  hash <- letters[round(26*runif(n))]
+  str_c(c(prefix, hash), collapse = "")
+}
+
 setReplaceMethod("site", "SoilProfileCollection",
   function(object, value) {
     if (inherits(value, "formula")) {
       mf <- model.frame(value, horizons(object))
       names_attr <- names(mf)
       idx <- match(names(mf), names(horizons(object)))
+      # Adding a profile id column
       mf <- data.frame(mf, 
-	PID=unlist(
+	unlist(
 	  llply(profile_id(object), 
 	    function(x){
 	      rep(x, length.out=length(profiles(object, x)))
 	    })
 	, use.names=F))
+      # for identification of the profiles, a hash is used 
+      # so we don't mess up with the *real* attributes names.
+      # if theres a confusion you really have strange attr names
+      tmp_id <- .createCharHash(n=5, prefix='TMP') 
+      names(mf) <- c(names_attr, tmp_id)
       # assemble site_data, this is a 1-row data.frame
       # since these data are repeated for each horizon, just keep the first
       
       # when there is only one attribute for site data we need to use a different approach
-      site_data <- ddply(mf, .(PID), 
+      site_data <- ddply(mf, tmp_id, 
 	  .fun=function(x) {
 	    df <- subset(x, select=names_attr)
 	    colwise(unique)(df)
 	  })
-#       if(ncol(mf) < 2) {
-# 	site_data <- data.frame(X1=mf[1,])
-# 	names(site_data) <- names(mf)
-#       }
-#       # otherwise we just take the first row
-#       else {
-# 	# checking unicity of the attributes along the profile
-# 	id_error <- which(sapply(mf, function(x){length(unique(x))}) > 1)
-# 	if (length(id_error) == 0)
-# 	  site_data <- mf[1, ]
-# 	else
-# 	  stop('site values are not site-specific')
-#       }
+      tmp_id_col <- which(names(site_data) == tmp_id)
+      site_data <- site_data[,-tmp_id_col]
       
+      if (!inherits(site_data, 'data.frame'))
+	site_data <- as.data.frame(site_data)
       # update/create the site data slot
       object@site <- site_data
       # remove the named site data from horizon_data IN EACH PROFILE
