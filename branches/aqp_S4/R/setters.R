@@ -146,7 +146,16 @@ setReplaceMethod("site", "SoilProfileCollection",
       }
       # update/create the site data slot
       object@site <- site_data
-      # remove the named site data from horizon_data IN EACH PROFILE
+      
+    # remove the named site data from horizon_data IN EACH PROFILE
+    # note that we are replacing the list of SoilProfile objects (in place) with modified versions
+    object@profiles <- lapply(object@profiles, function(i, v.names=names_attr) {
+     h <- horizons(i)
+     idx <- match(v.names, names(h))
+     horizons(i) <- h[, -idx]
+     return(i) 
+     })
+      
 #       l_ply(.data=object, .fun=function(x){
 # 	idx <- match(names_attr, names(horizons(x)))
 # 	horizons(x) <- horizons(x)[, -idx]
