@@ -146,8 +146,10 @@ setReplaceMethod("site", "SoilProfileCollection",
       tmp_id_col <- which(names(site_data) == tmp_id)
       site_data <- site_data[,-tmp_id_col]
       
-      if (!inherits(site_data, 'data.frame'))
+      if (!inherits(site_data, 'data.frame')) {
 	site_data <- as.data.frame(site_data)
+	names(site_data) <- names_attr
+      }
       # update/create the site data slot
       object@site <- site_data
       # remove the named site data from horizon_data IN EACH PROFILE
