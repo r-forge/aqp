@@ -1,6 +1,6 @@
 data(sp1)
 
-source('class_defs_S4.R')
+source('class_defs_S4-dylan.R')
 
 # check simple case -- 1 profile
 sp1.1 <- sp1[sp1$id == 'P001', ]
@@ -10,4 +10,5 @@ site_data(sp1.1) <- ~ group
 # check complex case -- multiple profiles
 depths(sp1) <- id ~ top + bottom
 
+# check "upgraded" object
 sp1
