@@ -147,13 +147,36 @@ setReplaceMethod("site", "SoilProfileCollection",
       # update/create the site data slot
       object@site <- site_data
       # remove the named site data from horizon_data IN EACH PROFILE
-      l_ply(.data=profiles(object), .fun=function(x){
-	idx <- match(names_attr, names(horizons(x)))
-	x@horizons <- horizons(x)[, -idx]
-      })
+#       l_ply(.data=object, .fun=function(x){
+# 	idx <- match(names_attr, names(horizons(x)))
+# 	horizons(x) <- horizons(x)[, -idx]
+#       })
     }
     else 
       stop('not implemented yet')
+    object
+  }
+)
+
+## horizons<- setter method
+##
+if (!isGeneric('horizons<-'))
+  setGeneric('horizons<-', function(object, value) 
+    standardGeneric('horizons<-'))
+
+setReplaceMethod("horizons", "Profile",
+  function(object, value) {
+    # testing the class of the horizon data to add to the object
+    if (!inherits(value, "data.frame"))
+      stop("value must be a data.frame")
+    # testing the number of rows of the horizon data
+    if (nrow(value) != length(object))
+      stop("inconsistent number of rows")
+    # testing if a horizons slot is available
+    if (class(object) == "Profile")
+      object <- SoilProfileDataFrame(object, horizons=value)
+    else 
+      object@horizons <- value
     object
   }
 )
