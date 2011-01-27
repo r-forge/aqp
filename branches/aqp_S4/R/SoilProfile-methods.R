@@ -11,10 +11,19 @@
 #'
 "SoilProfile" <- function(depths=matrix(ncol=2), horizons=data.frame(), id=as.character(NA), depth_units="cm"){
   # if the first argument is a Profile object, it is used to construct the SoilProfile object
-  if (!is(depths, "Profile")) {
+  if (!inherits(depths, "Profile")) {
     # creation of the Profile object 
     depths <- Profile(depths=depths, id=id, depth_units=depth_units)
+  } 
+  else { 
+    # depths has a Profile inheritance
+    obj <- depths
+    # getting all the available properties
+    id <- profile_id(obj)
+    depths_units <- depths_units(obj)
+    depths <- depths(obj)
+    depths <- Profile(depths=depths, id=id, depth_units=depths_units)
   }
   # creation of the object (includes a validity check)
-  new("SoilProfile", as(depths, "Profile"), horizons=horizons)
+  new("SoilProfile", depths, horizons=horizons)
 }
