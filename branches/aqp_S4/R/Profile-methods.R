@@ -80,20 +80,20 @@ summary.Profile <- function (object, ...){
 	else
 	  obj[["horizons"]] <- summary(horizons(object)[[1]])
       else
-	obj[["horizons"]] <- NA
+	obj[["horizons"]] <- data.frame()
     }
     else 
-      obj[["horizons"]] <- NA
+      obj[["horizons"]] <- data.frame()
 
     # If there are site data in the object (SoilProfileDataFrame class)
     if ("site" %in% slotNames(object)) {
       if (ncol(object@site) > 0) 
 	obj[["site"]] <- summary(object@site)
       else 
-	obj[["site"]] <- NA
+	obj[["site"]] <- data.frame()
     }
     else 
-      obj[["site"]] <- NA
+      obj[["site"]] <- data.frame()
 
     class(obj) <- "summary.Profile"
     obj
@@ -109,11 +109,11 @@ print.summary.Profile = function(x, ...) {
     cat("Available depths:\n")
     sapply(x[['depth_classes']], function(x){cat(x, '\n', sep='')})
   }
-  if (!is.na(x[["horizons"]])) {
+  if (length(x[["horizons"]]) > 0) {
     cat("\nHorizons attributes:\n")
     print(x[["horizons"]])
   }
-  if (!is.na(x[["site"]])) {
+  if (length(x[["site"]]) > 0) {
     cat("\nSampling site attributes:\n")
     print(x[["site"]])
   }
@@ -180,7 +180,10 @@ setMethod("horizons", "Profile",
 #'
   function(object) {
     if ("horizons" %in% slotNames(object))
-      res <- data.frame(profile_id=profile_id(object), object@horizons)
+      if (nrow(object@horizons) > 0)
+	res <- object@horizons #res <- data.frame(profile_id=profile_id(object), object@horizons)
+      else
+	res <- data.frame()
     else
       res <- data.frame()
     res
