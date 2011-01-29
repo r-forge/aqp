@@ -157,8 +157,8 @@ setMethod("profiles", "SoilProfileCollection",
       if (!is.numeric(id))
 	id <- which(profile_id(object) %in% id)
     res <- object@profiles[id]
-    if (length(res) == 1)
-      res <- res[[1]]
+#     if (length(res) == 1)
+#       res <- res[[1]]
     res
   }
 )
