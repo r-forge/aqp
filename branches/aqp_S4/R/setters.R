@@ -86,7 +86,11 @@ setReplaceMethod("site", "Profile",
       }
       
       # remove the named site data from horizon_data
-      object@horizons <- horizons(object)[, -idx]
+      horizons(object) <- horizons(object)[, -idx]
+
+      # if site data is already present in the object, we don't want to erase it
+      if (length(site(object)) > 0)
+	site_data <- data.frame(site(object), site_data)
 
       # update or create the site data
       if (inherits(object, "SoilProfileDataFrame"))
@@ -94,9 +98,9 @@ setReplaceMethod("site", "Profile",
       else # creation of a SoilProfileDataFrame object
 	object <- SoilProfileDataFrame(object, site=site_data)
     }
-
     else
       stop('not implemented yet')
+    object
   }
 )
 
