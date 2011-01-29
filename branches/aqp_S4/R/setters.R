@@ -144,22 +144,16 @@ setReplaceMethod("site", "SoilProfileCollection",
 	site_data <- as.data.frame(site_data)
 	names(site_data) <- names_attr
       }
-      # update/create the site data slot
-      object@site <- site_data
-      
-    # remove the named site data from horizon_data IN EACH PROFILE
-    # note that we are replacing the list of SoilProfile objects (in place) with modified versions
-    object@profiles <- lapply(object@profiles, function(i, v.names=names_attr) {
-     h <- horizons(i)
-     idx <- match(v.names, names(h))
-     horizons(i) <- h[, -idx]
-     return(i) 
-     })
-      
-#       l_ply(.data=object, .fun=function(x){
-# 	idx <- match(names_attr, names(horizons(x)))
-# 	horizons(x) <- horizons(x)[, -idx]
-#       })
+
+      # remove the named site data from horizon_data IN EACH PROFILE
+      # note that we are replacing the list of SoilProfile objects (in place) with modified versions
+      profiles_list <- lapply(object@profiles, function(i, v.names=names_attr) {
+	h <- horizons(i)
+	idx <- match(v.names, names(h))
+	horizons(i) <- h[, -idx]
+	return(i) 
+      })
+      object <- SoilProfileCollection(profiles=profiles_list, site=site_data)
     }
     else 
       stop('not implemented yet')
@@ -186,6 +180,21 @@ setReplaceMethod("horizons", "Profile",
       object <- SoilProfileDataFrame(object, horizons=value)
     else 
       object@horizons <- value
+    object
+  }
+)
+
+## profiles<- setter method
+##
+if (!isGeneric('profiles<-'))
+  setGeneric('profiles<-', function(object, value) 
+    standardGeneric('profiles<-'))
+
+setReplaceMethod("profiles", "SoilProfileCollection",
+  function(object, value) {
+    # this setter aims at replacing one or several profiles in the collection
+    # without using the @ slot accessor (but using the validity checks). 
+    # 
     object
   }
 )
