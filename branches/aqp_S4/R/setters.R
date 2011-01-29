@@ -69,9 +69,6 @@ setReplaceMethod("site", "Profile",
     if (inherits(value, "formula") & (class(object) != "Profile")) {
       mf <- model.frame(value, horizons(object))
       idx <- match(names(mf), names(horizons(object)))
-
-      # assemble site_data, this is a 1-row data.frame
-      # since these data are repeated for each horizon, just keep the first
       
       # when there is only one attribute for site data we need to use a different approach
       if(ncol(mf) < 2) {
@@ -90,6 +87,7 @@ setReplaceMethod("site", "Profile",
       
       # remove the named site data from horizon_data
       object@horizons <- horizons(object)[, -idx]
+
       # update or create the site data
       if (inherits(object, "SoilProfileDataFrame"))
 	object@site <- site_data # assign to object's slot
@@ -128,8 +126,6 @@ setReplaceMethod("site", "SoilProfileCollection",
       # if theres a confusion you really have strange attr names
       tmp_id <- .createCharHash(n=5, prefix='TMP') 
       names(mf) <- c(names_attr, tmp_id)
-      # assemble site_data, this is a 1-row data.frame
-      # since these data are repeated for each horizon, just keep the first
       
       # when there is only one attribute for site data we need to use a different approach
       site_data <- ddply(mf, tmp_id, 
@@ -144,6 +140,10 @@ setReplaceMethod("site", "SoilProfileCollection",
 	site_data <- as.data.frame(site_data)
 	names(site_data) <- names_attr
       }
+
+      # if site data is already present in the object, we don't want to erase it
+      if (length(site(object)) > 0)
+	site_data <- data.frame(site(object), site_data)
 
       # remove the named site data from horizon_data IN EACH PROFILE
       # note that we are replacing the list of SoilProfile objects (in place) with modified versions
