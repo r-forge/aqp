@@ -239,3 +239,34 @@ setMethod(f='length', signature='SoilProfile',
     res
   }
 )
+
+setMethod("$", "SoilProfile",
+  function(x, name) 
+    horizons(x)[[name]]
+)
+
+setReplaceMethod("$", "SoilProfile",
+  function(x, name, value) {
+    horizons(x)[[name]] <- value
+    x
+  }
+)
+
+setMethod("[[", c("SoilProfile", "ANY", "missing"),
+  function(x, i, j, ...)
+    x@horizons[[i]]
+)
+
+setReplaceMethod("[[", c("SoilProfile", "ANY", "missing", "ANY"),
+  function(x, i, j, value) {
+    x@horizons[[i]] <- value
+    x
+  }
+)
+
+names.SoilProfile <- function(x) names(horizons(x))
+
+"names<-.SoilProfile" <- function(x, value) {
+  names(horizons(x)) <- value
+  x
+}
