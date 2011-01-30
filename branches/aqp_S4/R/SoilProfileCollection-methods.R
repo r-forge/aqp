@@ -154,6 +154,8 @@ setMethod("depths", "SoilProfileCollection",
   }
 )
 
+# gives the name of the depths columns used
+# in the original data.frame
 if (!isGeneric("depthnames"))
   setGeneric("depthnames", function(object, ...)
     standardGeneric("depthnames"))
@@ -249,3 +251,102 @@ setMethod(f='length', signature='SoilProfileCollection',
     length(profiles(x))
   }
 )
+
+setMethod("$", "SoilProfileCollection",
+  function(x, name) {
+    if (name %in% names(horizons(x)))
+      res <- horizons(x)[[name]]
+    else
+      if (name %in% names(site(x)))
+	res <- site(x)[[name]]
+      else
+	res <- NULL
+    res
+  }
+)
+
+setReplaceMethod("$", "SoilProfileCollection",
+  function(x, name, value) {
+    if (name %in% names(horizons(x)))
+      horizons(x)[[name]] <- value
+    else
+      site(x)[[name]] <- value
+    x
+  }
+)
+
+names.SoilProfileCollection <- function(x) c(names(horizons(x)), names(site(x)))
+
+## data manipulation
+
+# adds SoilProfiles to the collection
+if (!isGeneric("add"))
+  setGeneric("add", function(x, y, ...)
+    standardGeneric("add"))
+
+# Adding 2 SPC together
+setMethod("add", signature=c("SoilProfileCollection", "SoilProfileCollection"),
+  function(x, y, ...) { # x and y are SPC
+    if (identical(x, y))
+      stop('you cant add an object to itself')
+    # checking ID unicity
+    if (any(profile_id(y) %in% profile_id(x))) {
+      i <- which(profile_id(y) %in% profile_id(x))
+      # replace duplicated IDs by unique IDs
+      ids <- make.unique(c(profile_id(x), profile_id(y)[i]))
+      profile_id(y)[i] <- ids[length(profile_id(x))+1:length(ids)]
+    }
+    profile_ids <- c(profile_id(x), profile_id(y))
+    profiles_list <- c(.getProfilesAsList(x), .getProfilesAsList(y))
+    
+    sx <- site(x)
+    sy <- site(y)
+    # case 1: both have site data
+    if ((length(sx) > 0) & (length(sy) > 0)) {
+      tmp_id <- .createCharHash(n=5, prefix='TMP') 
+      sx[, tmp_id] <- rownames(sx)
+      sy[, tmp_id] <- rownames(sy)
+      site_data <- join(sx, sy, by=tmp_id, type='full')
+      site_data[, tmp_id] <- NULL
+    }
+    # case 2 & 3: only one object has site data
+    if ((length(sx) > 0) & (length(sy) == 0))
+      site_data <- rbind(sx, matrix(NA, ncol=ncol(sx), nrow=length(y), dimnames=list(NULL, names(sx))))
+    if ((length(sx) == 0) & (length(sy) > 0))
+      site_data <- rbind(sy, matrix(NA, ncol=ncol(sy), nrow=length(x), dimnames=list(NULL, names(sy))))
+    # case 4: none has site data
+    if ((length(sx) == 0) & (length(sy) == 0))
+      site_data <- data.frame()
+    res <- SoilProfileCollection(profiles=profiles_list, site=site_data, ids=profile_ids)
+    res
+  }
+)
+
+# Adding a SP to a SPC
+setMethod("add", signature=c("SoilProfileCollection", "SoilProfile"),
+  function(x, y, ...) {
+    # x is a SPC, y is a SP
+    # checking ID unicity
+    if (profile_id(y) %in% profile_id(x)) {
+      profile_id(y) <- make.unique(c(profile_id(x), profile_id(y)))[length(x)+1]
+    }
+    profiles_list <- .getProfilesAsList(x)
+    profiles_list <- c(profiles_list, y)
+    
+    if (length(site(x)) > 0) { # if some site data is present
+      # if the added SP has matching colnames
+      if (any(names(horizons(x)) %in% names(site(x)))) {
+	i <- names(horizons(x)) %in% names(site(x))
+	df <- horizons(sp)[,which(i)]
+      }
+      # otherwise we create NA values
+    }
+    else 
+      site_data <- data.frame()
+
+    res <- SoilProfileCollection(profiles=profiles_list, site=site_data)
+    res
+  }
+)
+
+# Adding 2 SP together to form a new SPC
