@@ -275,6 +275,29 @@ setReplaceMethod("$", "SoilProfileCollection",
   }
 )
 
+setMethod("[[", c("SoilProfileCollection", "ANY", "missing"),
+  function(x, i, j, ...) {
+    if (i %in% names(horizons(x)))
+      res <- horizons(x)[[i]]
+    else
+      if (i %in% names(site(x)))
+	res <- site(x)[[i]]
+      else
+	res <- NULL
+    res
+  }
+)
+
+setReplaceMethod("[[", c("SoilProfileCollection", "ANY", "missing", "ANY"),
+  function(x, i, j, value) {
+    if (i %in% names(horizons(x)))
+      horizons(x)[[i]] <- value
+    else
+      site(x)[[i]] <- value
+    x
+  }
+)
+
 names.SoilProfileCollection <- function(x) c(names(horizons(x)), names(site(x)))
 
 ## data manipulation
