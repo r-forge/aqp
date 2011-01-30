@@ -49,7 +49,7 @@ summary.SoilProfileCollection <- function (object, ...){
       obj[["depth_range"]] <- NA
     if (length(profiles(object)) > 0) {
       # on how many profiles do we have horizon data?
-      is.SoilProfile <- laply(profiles(object), function(x){'horizons' %in% slotNames(x)})
+      is.SoilProfile <- laply(.getProfilesAsList(object), function(x){'horizons' %in% slotNames(x)})
       obj[["n_horizons_data"]] <- length(which(is.SoilProfile))
       if (obj[["n_horizons_data"]] > 0) { # if data is availbale we store its summary
 	obj[['horizons']] <- summary(horizons(object))
@@ -98,6 +98,35 @@ print.summary.SoilProfileCollection = function(x, ...) {
 
 setMethod("print", "summary.SoilProfileCollection", print.summary.SoilProfileCollection)
 
+## internal functions
+
+# to be sure to be returned a list of profiles
+# even when n profiles == 1
+.getProfilesAsList <- function(object){
+  if (!is.list(profiles(object)))
+    profiles_list <- list(profiles(object))
+  else 
+    profiles_list <- profiles(object)
+  profiles_list
+}
+
+## coerce
+
+as.data.frame.SoilProfileCollection = function(object, ...) {
+  id <- unlist(llply(profiles(object), function(x){rep(profile_id(x), length(x))}), use.names=FALSE)
+  if (length(site(object)) == 0)
+    res <- data.frame(id=id, ldply(depths(object), rbind.data.frame), horizons(object))
+  else {
+    n_horizons <- llply(profiles(object), length)
+    site <- sapply(site(object), function(x){rep(x, n_horizons)})
+    res <- data.frame(id=id, site, ldply(depths(object), rbind.data.frame), horizons(object))
+  }
+  res
+}
+
+setAs("SoilProfileCollection", "data.frame", function(from)
+	as.data.frame.SoilProfileCollection(from))
+
 ## accessors
 
 if (!isGeneric("site"))
@@ -121,7 +150,7 @@ if (!isGeneric("depths"))
 
 setMethod("depths", "SoilProfileCollection",
   function(object, na.rm=TRUE){
-    llply(profiles(v), depths, na.rm=na.rm)
+    llply(.getProfilesAsList(object), depths, na.rm=na.rm)
   }
 )
 
@@ -132,8 +161,9 @@ if (!isGeneric("horizons"))
 
 setMethod(f='horizons', signature='SoilProfileCollection',
   function(object ,id=as.numeric(NA)){
-    if (all(is.na(id)))  # if no profile id, the data for every profile is returned
-      res <- ldply(profiles(object), horizons)
+    if (all(is.na(id))) { # if no profile id, the data for every profile is returnedt)
+      res <- ldply(.getProfilesAsList(object), horizons)
+    }
     else {
       if (!is.numeric(id))
 	id <- which(profile_id(object) %in% id)
@@ -157,8 +187,8 @@ setMethod("profiles", "SoilProfileCollection",
       if (!is.numeric(id))
 	id <- which(profile_id(object) %in% id)
     res <- object@profiles[id]
-#     if (length(res) == 1)
-#       res <- res[[1]]
+    if (length(res) == 1)
+      res <- res[[1]]
     res
   }
 )
@@ -168,8 +198,9 @@ if (!isGeneric("depths_units"))
     standardGeneric("depths_units"))
 
 setMethod("depths_units", "SoilProfileCollection",
-  function(object)
-    unique(sapply(profiles(object), depths_units))
+  function(object) {
+    unique(laply(.getProfilesAsList(object), depths_units))
+  }
 )
 
 # retrieves the ids
