@@ -10,20 +10,223 @@
 #' @param depth_units the unit in which horizon depths are expressed
 #'
 "SoilProfile" <- function(depths=matrix(ncol=2), horizons=data.frame(), id=as.character(NA), depth_units="cm"){
-  # if the first argument is a Profile object, it is used to construct the SoilProfile object
-  if (!inherits(depths, "Profile")) {
-    # creation of the Profile object 
-    depths <- Profile(depths=depths, id=id, depth_units=depth_units)
-  } 
-  else { 
-    # depths has a Profile inheritance
-    obj <- depths
-    # getting all the available properties
-    id <- profile_id(obj)
-    depths_units <- depths_units(obj)
-    depths <- depths(obj)
-    depths <- Profile(depths=depths, id=id, depth_units=depths_units)
-  }
+  if (missing(depth_units))
+    warning("unspecified depths units - centimeters are used.")
+  # if the id is not given, it is initilialized at character(1).
+  if (is.na(id))
+    id <- as.character(1)
+  # the id *must* be of class character (this is in the class definition)
+  if (!is.character(id))
+    id <- as.character(id)
+  
   # creation of the object (includes a validity check)
-  new("SoilProfile", depths, horizons=horizons)
+  new("SoilProfile", depths=depths, id=id, depth_units=depth_units, horizons=horizons)
 }
+
+## show
+
+setMethod(
+  f='show',
+  signature='SoilProfile',
+  definition=function(object){
+    cat("Object of class ", class(object), "\n", sep = "")
+    cat("ID: ", profile_id(object), "\n", sep="")
+    cat("Number of horizons: ", length(object), "\n", sep="")
+    if (length(object) > 0) {
+      cat("Available depths:\n")
+      depth_classes <- aaply(depths(object), 1, function(x){paste(x[1], '-', x[2], ' ', depths_units(object), sep='')}, .expand=FALSE)
+      sapply(depth_classes, function(x){cat(x, "\n", sep="")})
+    }
+    # If there are horizon data in the object (SoilProfile and SoilProfileDataFrame classes)
+    if ("horizons" %in% slotNames(object)) {
+      cat("\nHorizons attributes:\n")
+      print(horizons(object))
+    }
+    # If there are site data in the object (SoilProfileDataFrame class)
+    if ("site" %in% slotNames(object)) {
+      cat("\nSampling site attributes:\n")
+      print(site(object))
+    }
+  }
+)
+
+## summary
+
+if (!isGeneric("summary"))
+  setGeneric("summary", function(object, ...)
+    standardGeneric("summary"))
+
+summary.SoilProfile <- function (object, ...){
+    obj <- list()
+    obj[["class"]] = class(object)
+    if (length(object) > 0)
+      obj[["depths"]] <- depths(object)
+    else
+      obj[["depths"]] <- NA
+    obj[["n_depths"]] <- length(object)
+    if (length(object) > 0) {
+      depth_classes <- aaply(depths(object), 1, function(x){paste(x[1], '-', x[2], ' ', depths_units(object), sep='')}, .expand=FALSE)
+      obj[["depth_classes"]] <- depth_classes
+    }
+#     n_horizons <- nrow(depths(object))
+#     obj[["n_horizons"]] <- n_horizons
+    obj[["id"]] = profile_id(object)
+    obj[["units"]] = depths_units(object)
+    
+    # If there are horizon data in the object (SoilProfile and SoilProfileDataFrame classes)
+    if ("horizons" %in% slotNames(object)) {
+      if (nrow(horizons(object)) > 0)
+	if (ncol(horizons(object)) > 1)
+	  obj[["horizons"]] <- summary(horizons(object))
+	else
+	  obj[["horizons"]] <- summary(horizons(object)[[1]])
+      else
+	obj[["horizons"]] <- data.frame()
+    }
+    else 
+      obj[["horizons"]] <- data.frame()
+
+    # If there are site data in the object (SoilProfileDataFrame class)
+    if ("site" %in% slotNames(object)) {
+      if (ncol(object@site) > 0) 
+	obj[["site"]] <- summary(object@site)
+      else 
+	obj[["site"]] <- data.frame()
+    }
+    else 
+      obj[["site"]] <- data.frame()
+
+    class(obj) <- "summary.SoilProfile"
+    obj
+}
+
+setMethod("summary", "summary.SoilProfile", summary.SoilProfile)
+
+print.summary.SoilProfile = function(x, ...) {
+  cat(paste("Object of class ", x[["class"]], "\n", sep = ""))
+  cat("ID: ", x[["id"]], "\n", sep="")
+  cat("Number of horizons: ",  x[["n_depths"]], "\n", sep="")
+  if (x[["n_depths"]] > 0) {
+    cat("Available depths:\n")
+    sapply(x[['depth_classes']], function(x){cat(x, '\n', sep='')})
+  }
+  if (length(x[["horizons"]]) > 0) {
+    cat("\nHorizons attributes:\n")
+    print(x[["horizons"]])
+  }
+  if (length(x[["site"]]) > 0) {
+    cat("\nSampling site attributes:\n")
+    print(x[["site"]])
+  }
+
+  invisible(x)
+}
+
+setMethod("print", "summary.SoilProfile", print.summary.SoilProfile)
+
+## coerce
+
+as.data.frame.SoilProfile = function(object, ...)
+  data.frame(profile_id(object), depths(object), horizons(object))
+
+setAs("SoilProfile", "data.frame", function(from)
+	as.data.frame.SoilProfile(from))
+
+## accessors
+
+if (!isGeneric("depths"))
+  setGeneric("depths", function(object, ...)
+    standardGeneric("depths"))
+
+setMethod("depths", "SoilProfile",
+  function(object, na.rm=TRUE){
+    if (na.rm) {
+      i <- which(!is.na(object@depths[, 1]) & !is.na(object@depths[, 2]))
+      if (length(i) > 0)
+        res <- object@depths[i, ]
+      else
+        res <- NULL
+    }
+    else
+      res <- object@depths
+    res
+  }
+)
+
+if (!isGeneric("profile_id"))
+  setGeneric("profile_id", function(object, ...)
+    standardGeneric("profile_id"))
+
+setMethod("profile_id", "SoilProfile",
+  function(object, na.rm=TRUE){
+    if (na.rm)
+      res <- object@id[!is.na(object@id)]
+    else
+      res <- object@id
+    res
+  }
+)
+
+if (!isGeneric("depths_units"))
+  setGeneric("depths_units", function(object, ...)
+    standardGeneric("depths_units"))
+
+setMethod("depths_units", "SoilProfile",
+  function(object)
+    object@depth_units
+)
+
+## horizon accessor
+##
+
+if (!isGeneric("horizons"))
+  setGeneric("horizons", function(object, ...)
+    standardGeneric("horizons"))
+
+setMethod("horizons", "SoilProfile",
+#' Retrieves the horizon information within a profile
+#'
+  function(object) {
+    if ("horizons" %in% slotNames(object))
+      if (nrow(object@horizons) > 0)
+	res <- object@horizons #res <- data.frame(profile_id=profile_id(object), object@horizons)
+      else
+	res <- data.frame()
+    else
+      res <- data.frame()
+    res
+  }
+)
+
+if (!isGeneric("site"))
+  setGeneric("site", function(object, ...)
+    standardGeneric("site"))
+
+setMethod("site", "SoilProfile",
+  function(object)
+    NULL
+)
+
+## overloads
+
+# overload min() to give us the min depth within a profile
+setMethod(f='min', signature='SoilProfile',
+definition=function(x)
+    min(sapply(x@depths, min, na.rm=TRUE))
+)
+
+# overload max() to give us the max depth within a profile
+setMethod(f='max', signature='SoilProfile',
+definition=function(x)
+    max(sapply(x@depths, max, na.rm=TRUE))
+)
+
+# overload length() to give us the number of horizons
+setMethod(f='length', signature='SoilProfile',
+  definition=function(x){
+    res <- nrow(depths(x, na.rm=TRUE))
+    if (is.null(res))
+      res <- 0
+    res
+  }
+)
