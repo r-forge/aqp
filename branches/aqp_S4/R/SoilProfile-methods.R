@@ -153,6 +153,15 @@ setMethod("depths", "SoilProfile",
   }
 )
 
+if (!isGeneric("depthnames"))
+  setGeneric("depthnames", function(object, ...)
+    standardGeneric("depthnames"))
+
+setMethod("depthnames", "SoilProfile",
+  function(object) 
+    dimnames(depths(object))[[2]]
+)
+
 if (!isGeneric("profile_id"))
   setGeneric("profile_id", function(object, ...)
     standardGeneric("profile_id"))
