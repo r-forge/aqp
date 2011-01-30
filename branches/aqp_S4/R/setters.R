@@ -104,56 +104,77 @@ setReplaceMethod("site", "SoilProfile",
   str_c(c(prefix, hash), collapse = "")
 }
 
+.createSiteFromHorizon <- function(object, mf){
+  names_attr <- names(mf)
+  idx <- match(names(mf), names(horizons(object)))
+  # Adding a profile id column
+  mf <- data.frame(mf, 
+    unlist(
+      llply(profile_id(object), 
+	function(x){
+	  rep(x, length.out=length(profiles(object, x)))
+	})
+    , use.names=F))
+  # for identification of the profiles, a hash is used 
+  # so we don't mess up with the *real* attributes names.
+  # if theres a confusion you really have strange attr names
+  tmp_id <- .createCharHash(n=5, prefix='TMP') 
+  names(mf) <- c(names_attr, tmp_id)
+  
+  # when there is only one attribute for site data we need to use a different approach
+  site_data <- ddply(mf, tmp_id, 
+      .fun=function(x) {
+	df <- subset(x, select=names_attr)
+	colwise(unique)(df)
+      })
+  tmp_id_col <- which(names(site_data) == tmp_id)
+  site_data <- site_data[,-tmp_id_col]
+  
+  if (!inherits(site_data, 'data.frame')) {
+    site_data <- as.data.frame(site_data)
+    names(site_data) <- names_attr
+  }
+
+  # if site data is already present in the object, we don't want to erase it
+  if (length(site(object)) > 0)
+    site_data <- data.frame(site(object), site_data)
+
+  # remove the named site data from horizon_data IN EACH PROFILE
+  # note that we are replacing the list of SoilProfile objects (in place) with modified versions
+  profiles_list <- lapply(profiles(object), function(i, v.names=names_attr) {
+    h <- horizons(i)
+    select_cols <- setdiff(names(h), v.names)
+    horizons(i) <- subset(h, select=select_cols)
+    return(i) 
+  })
+  list(profiles_list=profiles_list, site_data=site_data)
+}
+
 setReplaceMethod("site", "SoilProfileCollection",
   function(object, value) {
+
+  # creation of site data from horizon data
     if (inherits(value, "formula")) {
       mf <- model.frame(value, horizons(object))
-      names_attr <- names(mf)
-      idx <- match(names(mf), names(horizons(object)))
-      # Adding a profile id column
-      mf <- data.frame(mf, 
-	unlist(
-	  llply(profile_id(object), 
-	    function(x){
-	      rep(x, length.out=length(profiles(object, x)))
-	    })
-	, use.names=F))
-      # for identification of the profiles, a hash is used 
-      # so we don't mess up with the *real* attributes names.
-      # if theres a confusion you really have strange attr names
-      tmp_id <- .createCharHash(n=5, prefix='TMP') 
-      names(mf) <- c(names_attr, tmp_id)
-      
-      # when there is only one attribute for site data we need to use a different approach
-      site_data <- ddply(mf, tmp_id, 
-	  .fun=function(x) {
-	    df <- subset(x, select=names_attr)
-	    colwise(unique)(df)
-	  })
-      tmp_id_col <- which(names(site_data) == tmp_id)
-      site_data <- site_data[,-tmp_id_col]
-      
-      if (!inherits(site_data, 'data.frame')) {
-	site_data <- as.data.frame(site_data)
-	names(site_data) <- names_attr
-      }
-
-      # if site data is already present in the object, we don't want to erase it
-      if (length(site(object)) > 0)
-	site_data <- data.frame(site(object), site_data)
-
-      # remove the named site data from horizon_data IN EACH PROFILE
-      # note that we are replacing the list of SoilProfile objects (in place) with modified versions
-      profiles_list <- lapply(profiles(object), function(i, v.names=names_attr) {
-	h <- horizons(i)
-	select_cols <- setdiff(names(h), v.names)
-	horizons(i) <- subset(h, select=select_cols)
-	return(i) 
-      })
-      object <- SoilProfileCollection(profiles=profiles_list, site=site_data)
+      res <- .createSiteFromHorizon(object, mf)
+      object <- SoilProfileCollection(profiles=res$profiles_list, site=res$site_data)
     }
-    else stop('not implemented yet')
-
+    else {
+      if (inherits(value, "character")) {
+	i <- which(names(horizons(object)) %in% value)
+	mf <- horizons(object)[, i]
+	res <- .createSiteFromHorizon(object, mf)
+	object <- SoilProfileCollection(profiles=res$profiles_list, site=res$site_data)
+      }
+  # creation of site data from external data
+      else {
+	if (inherits(value, "data.frame")) {
+	# if this is a data.frame we are actually adding data
+	object <- SoilProfileCollection(profiles=profiles(object), site=value)
+	}
+	else stop('not implemented yet')
+      }
+    }
     object
   }
 )
@@ -191,6 +212,50 @@ setReplaceMethod("profiles", "SoilProfileCollection",
     # this setter aims at replacing one or several profiles in the collection
     # without using the @ slot accessor (but using the validity checks). 
     # 
+
+    # Only one profile is given
+    if (inherits(value, "SoilProfile")) {
+      object <- SoilProfileCollection(profiles=list(value), site=site(object))
+    }
+    else
+      # More than one profile - but it has to ba a list of SoilProfile!
+      if (inherits(value, "list") & (all(laply(value, inherits, "SoilProfile"))))
+	object <- SoilProfileCollection(profiles=value, site=site(object))
+      else stop("wrong profile re-initialization")
     object
   }
 )
+
+## profile_id<- setter
+
+# this setter aims at replacing the ID of a SoilProfile
+# 
+if (!isGeneric('profile_id<-'))
+  setGeneric('profile_id<-', function(object, value) 
+    standardGeneric('profile_id<-'))
+
+setReplaceMethod("profile_id", "SoilProfile",
+  function(object, value) {
+    if (length(value) != 1)
+      stop("length of the new ID does not match the length of the object")
+    if (!is.character(value))
+      value <- as.character(value)
+    object@id <- value
+    object
+  })
+
+setReplaceMethod("profile_id", "SoilProfileCollection",
+  function(object, value) {
+    # check length of the object
+    if (length(value) != length(object))
+      stop("length of the new IDs does not match the length of the object")
+    if (!is.character(value))
+      value <- as.character(value)
+    # check unicity of IDs in value
+    if (length(unique(value)) < length(value)) {
+      value <- make.unique(value)
+      warning("You entered duplicated IDs. This has been corrected but you may want to check the new IDs.")
+    }
+    object@ids <- value
+    object
+  })
