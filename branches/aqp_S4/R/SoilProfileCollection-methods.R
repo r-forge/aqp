@@ -154,6 +154,22 @@ setMethod("depths", "SoilProfileCollection",
   }
 )
 
+if (!isGeneric("depthnames"))
+  setGeneric("depthnames", function(object, ...)
+    standardGeneric("depthnames"))
+
+setMethod("depthnames", "SoilProfileCollection",
+  function(object) {
+    dn <- laply(.getProfilesAsList(spc), depthnames)
+    res <- apply(a, 2, unique)
+    # if there is only one set of depthnames, we remove the 
+    # heqders from the result to get just a plain character vector.
+    if (is.null(nrow(res)))
+      names(res) <- NULL
+    res
+  }
+)
+
 # returns a data.frame aggregating horizons data
 if (!isGeneric("horizons"))
   setGeneric("horizons", function(object, ...)
