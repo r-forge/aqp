@@ -26,9 +26,8 @@ setReplaceMethod("depths", "data.frame",
 	# make a copy of the horizon data, with id, top, and bottom removed
 	horizon_data <- object[, -idx]
 
-	res <- Profile(depths=depths, id=profiles_id) # assemble as a Profile object
-	if (nrow(horizon_data) > 0) # if theres data left, we create a SoilProfile object
-	  res <- SoilProfile(res, horizons=horizon_data)	  
+	# we create a SoilProfile object
+	res <- SoilProfile(depths=depths, id=profiles_id, horizons=horizon_data)	  
       }
       else { # otherwise, we have a collection -> SoilProfileCollection
 	  # nm contains names for profiles_ids, top, bottom
@@ -51,22 +50,20 @@ setReplaceMethod("depths", "data.frame",
     }	
     else
       stop('invalid initialization for SoilProfile object')
-
     res
   }
 )
 
 ## site<- setter method - to initialize site data
-## in SoilProfileDataFrame and SoilProfileCollection objects
+## in SoilProfileCollection objects
 ##
 if (!isGeneric('site<-'))
   setGeneric('site<-', function(object, value) 
     standardGeneric('site<-'))
 
-setReplaceMethod("site", "Profile",
+setReplaceMethod("site", "SoilProfile",
   function(object, value) {
-    # cant do that on a Profile object as it does not have any data at all (excpet depths)
-    if (inherits(value, "formula") & (class(object) != "Profile")) {
+    if (inherits(value, "formula")) {
       mf <- model.frame(value, horizons(object))
       idx <- match(names(mf), names(horizons(object)))
       
@@ -92,11 +89,7 @@ setReplaceMethod("site", "Profile",
       if (length(site(object)) > 0)
 	site_data <- data.frame(site(object), site_data)
 
-      # update or create the site data
-      if (inherits(object, "SoilProfileDataFrame"))
-	object@site <- site_data # assign to object's slot
-      else # creation of a SoilProfileDataFrame object
-	object <- SoilProfileDataFrame(object, site=site_data)
+      object <- SoilProfileCollection(profiles=list(object), site=site_data)
     }
     else
       stop('not implemented yet')
@@ -151,16 +144,16 @@ setReplaceMethod("site", "SoilProfileCollection",
 
       # remove the named site data from horizon_data IN EACH PROFILE
       # note that we are replacing the list of SoilProfile objects (in place) with modified versions
-      profiles_list <- lapply(object@profiles, function(i, v.names=names_attr) {
+      profiles_list <- lapply(profiles(object), function(i, v.names=names_attr) {
 	h <- horizons(i)
-	idx <- match(v.names, names(h))
-	horizons(i) <- h[, -idx]
+	select_cols <- setdiff(names(h), v.names)
+	horizons(i) <- subset(h, select=select_cols)
 	return(i) 
       })
       object <- SoilProfileCollection(profiles=profiles_list, site=site_data)
     }
-    else 
-      stop('not implemented yet')
+    else stop('not implemented yet')
+
     object
   }
 )
@@ -171,7 +164,7 @@ if (!isGeneric('horizons<-'))
   setGeneric('horizons<-', function(object, value) 
     standardGeneric('horizons<-'))
 
-setReplaceMethod("horizons", "Profile",
+setReplaceMethod("horizons", "SoilProfile",
   function(object, value) {
     # testing the class of the horizon data to add to the object
     if (!inherits(value, "data.frame"))
@@ -179,11 +172,10 @@ setReplaceMethod("horizons", "Profile",
     # testing the number of rows of the horizon data
     if (nrow(value) != length(object))
       stop("inconsistent number of rows")
-    # testing if a horizons slot is available
-    if (class(object) == "Profile")
-      object <- SoilProfileDataFrame(object, horizons=value)
-    else 
-      object@horizons <- value
+    # if horizon data is already present
+#     if (length(horizons(object)) > 0)
+#       value <- data.frame(horizons(object), value)
+    object@horizons <- value
     object
   }
 )
