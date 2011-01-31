@@ -7,20 +7,22 @@
 #'
 #' @param depths a two-columns matrix with the top and bottom depths of each horizon in the profile.
 #' @param id a unique identification of the profile
-#' @param depth_units the unit in which horizon depths are expressed
+#' @param units the unit in which horizon depths are expressed
 #'
-"SoilProfile" <- function(depths=matrix(ncol=2), horizons=data.frame(), id=as.character(NA), depth_units="cm"){
-  if (missing(depth_units))
-    warning("unspecified depths units - centimeters are used.")
+"SoilProfile" <- function(depths=matrix(ncol=2), horizons=data.frame(), id=as.character(NA), units="cm"){
+  if (missing(units))
+    warning("unspecified depths units, centimeters are used")
   # if the id is not given, it is initilialized at character(1).
   if (is.na(id))
     id <- as.character(1)
   # the id *must* be of class character (this is in the class definition)
   if (!is.character(id))
     id <- as.character(id)
-  
+  # if there is only one horizon, we force it to be passed as a matric object to pass the validity test
+  if (!is.matrix(depths))
+    depths <- matrix(depths, ncol=2)
   # creation of the object (includes a validity check)
-  new("SoilProfile", depths=depths, id=id, depth_units=depth_units, horizons=horizons)
+  new("SoilProfile", depths=depths, id=id, units=units, horizons=horizons)
 }
 
 ## show
@@ -34,7 +36,7 @@ setMethod(
     cat("Number of horizons: ", length(object), "\n", sep="")
     if (length(object) > 0) {
       cat("Available depths:\n")
-      depth_classes <- aaply(depths(object), 1, function(x){paste(x[1], '-', x[2], ' ', depths_units(object), sep='')}, .expand=FALSE)
+      depth_classes <- aaply(depths(object), 1, function(x){paste(x[1], '-', x[2], ' ', units(object), sep='')}, .expand=FALSE)
       sapply(depth_classes, function(x){cat(x, "\n", sep="")})
     }
     # If there are horizon data in the object (SoilProfile and SoilProfileDataFrame classes)
@@ -65,13 +67,13 @@ summary.SoilProfile <- function (object, ...){
       obj[["depths"]] <- NA
     obj[["n_depths"]] <- length(object)
     if (length(object) > 0) {
-      depth_classes <- aaply(depths(object), 1, function(x){paste(x[1], '-', x[2], ' ', depths_units(object), sep='')}, .expand=FALSE)
+      depth_classes <- aaply(depths(object), 1, function(x){paste(x[1], '-', x[2], ' ', units(object), sep='')}, .expand=FALSE)
       obj[["depth_classes"]] <- depth_classes
     }
 #     n_horizons <- nrow(depths(object))
 #     obj[["n_horizons"]] <- n_horizons
     obj[["id"]] = profile_id(object)
-    obj[["units"]] = depths_units(object)
+    obj[["units"]] = units(object)
     
     # If there are horizon data in the object (SoilProfile and SoilProfileDataFrame classes)
     if ("horizons" %in% slotNames(object)) {
@@ -153,11 +155,11 @@ setMethod("depths", "SoilProfile",
   }
 )
 
-if (!isGeneric("depthnames"))
-  setGeneric("depthnames", function(object, ...)
-    standardGeneric("depthnames"))
+if (!isGeneric("depthsnames"))
+  setGeneric("depthsnames", function(object, ...)
+    standardGeneric("depthsnames"))
 
-setMethod("depthnames", "SoilProfile",
+setMethod("depthsnames", "SoilProfile",
   function(object) 
     dimnames(depths(object))[[2]]
 )
@@ -176,13 +178,13 @@ setMethod("profile_id", "SoilProfile",
   }
 )
 
-if (!isGeneric("depths_units"))
-  setGeneric("depths_units", function(object, ...)
-    standardGeneric("depths_units"))
+if (!isGeneric("units"))
+  setGeneric("units", function(object, ...)
+    standardGeneric("units"))
 
-setMethod("depths_units", "SoilProfile",
+setMethod("units", "SoilProfile",
   function(object)
-    object@depth_units
+    object@units
 )
 
 ## horizon accessor
@@ -223,7 +225,7 @@ setMethod(f='min', signature='SoilProfile',
 definition=function(x)
     min(sapply(x@depths, min, na.rm=TRUE))
 )
-
+  
 # overload max() to give us the max depth within a profile
 setMethod(f='max', signature='SoilProfile',
 definition=function(x)
@@ -263,6 +265,47 @@ setReplaceMethod("[[", c("SoilProfile", "ANY", "missing", "ANY"),
     x
   }
 )
+
+setMethod("[", c("SoilProfile", "ANY", "ANY"),
+  function(x, i, j, ...) {
+    if (!missing(i)) { 
+      d <- depths(x)[i, ]
+      # if there is only one horizon, we force it to be passed as a matric object to pass the validity test
+      if (is.numeric(d) | is.integer(d))
+	d <- matrix(d, ncol=2, dimnames=list(NULL, depthsnames(x)))
+      if (missing(j)) # selection on rows
+	x <- SoilProfile(depths=d, id=profile_id(x), horizons=horizons(x)[i, ], units=units(x))
+      else {# selection on rows *and* cols
+	h <- horizons(x)[i, j]
+	if (!is.data.frame(h))
+	  h <- as.data.frame(h)
+	x <- SoilProfile(depths=d, id=profile_id(x), horizons=h, units=units(x))
+      }
+    }
+    else {
+      if (!missing(j)) # selection on cols
+	x <- SoilProfile(depths=depths(x), id=profile_id(x), horizons=horizons(x)[, j], units=units(x))
+#     if (!missing(j)) # no selection
+#       x <- x
+    }
+    x
+  }
+)
+
+setReplaceMethod("[", c("SoilProfile", "ANY", "missing", "ANY"),
+  function(x, i, j, value) {
+    if (!(missing(i)) & (missing(j)))
+      x@horizons[i, ] <- value
+    if ((missing(i)) & (!missing(j)))
+      x@horizons[, j] <- value
+    if ((!missing(i)) & (!missing(j)))
+      x@horizons[i, j] <- value
+    if ((!missing(i)) & (!missing(j)))
+      x@horizons <- value
+    x
+  }
+)
+
 
 names.SoilProfile <- function(x) names(horizons(x))
 
