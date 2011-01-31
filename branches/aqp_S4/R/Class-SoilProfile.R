@@ -3,13 +3,13 @@ setClass(
   representation=representation(
     depths='matrix', # 2-col matrix with top and bottom horizon depths
     id='character', # change it to profile_id ??
-    depth_units='character',
+    units='character',
     horizons='data.frame' # the data for each horizon
   ), 
   prototype=prototype(
     depths=matrix(ncol=2),
     id=as.character(NA),
-    depth_units=as.character(NA),
+    units=as.character(NA),
     horizons=data.frame()
   ),
   validity=function(object) {
@@ -26,7 +26,7 @@ setClass(
     if (length(object@id) != 1)
       stop("profile id must be unique")
     # units must be unique
-    if (length(object@depth_units) != 1)
+    if (length(object@units) != 1)
       stop("depths must be expressed using one unique unit.")
     # If there is horizon data available
     if (length(object@horizons) > 0 ) {
