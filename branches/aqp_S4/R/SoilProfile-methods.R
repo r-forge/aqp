@@ -178,14 +178,8 @@ setMethod("profile_id", "SoilProfile",
   }
 )
 
-if (!isGeneric("units"))
-  setGeneric("units", function(object, ...)
-    standardGeneric("units"))
-
-setMethod("units", "SoilProfile",
-  function(object)
-    object@units
-)
+units.SoilProfile <- function(object)
+  object@units
 
 ## horizon accessor
 ##
@@ -311,5 +305,36 @@ names.SoilProfile <- function(x) names(horizons(x))
 
 "names<-.SoilProfile" <- function(x, value) {
   names(horizons(x)) <- value
+  x
+}
+
+## Subset SP with a subset/select query on the horizon data AND/OR the depths
+
+subset.SoilProfile <- function(x, subset, select, drop = FALSE, ...) {
+  # adapted from subset.data.frame
+  
+  if (missing(subset))
+        r <- TRUE
+  else {
+    d <- data.frame(depths(x))
+    e <- substitute(subset)
+    r <- eval(e, d, parent.frame())
+    if (!is.logical(r))
+      stop("'subset' must evaluate to logical")
+    r <- r & !is.na(r)
+  }
+
+  if (missing(select))
+    vars <- TRUE
+  else {
+    h <- horizons(x)
+    nl <- as.list(seq_along(h))
+    names(nl) <- names(h)
+    vars <- eval(substitute(select), nl, parent.frame())
+  }
+  # remove unused factors
+  h <- droplevels(horizons(x)[r, vars])
+  # generate the new SP object
+  x <- SoilProfile(depths=depths(x)[r, ], horizons=h, id=profile_id(x), units=units(x))
   x
 }
