@@ -2,7 +2,7 @@
 #'
 #' @param depths a two-columns matrix with the top and bottom depths of each horizon in the profile.
 #' @param id a unique identification of the profile
-#' @param depth_units the unit in which horizon depths are expressed
+#' @param units the unit in which horizon depths are expressed
 #'
 "SoilProfileCollection" <- function(profiles=list(SoilProfile()), site=data.frame(), ids=as.character(NA)){
   # default is that the ids are the id of the SoilProfile objects
@@ -156,15 +156,15 @@ setMethod("depths", "SoilProfileCollection",
 
 # gives the name of the depths columns used
 # in the original data.frame
-if (!isGeneric("depthnames"))
-  setGeneric("depthnames", function(object, ...)
-    standardGeneric("depthnames"))
+if (!isGeneric("depthsnames"))
+  setGeneric("depthsnames", function(object, ...)
+    standardGeneric("depthsnames"))
 
-setMethod("depthnames", "SoilProfileCollection",
+setMethod("depthsnames", "SoilProfileCollection",
   function(object) {
-    dn <- laply(.getProfilesAsList(spc), depthnames)
+    dn <- laply(.getProfilesAsList(spc), depthsnames)
     res <- apply(a, 2, unique)
-    # if there is only one set of depthnames, we remove the 
+    # if there is only one set of depthsnames, we remove the 
     # heqders from the result to get just a plain character vector.
     if (is.null(nrow(res)))
       names(res) <- NULL
