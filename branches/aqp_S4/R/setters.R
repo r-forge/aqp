@@ -193,16 +193,31 @@ setReplaceMethod("horizons", "SoilProfile",
     # testing the number of rows of the horizon data
     if (nrow(value) != length(object))
       stop("inconsistent number of rows")
-    # if horizon data is already present
-#     if (length(horizons(object)) > 0)
-#       value <- data.frame(horizons(object), value)
     object@horizons <- value
     object
   }
 )
 
+setReplaceMethod("horizons", "SoilProfileCollection",
+  function(object, value) {
+    # testing the class of the horizon data to add to the object
+    if (!inherits(value, "data.frame"))
+      stop("value must be a data.frame")
+    # testing the number of rows of the horizon data
+    if (nrow(value) != nrow(horizons(object)))
+      stop("inconsistent number of rows")
+    profiles_list <- llply(profiles(object), function(x) {
+      i <- which(horizons(object)$.id == profile_id(x))
+      horizons(x) <- value[i,]
+      x
+    })
+    object <- SoilProfileCollection(profiles=profiles_list, site=site(object))
+    object
+  }
+)
+
 ## profiles<- setter method
-##
+
 if (!isGeneric('profiles<-'))
   setGeneric('profiles<-', function(object, value) 
     standardGeneric('profiles<-'))
