@@ -211,15 +211,8 @@ setMethod("profiles", "SoilProfileCollection",
   }
 )
 
-if (!isGeneric("depths_units"))
-  setGeneric("depths_units", function(object, ...)
-    standardGeneric("depths_units"))
-
-setMethod("depths_units", "SoilProfileCollection",
-  function(object) {
-    unique(laply(.getProfilesAsList(object), depths_units))
-  }
-)
+units.SoilProfileCollection <- function(object)
+  unique(laply(.getProfilesAsList(object), units))
 
 # retrieves the ids
 if (!isGeneric("profile_id"))
