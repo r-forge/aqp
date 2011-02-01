@@ -1,5 +1,7 @@
-## initializer
+.withWarnings <- FALSE
 
+## initializer
+##
 #' Initialises a new Profile object.
 #' 
 #' Profile objects are storing very basic metadata about a soil profile: 
@@ -10,7 +12,7 @@
 #' @param units the unit in which horizon depths are expressed
 #'
 "SoilProfile" <- function(depths=matrix(ncol=2), horizons=data.frame(), id=as.character(NA), units="cm"){
-  if (missing(units))
+  if (missing(units) & .withWarnings)
     warning("unspecified depths units, centimeters are used")
   # if the id is not given, it is initilialized at character(1).
   if (is.na(id))
@@ -67,7 +69,10 @@ summary.SoilProfile <- function (object, ...){
       obj[["depths"]] <- NA
     obj[["n_depths"]] <- length(object)
     if (length(object) > 0) {
-      depth_classes <- aaply(depths(object), 1, function(x){paste(x[1], '-', x[2], ' ', units(object), sep='')}, .expand=FALSE)
+      d <- depths(object)
+      if (!is.matrix(object))
+	d <- matrix(d, ncol=2, dimnames=list(NULL, depthsnames(object)))
+      depth_classes <- aaply(d, 1, function(x){paste(x[1], '-', x[2], ' ', units(object), sep='')}, .expand=FALSE)
       obj[["depth_classes"]] <- depth_classes
     }
 #     n_horizons <- nrow(depths(object))
@@ -128,8 +133,15 @@ setMethod("print", "summary.SoilProfile", print.summary.SoilProfile)
 
 ## coerce
 
-as.data.frame.SoilProfile = function(object, ...)
-  data.frame(profile_id(object), depths(object), horizons(object))
+as.data.frame.SoilProfile = function(object, ...){
+  id <- matrix(rep(profile_id(object), length(object)), ncol=1, dimnames=list(NULL, idname(object)))
+  d <- depths(object)
+  h <- horizons(object)
+  # if depth is a vector 
+  if (is.integer(d) | is.numeric(d)) 
+    d <- matrix(d, ncol=2, dimnames=list(NULL, depthsnames(object)))
+  data.frame(id, d, h)
+}
 
 setAs("SoilProfile", "data.frame", function(from)
 	as.data.frame.SoilProfile(from))
@@ -160,8 +172,14 @@ if (!isGeneric("depthsnames"))
     standardGeneric("depthsnames"))
 
 setMethod("depthsnames", "SoilProfile",
-  function(object) 
-    dimnames(depths(object))[[2]]
+  function(object) {
+    d <- depths(object)
+    if (!is.matrix(d) & (length(d) == 2))
+      res <- names(d)
+    else
+      res <- dimnames(d)[[2]]
+    res
+  }
 )
 
 if (!isGeneric("profile_id"))
@@ -202,14 +220,11 @@ setMethod("horizons", "SoilProfile",
 #' Retrieves the horizon information within a profile
 #'
   function(object) {
-    if ("horizons" %in% slotNames(object))
-      if (nrow(object@horizons) > 0)
-	res <- object@horizons #res <- data.frame(profile_id=profile_id(object), object@horizons)
-      else
-	res <- data.frame()
+    if (nrow(object@horizons) > 0)
+      res <- object@horizons #res <- data.frame(profile_id=profile_id(object), object@horizons)
     else
       res <- data.frame()
-    res
+  res
   }
 )
 
@@ -239,7 +254,10 @@ definition=function(x)
 # overload length() to give us the number of horizons
 setMethod(f='length', signature='SoilProfile',
   definition=function(x){
-    res <- nrow(depths(x, na.rm=TRUE))
+    if ((length(depths(x)) == 2) & (is.integer(depths(x)) | is.numeric(depths(x)))) # only one horizon
+      res <- 1
+    else
+      res <- nrow(depths(x, na.rm=TRUE))
     if (is.null(res))
       res <- 0
     res
@@ -322,29 +340,35 @@ names.SoilProfile <- function(x) names(horizons(x))
 
 subset.SoilProfile <- function(x, subset, select, drop = FALSE, ...) {
   # adapted from subset.data.frame
-  
+  df <- as.data.frame(x)
+  id <- idname(x)
+  dpth <- depthsnames(x)
+
+  # subset rows
   if (missing(subset))
         r <- TRUE
   else {
-    d <- data.frame(depths(x))
     e <- substitute(subset)
-    r <- eval(e, d, parent.frame())
+    r <- eval(e, df, parent.frame())
     if (!is.logical(r))
       stop("'subset' must evaluate to logical")
     r <- r & !is.na(r)
   }
 
+  # select cols
   if (missing(select))
-    vars <- TRUE
+    vars <- setdiff(names(df), c(id, dpth))
   else {
-    h <- horizons(x)
-    nl <- as.list(seq_along(h))
-    names(nl) <- names(h)
+    nl <- as.list(seq_along(df))
+    names(nl) <- names(df)
     vars <- eval(substitute(select), nl, parent.frame())
   }
+
+  # subset DF and create SPC
+  sp <- df[r, c(id, dpth, vars)]
   # remove unused factors
-  h <- droplevels(horizons(x)[r, vars])
-  # generate the new SP object
-  x <- SoilProfile(depths=depths(x)[r, ], horizons=h, id=profile_id(x), units=units(x))
-  x
+  sp <- droplevels(sp)
+  depths(sp) <- c(id, dpth)
+ 
+  sp
 }
