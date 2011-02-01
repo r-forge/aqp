@@ -1,11 +1,7 @@
 library(plyr)
-source("Class-Profile.R")
 source("Class-SoilProfile.R")
-source("Class-SoilProfileDataFrame.R")
 source("Class-SoilProfileCollection.R")
-source('Profile-methods.R')
 source('SoilProfile-methods.R')
-source('SoilProfileDataFrame-methods.R')
 source('SoilProfileCollection-methods.R')
 source('setters.R')
 
@@ -25,6 +21,7 @@ sp <- spc[spc$id == "P001",]
 # let's initialize
 # SoilProfile
 depths(sp) <- id ~ top + bottom
+
 # SoilProfileCollection
 depths(spc) <- id ~ bottom + top # GOTYA! the order of top and bottom matters...
 depths(spc) <- id ~ top + bottom
@@ -35,6 +32,7 @@ summary(spc)
 
 # SoilProfile
 site(sp) <- ~ x+y+z
+
 # SoilProfileCollection
 site(spc) <- ~ x+y+z
 

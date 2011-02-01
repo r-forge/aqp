@@ -22,7 +22,7 @@ setMethod(
     cat("Object of class ", class(object), "\n", sep = "")
     cat("Number of profiles: ", length(object), "\n", sep="")
     if (length(object) > 0) {
-      cat("Depth range: ", min(object), "-", max(object), " ", depths_units(object), "\n", sep="")
+      cat("Depth range: ", min(object), "-", max(object), " ", units(object), "\n", sep="")
       cat("\nAvailable profiles:\n")
       print(profiles(object))
     }
@@ -61,7 +61,7 @@ summary.SoilProfileCollection <- function (object, ...){
       obj[["site"]] <- summary(site(object))
     else
       obj[["site"]] <- NA
-    obj[["units"]] <- depths_units(object)
+    obj[["units"]] <- units(object)
     class(obj) <- "summary.SoilProfileCollection"
     obj
 }
