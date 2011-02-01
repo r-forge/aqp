@@ -178,6 +178,16 @@ setMethod("profile_id", "SoilProfile",
   }
 )
 
+# retrieves the id colname in the original dataframe
+if (!isGeneric("idname"))
+  setGeneric("idname", function(object, ...)
+    standardGeneric("idname"))
+
+setMethod("idname", "SoilProfile",
+  function(object) 
+    names(profile_id(object))
+)
+
 units.SoilProfile <- function(object)
   object@units
 
