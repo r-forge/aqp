@@ -7,7 +7,7 @@
 "SoilProfileCollection" <- function(profiles=list(SoilProfile()), site=data.frame(), ids=as.character(NA)){
   # default is that the ids are the id of the SoilProfile objects
   if (all(is.na(ids)))
-    ids <- sapply(profiles, profile_id)
+    ids <- laply(profiles, profile_id)
   names(profiles) <- ids
   # creation of the object (includes a validity check)
   new("SoilProfileCollection", profiles=profiles, site=site, ids=ids)
@@ -52,7 +52,7 @@ summary.SoilProfileCollection <- function (object, ...){
       is.SoilProfile <- laply(.getProfilesAsList(object), function(x){'horizons' %in% slotNames(x)})
       obj[["n_horizons_data"]] <- length(which(is.SoilProfile))
       if (obj[["n_horizons_data"]] > 0) { # if data is availbale we store its summary
-	obj[['horizons']] <- summary(horizons(object))
+	obj[['horizons']] <- summary(horizons(object, keep.id=FALSE))
       }
     }
     else # no profile in the collection
@@ -113,14 +113,29 @@ setMethod("print", "summary.SoilProfileCollection", print.summary.SoilProfileCol
 ## coerce
 
 as.data.frame.SoilProfileCollection = function(object, ...) {
-  id <- unlist(llply(profiles(object), function(x){rep(profile_id(x), length(x))}), use.names=FALSE)
+  ids <- unlist(llply(profiles(object), 
+    .fun=function(x){
+      # coping with the case length(x) = 0
+#       if (length(x) > 0)
+# 	l <- length(x)
+#       else 
+# 	l <- 1
+      rep(profile_id(x), length(x))
+    }), use.names=FALSE)
+
+  ids <- matrix(ids, ncol=1, dimnames=list(NULL, idname(object)))
+  d <- do.call(rbind, depths(object))
+  row.names(d) <- 1:nrow(d)
+  h <- horizons(object, keep.id=FALSE)
+  
   if (length(site(object)) == 0)
-    res <- data.frame(id=id, ldply(depths(object), rbind.data.frame), horizons(object))
+    res <- data.frame(ids, d, h)
   else {
     n_horizons <- llply(profiles(object), length)
     site <- sapply(site(object), function(x){rep(x, n_horizons)})
-    res <- data.frame(id=id, site, ldply(depths(object), rbind.data.frame), horizons(object))
+    res <- data.frame(ids, d, site, h)
   }
+   
   res
 }
 
@@ -135,10 +150,19 @@ if (!isGeneric("site"))
 
 # retrieves the site data frame
 setMethod("site", "SoilProfileCollection",
-  function(object) {
-    res <- object@site
-    if (length(res) > 0)
+  function(object, keep.id=FALSE) {
+    if (keep.id) {
+      res <- data.frame(profile_id(object), object@site)
+      names(res)[1] <- idname(object)
+    }
+    else
+      res <- object@site
+    if (length(res) > 1)
       rownames(res) <- profile_id(object)
+    else
+      if (length(res) == 1)
+	names(res) <- profile_id(object)
+
     res
   }
 )
@@ -162,8 +186,8 @@ if (!isGeneric("depthsnames"))
 
 setMethod("depthsnames", "SoilProfileCollection",
   function(object) {
-    dn <- laply(.getProfilesAsList(spc), depthsnames)
-    res <- apply(a, 2, unique)
+    dn <- laply(.getProfilesAsList(object), depthsnames)
+    res <- apply(dn, 2, unique)
     # if there is only one set of depthsnames, we remove the 
     # heqders from the result to get just a plain character vector.
     if (is.null(nrow(res)))
@@ -178,7 +202,7 @@ if (!isGeneric("horizons"))
     standardGeneric("horizons"))
 
 setMethod(f='horizons', signature='SoilProfileCollection',
-  function(object ,id=as.numeric(NA)){
+  function(object ,id=as.numeric(NA), keep.id=TRUE){
     if (all(is.na(id))) { # if no profile id, the data for every profile is returnedt)
       res <- ldply(.getProfilesAsList(object), horizons)
     }
@@ -187,6 +211,18 @@ setMethod(f='horizons', signature='SoilProfileCollection',
 	id <- which(profile_id(object) %in% id)
       res <- ldply(profiles(object)[id], horizons)
     }
+    nm <- names(res)
+    # option to remove the .id column ldply is adding
+    idx <- which(names(res) == '.id')
+    if (!keep.id) {
+      res <- res[, -idx] # dirty hack to remove the .id column ldply is adding
+      if (is.null(ncol(res))) {# if it has become  a vector 
+	res <- data.frame(res)
+	names(res) <- nm[-idx]
+      }
+    }
+    else # if we keep it we do rename it
+      names(res)[idx] <- idname(object)
     res
   }
 )
@@ -222,6 +258,16 @@ if (!isGeneric("profile_id"))
 setMethod("profile_id", "SoilProfileCollection",
   function(object) 
     object@ids
+)
+
+# retrieves the id colname in the original dataframe
+if (!isGeneric("idname"))
+    setGeneric("idname", function(object, ...)
+      standardGeneric("idname"))
+
+setMethod("idname", "SoilProfileCollection",
+  function(object) 
+    unique(laply(profiles(object), function(x) names(profile_id(x))))
 )
 
 ## overloads
@@ -294,6 +340,50 @@ setReplaceMethod("[[", c("SoilProfileCollection", "ANY", "missing", "ANY"),
 names.SoilProfileCollection <- function(x) c(names(horizons(x)), names(site(x)))
 
 ## data manipulation
+
+## Subset SPC with a subset/select query on the horizon data AND/OR the depths AND/OR site data
+
+subset.SoilProfileCollection <- function(x, subset, select, drop = FALSE, ...) {
+  # adapted from subset.data.frame
+  df <- as.data.frame(x)
+  id <- idname(x)
+  dpth <- depthsnames(x)
+
+  # subset rows
+  if (missing(subset))
+        r <- TRUE
+  else {
+    e <- substitute(subset)
+    r <- eval(e, df, parent.frame())
+    if (!is.logical(r))
+      stop("'subset' must evaluate to logical")
+    r <- r & !is.na(r)
+  }
+
+  # select cols
+  if (missing(select))
+    vars <- setdiff(names(df), c(id, dpth))
+  else {
+    nl <- as.list(seq_along(df))
+    names(nl) <- names(df)
+    vars <- eval(substitute(select), nl, parent.frame())
+  }
+  
+  # subset DF and create SPC
+  spc <- df[r, c(id, dpth, vars)]
+  # remove unused factors
+  spc <- droplevels(spc)
+  depths(spc) <- c(id, dpth)
+ 
+  # if there is site data, the subset is also applied
+  if (length(site(x)) > 0) {
+    s <- names(site(x)) # retrieves the col names of the site data
+    if (s %in% names(spc))
+	site(spc) <- s
+  }
+  
+  spc
+}
 
 # adds SoilProfiles to the collection
 if (!isGeneric("add"))
