@@ -38,7 +38,10 @@ setMethod(
     cat("Number of horizons: ", length(object), "\n", sep="")
     if (length(object) > 0) {
       cat("Available depths:\n")
-      depth_classes <- aaply(depths(object), 1, function(x){paste(x[1], '-', x[2], ' ', units(object), sep='')}, .expand=FALSE)
+      d <- depths(object)
+      if (!is.matrix(object))
+	d <- matrix(d, ncol=2, dimnames=list(NULL, depthsnames(object)))
+      depth_classes <- aaply(d, 1, function(x){paste(x[1], '-', x[2], ' ', units(object), sep='')}, .expand=FALSE)
       sapply(depth_classes, function(x){cat(x, "\n", sep="")})
     }
     # If there are horizon data in the object (SoilProfile and SoilProfileDataFrame classes)
