@@ -209,7 +209,7 @@ setMethod(f='horizons', signature='SoilProfileCollection',
     nm <- names(res)
     # option to remove the .id column ldply is adding
     idx <- which(names(res) == '.id')
-    if (!keep.id & (length(idx) == 0)) {
+    if (!keep.id & (length(idx) != 0)) {
       res <- res[, -idx] # dirty hack to remove the .id column ldply is adding
       if (is.null(ncol(res))) {# if it has become  a vector 
 	res <- data.frame(res)
@@ -219,7 +219,6 @@ setMethod(f='horizons', signature='SoilProfileCollection',
     else # if we keep it we do rename it
       if (keep.id)
 	names(res)[idx] <- idname(object)
-    browser()
     res
   }
 )
@@ -284,7 +283,7 @@ definition=function(x)
 # overload length() to give us the number of profiles in the collection
 setMethod(f='length', signature='SoilProfileCollection',
   definition=function(x){
-    length(profiles(x))
+    length(.getProfilesAsList(x))
   }
 )
 
