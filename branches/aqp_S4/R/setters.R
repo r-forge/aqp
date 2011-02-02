@@ -122,42 +122,24 @@ setReplaceMethod("site", "SoilProfile",
   }
 )
 
-# function to generate a random char string
-.createCharHash <- function(n, prefix=""){
-  require(stringr)
-  hash <- letters[round(26*runif(n))]
-  str_c(c(prefix, hash), collapse = "")
-}
-
+# function to generate a list of profiles and a site data
+# frame - ready to be used to initialize/update a SPC
 .createSiteFromHorizon <- function(object, mf){
   names_attr <- names(mf)
   idx <- match(names(mf), names(horizons(object)))
-  # Adding a profile id column
-  mf <- data.frame(mf, 
-    unlist(
-      llply(profile_id(object), 
-	function(x){
-	  rep(x, length.out=length(profiles(object, x)))
-	})
-    , use.names=F))
-  # for identification of the profiles, a hash is used 
-  # so we don't mess up with the *real* attributes names.
-  # if theres a confusion you really have strange attr names
-  tmp_id <- .createCharHash(n=5, prefix='TMP') 
-  names(mf) <- c(names_attr, tmp_id)
   
   # when there is only one attribute for site data we need to use a different approach
-  site_data <- ddply(mf, tmp_id, 
+  site_data <- ddply(mf, idname(object), 
       .fun=function(x) {
 	df <- subset(x, select=names_attr)
 	colwise(unique)(df)
       })
-  tmp_id_col <- which(names(site_data) == tmp_id)
+  tmp_id_col <- which(names(site_data) == idname(object))
   site_data <- site_data[,-tmp_id_col]
   
   if (!inherits(site_data, 'data.frame')) {
     site_data <- as.data.frame(site_data)
-    names(site_data) <- names_attr
+    names(site_data) <- names_attr[-tmp_id_col]
   }
 
   # if site data is already present in the object, we don't want to erase it
@@ -180,7 +162,13 @@ setReplaceMethod("site", "SoilProfileCollection",
 
   # creation of site data from horizon data
     if (inherits(value, "formula")) {
+      ids <- unlist(llply(profiles(object), 
+	.fun=function(x)rep(profile_id(x), length(x))
+      ), use.names=FALSE)
       mf <- model.frame(value, horizons(object))
+      nm <- names(mf)
+      mf <- data.frame(ids, mf)
+      names(mf) <- c(idname(object), nm)
       res <- .createSiteFromHorizon(object, mf)
       object <- SoilProfileCollection(profiles=res$profiles_list, site=res$site_data)
     }
