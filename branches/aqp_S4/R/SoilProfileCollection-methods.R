@@ -114,14 +114,8 @@ setMethod("print", "summary.SoilProfileCollection", print.summary.SoilProfileCol
 
 as.data.frame.SoilProfileCollection = function(object, ...) {
   ids <- unlist(llply(profiles(object), 
-    .fun=function(x){
-      # coping with the case length(x) = 0
-#       if (length(x) > 0)
-# 	l <- length(x)
-#       else 
-# 	l <- 1
-      rep(profile_id(x), length(x))
-    }), use.names=FALSE)
+    .fun=function(x)rep(profile_id(x), length(x))
+    ), use.names=FALSE)
 
   ids <- matrix(ids, ncol=1, dimnames=list(NULL, idname(object)))
   d <- do.call(rbind, depths(object))
@@ -155,12 +149,13 @@ setMethod("site", "SoilProfileCollection",
       res <- data.frame(profile_id(object), object@site)
       names(res)[1] <- idname(object)
     }
-    else
+    else {
       res <- object@site
+    }
     if (length(res) > 1)
       rownames(res) <- profile_id(object)
     else
-      if (length(res) == 1)
+      if ((length(res) == 1) & !is.data.frame(res))
 	names(res) <- profile_id(object)
 
     res
@@ -189,7 +184,7 @@ setMethod("depthsnames", "SoilProfileCollection",
     dn <- laply(.getProfilesAsList(object), depthsnames)
     res <- apply(dn, 2, unique)
     # if there is only one set of depthsnames, we remove the 
-    # heqders from the result to get just a plain character vector.
+    # headers from the result to get just a plain character vector.
     if (is.null(nrow(res)))
       names(res) <- NULL
     res
