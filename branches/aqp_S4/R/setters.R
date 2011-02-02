@@ -159,12 +159,11 @@ setReplaceMethod("site", "SoilProfile",
 
 setReplaceMethod("site", "SoilProfileCollection",
   function(object, value) {
-
+    ids <- unlist(llply(profiles(object), 
+      .fun=function(x)rep(profile_id(x), length(x))
+      ), use.names=FALSE)
   # creation of site data from horizon data
     if (inherits(value, "formula")) {
-      ids <- unlist(llply(profiles(object), 
-	.fun=function(x)rep(profile_id(x), length(x))
-      ), use.names=FALSE)
       mf <- model.frame(value, horizons(object))
       nm <- names(mf)
       mf <- data.frame(ids, mf)
@@ -176,6 +175,10 @@ setReplaceMethod("site", "SoilProfileCollection",
       if (inherits(value, "character")) {
 	i <- which(names(horizons(object)) %in% value)
 	mf <- horizons(object)[, i]
+	if (!is.data.frame(mf)) {
+	  mf <- data.frame(mf)
+	  names(mf) <- names(horizons(object))[i]
+	}
 	nm <- names(mf)
 	mf <- data.frame(ids, mf)
 	names(mf) <- c(idname(object), nm)
@@ -223,7 +226,7 @@ setReplaceMethod("horizons", "SoilProfileCollection",
     if (nrow(value) != nrow(horizons(object)))
       stop("inconsistent number of rows")
     profiles_list <- llply(profiles(object), function(x) {
-      i <- which(horizons(object)$.id == profile_id(x))
+      i <- which(horizons(object, keep.id=TRUE)[[idname(object)]] == profile_id(x))
       horizons(x) <- value[i,]
       x
     })
