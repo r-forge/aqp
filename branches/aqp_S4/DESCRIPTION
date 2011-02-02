@@ -2,7 +2,7 @@ Package: aqp
 Version: 0.98
 Date: 2010-11-22
 Title: Algorithms for Quantitative Pedology
-Author: Dylan Beaudette <debeaudette@ucdavis.edu>, Pierre Roudier
+Author: Dylan Beaudette <debeaudette@ucdavis.edu>, Pierre Roudier <roudierp@landcareresearch.co.nz>
 Maintainer: Dylan Beaudette <debeaudette@ucdavis.edu>
 Depends: R (>= 2.9.0), plyr, reshape, stringr, lattice, cluster, sp, methods
 Suggests: RColorBrewer, colorspace, maptools, foreign, doMC, foreach
