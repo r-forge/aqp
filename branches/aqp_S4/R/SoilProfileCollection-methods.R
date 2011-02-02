@@ -332,6 +332,55 @@ setReplaceMethod("[[", c("SoilProfileCollection", "ANY", "missing", "ANY"),
   }
 )
 
+setMethod("[", c("SoilProfileCollection", "ANY", "ANY"),
+  function(x, i, j, ...) {
+    
+    # selection of profiles
+    if (!missing(i)) { 
+      p <- profiles(x, i)
+      ids <- profile_id(x)[i]
+      if (length(site(x)) > 0)
+	s <- site(x)[i, ]
+      else
+	s <- data.frame() 
+      # creation of a SPC object
+      x <- SoilProfileCollection(profiles=p, site=s, ids=ids)
+
+      # adding cols selection
+      if (!missing(j)) {
+	# if theres some site data it gets confusing (what should we subset?)
+	if (length(site(x)) > 0)
+	  warning('site data is present')
+	# we subset horizon data
+	h <- horizons(x, keep.id=F)[, j]
+	if (!is.data.frame(h)) {
+	  h <- as.data.frame(h)
+	  names(h) <- names(horizons(x))[j]
+	  cat('\n/!\\ this is a bug, not a feature :(\n')
+	}
+	horizons(x) <- h
+      }
+    }
+    # no profiles selection
+    else {
+      if (!missing(j)) {
+	# if theres some site data it gets confusing (what should we subset?)
+	if (length(site(x)) > 0)
+	  warning('site data is present')
+	# we subset horizon data
+	h <- horizons(x, keep.id=F)[, j]
+	if (!is.data.frame(h)) {
+	  h <- as.data.frame(h)
+	  names(h) <- names(horizons(x))[j]
+	}
+	horizons(x) <- h
+      }
+    }
+    x
+  }
+)
+
+# getting names
 names.SoilProfileCollection <- function(x) c(names(horizons(x)), names(site(x)))
 
 ## data manipulation
