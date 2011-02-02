@@ -1,3 +1,58 @@
+## initialize SP/SPC objects from a model.frame
+##
+.initSPCfromMF <- function(data, mf){
+  # get the names and column indices of the id, top, bottom
+  # so that we can remove them latter
+  nm <- names(mf)
+  idx <- match(nm, names(data))
+  
+  # generate profile(s) ID(s) and depths
+  profiles_id <- unique(as.character(mf[, 1]))
+  names(profiles_id) <- rep(nm[1], length(profiles_id))
+
+  # if there is only 1 ID we are generating a SoilProfile object
+  if(length(profiles_id) == 1) {
+    # extract depths
+    depths <- as.matrix(data[, idx[2:3]])      
+    # make a copy of the horizon data, with id, top, and bottom removed
+    horizon_data <- data[, -idx]
+    
+    # if horizon data is a vector we need to convert it
+    # as a data.frame so it passes the validity tests
+    if ((!is.data.frame(horizon_data)) & (length(horizon_data) > 0)) {
+      horizon_data <- as.data.frame(horizon_data)
+      names(horizon_data) <- names(data)[4]
+    }
+ 
+    # we create a SoilProfile object
+    res <- SoilProfile(depths=depths, id=profiles_id, horizons=horizon_data)	  
+  }
+  else { # otherwise, we have a collection -> SoilProfileCollection
+    SP_list <- dlply(.data=data, .variables=nm[1],
+      .fun=function(x) {
+	# get current user_id
+	profile_id_i <- unique(as.character(x[, idx[1]]))
+	names(profile_id_i) <- names(x)[idx[1]]
+	# extract depths
+	depths <- as.matrix(x[, idx[2:3]])
+	# make a copy of the horizon data, with id, top, and bottom removed
+	horizon_data <- x[, -idx]
+	# if horizon data is a vector we need to convert it
+	# as a data.frame so it passes the validity tests
+	if ((!is.data.frame(horizon_data)) & (length(horizon_data) > 0)) {
+	  horizon_data <- as.data.frame(horizon_data)
+	  names(horizon_data) <- names(x)[4]
+	} 
+	# assemble object and return
+	SoilProfile(depths=depths, horizons=horizon_data, id=profile_id_i)
+      }
+    )
+    # assemble and return the SoilProfileCollection object
+    res <- SoilProfileCollection(profiles=SP_list)
+  }
+  res
+}
+
 ## depths<- setter method - to create AQP objects
 ##
 if (!isGeneric('depths<-'))
@@ -10,46 +65,16 @@ setReplaceMethod("depths", "data.frame",
       # extract components of formula
       # 1. user id, 2. top, 3. bottom
       mf <- model.frame(value, object)
-      
-      # get the names and column indices of the id, top, bottom
-      # so that we can remove them latter
-      nm <- names(mf)
-      idx <- match(nm, names(object))
-      
-      # generate profile(s) ID(s) and depths
-      profiles_id <- unique(as.character(mf[, 1]))
-      
-      # if there is only 1 ID we are generating a SoilProfile object
-      if(length(profiles_id) == 1) {
-	# extract depths
-	depths <- as.matrix(object[, idx[2:3]])      
-	# make a copy of the horizon data, with id, top, and bottom removed
-	horizon_data <- object[, -idx]
-
-	# we create a SoilProfile object
-	res <- SoilProfile(depths=depths, id=profiles_id, horizons=horizon_data)	  
-      }
-      else { # otherwise, we have a collection -> SoilProfileCollection
-	  # nm contains names for profiles_ids, top, bottom
-	  SP_list <- dlply(.data=object, .variables=nm[1],
-		  .fun=function(x) {
-		    # get current user_id
-		    profile_id_i <- unique(as.character(x[, idx[1]]))
-		    # extract depths
-		    depths <- as.matrix(x[, idx[2:3]])
-		    # make a copy of the horizon data, with id, top, and bottom removed
-		    horizon_data <- x[, -idx]
-		    # assemble object and return
-		    SoilProfile(depths=depths, horizons=horizon_data, id=profile_id_i)
-		  }
-	  )
-	  
-	  # assemble and return the SoilProfileCollection object
-	  res <- SoilProfileCollection(profiles=SP_list)
-      }	
+      res <- .initSPCfromMF(data=object, mf=mf)
     }	
-    else
-      stop('invalid initialization for SoilProfile object')
+    else {
+      if (inherits(value, "character")) { # initialization by colnames
+	mf <- object[,value]
+	res <- .initSPCfromMF(data=object, mf=mf)
+      }
+      else
+	stop('invalid initialization for SoilProfile object')
+    }
     res
   }
 )
