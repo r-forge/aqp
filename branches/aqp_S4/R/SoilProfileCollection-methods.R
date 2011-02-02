@@ -102,11 +102,11 @@ setMethod("print", "summary.SoilProfileCollection", print.summary.SoilProfileCol
 
 # to be sure to be returned a list of profiles
 # even when n profiles == 1
-.getProfilesAsList <- function(object){
-  if (!is.list(profiles(object)))
-    profiles_list <- list(profiles(object))
+.getProfilesAsList <- function(object, id=NA){
+  if (!is.list(profiles(object, id=id)))
+    profiles_list <- list(profiles(object, id=id))
   else 
-    profiles_list <- profiles(object)
+    profiles_list <- profiles(object, id=id)
   profiles_list
 }
 
@@ -209,7 +209,7 @@ setMethod(f='horizons', signature='SoilProfileCollection',
     nm <- names(res)
     # option to remove the .id column ldply is adding
     idx <- which(names(res) == '.id')
-    if (!keep.id) {
+    if (!keep.id & (length(idx) == 0)) {
       res <- res[, -idx] # dirty hack to remove the .id column ldply is adding
       if (is.null(ncol(res))) {# if it has become  a vector 
 	res <- data.frame(res)
@@ -217,7 +217,9 @@ setMethod(f='horizons', signature='SoilProfileCollection',
       }
     }
     else # if we keep it we do rename it
-      names(res)[idx] <- idname(object)
+      if (keep.id)
+	names(res)[idx] <- idname(object)
+    browser()
     res
   }
 )
@@ -337,7 +339,7 @@ setMethod("[", c("SoilProfileCollection", "ANY", "ANY"),
     
     # selection of profiles
     if (!missing(i)) { 
-      p <- profiles(x, i)
+      p <- .getProfilesAsList(x, i)
       ids <- profile_id(x)[i]
       if (length(site(x)) > 0)
 	s <- site(x)[i, ]
@@ -352,7 +354,7 @@ setMethod("[", c("SoilProfileCollection", "ANY", "ANY"),
 	if (length(site(x)) > 0)
 	  warning('site data is present')
 	# we subset horizon data
-	h <- horizons(x, keep.id=F)[, j]
+	h <- horizons(x, keep.id=FALSE)[, j]
 	if (!is.data.frame(h)) {
 	  h <- as.data.frame(h)
 	  names(h) <- names(horizons(x))[j]
