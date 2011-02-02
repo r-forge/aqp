@@ -176,6 +176,9 @@ setReplaceMethod("site", "SoilProfileCollection",
       if (inherits(value, "character")) {
 	i <- which(names(horizons(object)) %in% value)
 	mf <- horizons(object)[, i]
+	nm <- names(mf)
+	mf <- data.frame(ids, mf)
+	names(mf) <- c(idname(object), nm)
 	res <- .createSiteFromHorizon(object, mf)
 	object <- SoilProfileCollection(profiles=res$profiles_list, site=res$site_data)
       }
