@@ -373,8 +373,9 @@ subset.SoilProfileCollection <- function(x, subset, select, drop = FALSE, ...) {
   # if there is site data, the subset is also applied
   if (length(site(x)) > 0) {
     s <- names(site(x)) # retrieves the col names of the site data
-    if (s %in% names(spc))
-	site(spc) <- s
+    if (any(s %in% names(spc)))
+	i <- which(s %in% names(spc))
+	site(spc) <- s[i]
   }
   
   spc
