@@ -278,6 +278,8 @@ setReplaceMethod("profile_id", "SoilProfile",
     object
   })
 
+
+
 setReplaceMethod("profile_id", "SoilProfileCollection",
   function(object, value) {
     # check length of the object
@@ -290,6 +292,35 @@ setReplaceMethod("profile_id", "SoilProfileCollection",
       value <- make.unique(value)
       warning("You entered duplicated IDs. This has been corrected but you may want to check the new IDs.")
     }
+    
+    # replace collection-level @ids slot
+    # note that the 'names' attribute is lost...
     object@ids <- value
+    
+    # replace each individual SoilProfile's id'
+    p <- profiles(object)
+    
+    # init empty list to hold SoilProfiles with new IDs
+    p.list <- vector(length=length(p), mode='list')
+    
+    # iterate over old list, assigning new IDs, saving to p.list
+    for(i in seq_along(value))	{
+	  p.i <- p[[i]]
+	  
+	  # important: the new id must have a names attribute of 'id' !!
+	  v.i <- value[i]
+	  attr(v.i, which='names') <- 'id'
+	  
+	  # update this profile ID
+	  profile_id(p.i) <- v.i
+	  # append to our new list of SoilProfile objects
+	  p.list[[i]] <- p.i
+	}
+    
+    # replace original profiles with new, updated list of SoilProfile objects
+    profiles(object) <- p.list
+    
+    # done
     object
   })
+  
