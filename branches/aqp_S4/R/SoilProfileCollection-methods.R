@@ -116,8 +116,14 @@ setMethod("print", "summary.SoilProfileCollection", print.summary.SoilProfileCol
 
 ## coerce
 
-as.data.frame.SoilProfileCollection = function(object, ...) {
-  
+as.list.SoilProfileCollection <- function(object, ...) {
+  .getProfilesAsList(object)
+}
+
+setAs("SoilProfileCollection", "list", function(from)
+	as.list.SoilProfileCollection(from))
+
+as.data.frame.SoilProfileCollection <- function(object, ...) {
   # Get a list of ids, each been repeated as many times as there are horizons
   ids <- unlist(llply(profiles(object), 
     .fun=function(x)rep(profile_id(x), length(x))
@@ -127,7 +133,7 @@ as.data.frame.SoilProfileCollection = function(object, ...) {
   d <- do.call(rbind, depths(object))
   row.names(d) <- 1:nrow(d)
   h <- horizons(object, keep.id=FALSE)
-  
+
   if (length(site(object)) == 0)
     res <- data.frame(ids, d, h)
   else {
@@ -135,7 +141,6 @@ as.data.frame.SoilProfileCollection = function(object, ...) {
     site <- sapply(site(object), function(x){rep(x, n_horizons)})
     res <- data.frame(ids, d, site, h)
   }
-   
   res
 }
 
