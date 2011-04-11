@@ -195,7 +195,7 @@ setMethod("profile_id", "SoilProfile",
       res <- object@id[!is.na(object@id)]
     else
       res <- object@id
-    res
+    as.character(res)
   }
 )
 
