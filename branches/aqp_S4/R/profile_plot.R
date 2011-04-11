@@ -8,7 +8,7 @@
 profile_plot <- function(...)
   UseMethod("profile_plot")
 
-# Tentative - Dylan to correct my dirty hacks in lattice ;)
+# Tentative - Dylan to correct my dirty hacks in base graphics ;)
 profile_plot.SoilProfile <- function(data, color='soil_color', width=0.2, name='name', cex.names=0.5, cex.depth.axis=cex.names, cex.id=cex.names+(0.2*cex.names), plot.order=1:length(data), add=FALSE, scaling.factor=1, y.offset=0, max.depth=max(data), n.depth.ticks=5, shrink=FALSE, shrink.cutoff=3, abbr=FALSE, abbr.cutoff=5, ...){
 
   # check for missing / bad soil color column
