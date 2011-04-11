@@ -100,23 +100,29 @@ setMethod("print", "summary.SoilProfileCollection", print.summary.SoilProfileCol
 
 ## internal functions
 
-# to be sure to be returned a list of profiles
-# even when n profiles == 1
+# to be sure to be returned a list of SoilProfiles
+# even when n profiles == 1 (unformatted version of profiles(...))
 .getProfilesAsList <- function(object, id=NA){
-  if (!is.list(profiles(object, id=id)))
-    profiles_list <- list(profiles(object, id=id))
-  else 
-    profiles_list <- profiles(object, id=id)
-  profiles_list
+  # if the id is unspecified, we return all profiles
+  if (all(is.na(id)))
+    id <- 1:length(object@profiles)
+  else
+    # if the id is not a index number but an id char
+    if (!is.numeric(id))
+      id <- which(profile_id(object) %in% id)
+  res <- object@profiles[id]
+  res
 }
 
 ## coerce
 
 as.data.frame.SoilProfileCollection = function(object, ...) {
+  
+  # Get a list of ids, each been repeated as many times as there are horizons
   ids <- unlist(llply(profiles(object), 
     .fun=function(x)rep(profile_id(x), length(x))
     ), use.names=FALSE)
-
+  # turn that into a 1 col matrix
   ids <- matrix(ids, ncol=1, dimnames=list(NULL, idname(object)))
   d <- do.call(rbind, depths(object))
   row.names(d) <- 1:nrow(d)
@@ -198,10 +204,10 @@ if (!isGeneric("horizons"))
 
 setMethod(f='horizons', signature='SoilProfileCollection',
   function(object ,id=as.numeric(NA), keep.id=TRUE){
-    if (all(is.na(id))) { # if no profile id, the data for every profile is returnedt)
+    if (all(is.na(id))) { # if no profile id at all has been specified, the data for every profile is returned
       res <- ldply(.getProfilesAsList(object), horizons)
     }
-    else {
+    else { # Otherwise one or several specific profiles are returned
       if (!is.numeric(id))
 	id <- which(profile_id(object) %in% id)
       res <- ldply(profiles(object)[id], horizons)
@@ -231,14 +237,21 @@ if (!isGeneric("profiles"))
 
 setMethod("profiles", "SoilProfileCollection",
   function(object, id=as.numeric(NA)) {
+    # if the id is unspecified, we return all profiles
     if (all(is.na(id)))
       id <- 1:length(object@profiles)
     else
+      # if the id is not a index number but an id char
       if (!is.numeric(id))
 	id <- which(profile_id(object) %in% id)
     res <- object@profiles[id]
+
+    # if there is only one profile, a SoilProfile object is returned
     if (length(res) == 1)
       res <- res[[1]]
+    # otherwise we create a new SoilProfileCollection
+    else
+      res <- SoilProfileCollection(profiles=res)
     res
   }
 )
@@ -253,7 +266,7 @@ if (!isGeneric("profile_id"))
 
 setMethod("profile_id", "SoilProfileCollection",
   function(object) 
-    object@ids
+    as.character(object@ids)
 )
 
 # retrieves the id colname in the original dataframe
@@ -263,7 +276,7 @@ if (!isGeneric("idname"))
 
 setMethod("idname", "SoilProfileCollection",
   function(object) 
-    unique(laply(profiles(object), function(x) names(profile_id(x))))
+    unique(laply(.getProfilesAsList(object), function(x) names(x@id)))
 )
 
 ## overloads
@@ -503,3 +516,37 @@ setMethod("add", signature=c("SoilProfileCollection", "SoilProfile"),
 )
 
 # Adding 2 SP together to form a new SPC
+setMethod("add", signature=c("SoilProfile", "SoilProfile"),
+  function(x, y, ...) {
+    # x is a SP, y is a SP
+    # checking ID unicity
+    if (profile_id(y) %in% profile_id(x)) {
+      profile_id(y) <- make.unique(c(profile_id(x), profile_id(y)))[length(x)+1]
+    }
+    profiles_list <- list(x, y)
+    res <- SoilProfileCollection(profiles=profiles_list)
+    res
+  }
+)
+
+
+# Mutate - plyr equivalent to transform(), but faster and better
+if (!isGeneric("mutate"))
+  setGeneric("mutate", function(.data, ...)
+    standardGeneric("mutate"))
+
+setMethod("mutate", signature="SoilProfileCollection",
+  function(.data, ...) {
+    # Storing the object parameters to re-create it
+    dpth <- depthsnames(.data)
+    ids <- idname(.data)
+    # Casting as data.frame
+    df <- as.data.frame(.data)
+    # Apply the mutate
+    df <- mutate(df, ...)
+    depths(df) <- c(ids, dpth)
+    if (length(site(.data)) > 0)
+      site(df) <- names(site(.data))
+    df
+  }
+)
