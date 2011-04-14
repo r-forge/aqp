@@ -7,11 +7,11 @@ spc <-  sp1
 spc$soil_color <- with(spc, munsell2rgb(hue, value, chroma))
 detach(package:aqp)
 
-source("Class-SoilProfile.R")
-source("Class-SoilProfileCollection.R")
-source('SoilProfile-methods.R')
-source('SoilProfileCollection-methods.R')
-source('setters.R')
+source("../branches/aqp_S4/R/Class-SoilProfile.R")
+source("../branches/aqp_S4/R/Class-SoilProfileCollection.R")
+source('../branches/aqp_S4/R/SoilProfile-methods.R')
+source('../branches/aqp_S4/R/SoilProfileCollection-methods.R')
+source('../branches/aqp_S4/R/setters.R')
 
 spc$x <- unlist(dlply(spc, .(id), function(x){n <- nrow(x);
 rep(runif(1), length.out=n)}))
