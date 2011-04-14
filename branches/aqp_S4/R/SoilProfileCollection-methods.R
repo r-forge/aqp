@@ -24,7 +24,7 @@ setMethod(
     if (length(object) > 0) {
       cat("Depth range: ", min(object), "-", max(object), " ", units(object), "\n", sep="")
       cat("\nAvailable profiles:\n")
-      print(profiles(object))
+      print(.getProfilesAsList(object))
     }
     if (length(site(object)) > 0) {
       cat("\nSampling sites attributes:\n")
@@ -250,13 +250,13 @@ setMethod("profiles", "SoilProfileCollection",
       if (!is.numeric(id))
 	id <- which(profile_id(object) %in% id)
     res <- object@profiles[id]
-
     # if there is only one profile, a SoilProfile object is returned
     if (length(res) == 1)
       res <- res[[1]]
     # otherwise we create a new SoilProfileCollection
     else
       res <- SoilProfileCollection(profiles=res)
+    
     res
   }
 )
