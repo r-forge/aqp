@@ -153,6 +153,9 @@ if (!isGeneric("site"))
   setGeneric("site", function(object, ...)
     standardGeneric("site"))
 
+## TODO: this needs to use the site_id property
+## idname() may solve this problem
+ 
 # retrieves the site data frame
 setMethod("site", "SoilProfileCollection",
   function(object, keep.id=FALSE) {

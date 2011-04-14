@@ -191,6 +191,7 @@ setReplaceMethod("site", "SoilProfileCollection",
 	# check for a valid site_id
 	if(is.na(match(object@site_id, names(value)))) {
 	  warning(paste('there is no column in the site table matching the current site id (', object@site_id, ')', sep=''))
+	  warning('this is still experimental, use with caution!')
 	  # stop('please assign a different site id, or add one to the site table')
 	  }
 	# if this is a data.frame we are actually adding data
