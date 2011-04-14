@@ -83,7 +83,7 @@ setReplaceMethod("depths", "data.frame",
 ## in SoilProfileCollection objects
 ##
 if (!isGeneric('site<-'))
-  setGeneric('site<-', function(object, value) 
+  setGeneric('site<-', function(object, value, ...) 
     standardGeneric('site<-'))
 
 setReplaceMethod("site", "SoilProfile",
@@ -158,7 +158,7 @@ setReplaceMethod("site", "SoilProfile",
 }
 
 setReplaceMethod("site", "SoilProfileCollection",
-  function(object, value) {
+  function(object, value, site_id=NA) {
     ids <- unlist(llply(profiles(object), 
       .fun=function(x)rep(profile_id(x), length(x))
       ), use.names=FALSE)
@@ -189,7 +189,7 @@ setReplaceMethod("site", "SoilProfileCollection",
       else {
 	if (inherits(value, "data.frame")) {
 	# if this is a data.frame we are actually adding data
-	object <- SoilProfileCollection(profiles=profiles(object), site=value)
+	object <- SoilProfileCollection(profiles=as.list(profiles(object)), site=value)
 	}
 	else stop('not implemented yet')
       }
@@ -260,6 +260,7 @@ setReplaceMethod("profiles", "SoilProfileCollection",
   }
 )
 
+
 ## profile_id<- setter
 
 # this setter aims at replacing the ID of a SoilProfile
@@ -277,8 +278,6 @@ setReplaceMethod("profile_id", "SoilProfile",
     object@id <- value
     object
   })
-
-
 
 setReplaceMethod("profile_id", "SoilProfileCollection",
   function(object, value) {
