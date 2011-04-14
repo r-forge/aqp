@@ -3,13 +3,8 @@
 # optionally color with vector that is the same length as number of horizons
 # behavior not defined for horizons with an indefinate lower boundary
 
-
-# generic function prototype
-profile_plot <- function(...)
-  UseMethod("profile_plot")
-
 # Tentative - Dylan to correct my dirty hacks in base graphics ;)
-profile_plot.SoilProfile <- function(data, color=NA, width=0.2, name='name', cex.names=0.5, cex.depth.axis=cex.names, cex.id=cex.names+(0.2*cex.names), plot.order=1:length(data), add=FALSE, scaling.factor=1, y.offset=0, max.depth=max(data), n.depth.ticks=5, shrink=FALSE, shrink.cutoff=3, abbr=FALSE, abbr.cutoff=5, ...){
+plot.SoilProfile <- function(data, color=NA, width=0.2, name='name', cex.names=0.5, cex.depth.axis=cex.names, cex.id=cex.names+(0.2*cex.names), plot.order=1:length(data), add=FALSE, scaling.factor=1, y.offset=0, max.depth=max(data), n.depth.ticks=5, shrink=FALSE, shrink.cutoff=3, abbr=FALSE, abbr.cutoff=5, ...){
 
   # if soil colour is defined
   if (!is.na(color)) {
@@ -72,7 +67,10 @@ profile_plot.SoilProfile <- function(data, color=NA, width=0.2, name='name', cex
   axis(side=4, line=-2.5, las=2, at=depth_axis_tick_locations, labels=depth_axis_labels, cex.axis=cex.depth.axis)
 }
 
-profile_plot.SoilProfileCollection <- function(data, color=NA, width=0.2, name='name', cex.names=0.5, cex.depth.axis=cex.names, cex.id=cex.names+(0.2*cex.names), plot.order=1:length(data), add=FALSE, scaling.factor=1, y.offset=0, max.depth=max(data), n.depth.ticks=5, shrink=FALSE, shrink.cutoff=3, abbr=FALSE, abbr.cutoff=5, ...){
+setMethod("plot", signature(x = "SoilProfile", y = "missing"),
+	function(x,y,...) plot.SoilProfile(x,...))
+
+plot.SoilProfileCollection <- function(data, color=NA, width=0.2, name='name', cex.names=0.5, cex.depth.axis=cex.names, cex.id=cex.names+(0.2*cex.names), plot.order=1:length(data), add=FALSE, scaling.factor=1, y.offset=0, max.depth=max(data), n.depth.ticks=5, shrink=FALSE, shrink.cutoff=3, abbr=FALSE, abbr.cutoff=5, ...){
 
   # if soil colour is defined
   if (!is.na(color)) {
@@ -138,3 +136,6 @@ profile_plot.SoilProfileCollection <- function(data, color=NA, width=0.2, name='
 
   axis(side=4, line=-2.5, las=2, at=depth_axis_tick_locations, labels=depth_axis_labels, cex.axis=cex.depth.axis)
 }
+
+setMethod("plot", signature(x = "SoilProfileCollection", y = "missing"),
+	function(x,y,...) plot.SoilProfileCollection(x,...))
