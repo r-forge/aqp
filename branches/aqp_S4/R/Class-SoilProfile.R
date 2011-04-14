@@ -13,14 +13,17 @@ setClass(
     horizons=data.frame()
   ),
   validity=function(object) {
+  	# test for NA
+  	if (any(is.na(object@depths)))
+  		stop(paste("depths matrix cannot contain NA", ", profile: ", object@id, sep=''))
     # testing that the depths are passesd using a 2-col matrix
     if (ncol(object@depths) != 2)
-      stop("unconsistent number of depths columns")
+      stop("inconsistent number of depths columns")
     # if the depths are not void (everything NA)
     if (!all(is.na(object@depths))) {
       # testing that the depths are consistently ordered
       if (any((object@depths[, 2] - object@depths[, 1]) < 0))
-	stop("the depths matrix must be ordered with top depths first, and bottom depths second")
+		stop("the depths matrix must be ordered with top depths first, and bottom depths second")
     }
      # Number of user_id must equals one (one per profile)
     if (length(object@id) != 1)
