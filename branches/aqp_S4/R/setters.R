@@ -335,19 +335,19 @@ if (!isGeneric('site_id<-'))
   setGeneric('site_id<-', function(object, value) 
     standardGeneric('site_id<-'))
 
-#	  # site_id column must exist in the site data
-#	  # but only enforce if the site_id has already been set
-#	  if(!is.na(object@site_id) & is.na(match(object@site_id, names(object@site))))
-#	     stop("site ID is not a column in the site data table")
-
 setReplaceMethod("site_id", "SoilProfileCollection",
   function(object, value) {
     # sanity check
     if(length(value) > 1)
       stop('site id must be a character vector with 1 element')
-    # ok for now  
-    else 
-      object@site_id <- value
+    
+    # check to make sure the the given site id makes sense
+    if(is.na(match(value, names(object@site))))
+	  stop(paste('there is no column in the site table matching (', value, ')', sep=''))
+    
+    
+    # looks OK, assign site id
+    object@site_id <- value
     
     # done  
     object
