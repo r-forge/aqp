@@ -264,7 +264,7 @@ setMethod("profiles", "SoilProfileCollection",
 units.SoilProfileCollection <- function(object)
   unique(laply(.getProfilesAsList(object), units))
 
-# retrieves the ids
+# retrieves the profile ids
 if (!isGeneric("profile_id"))
   setGeneric("profile_id", function(object, ...)
     standardGeneric("profile_id"))
@@ -273,6 +273,19 @@ setMethod("profile_id", "SoilProfileCollection",
   function(object) 
     as.character(object@ids)
 )
+
+
+# retrieves the site id column name
+# only useful when setting site data from external DF
+if (!isGeneric("site_id"))
+  setGeneric("site_id", function(object, ...)
+    standardGeneric("site_id"))
+
+setMethod("site_id", "SoilProfileCollection",
+  function(object) 
+    as.character(object@site_id)
+)
+
 
 # retrieves the id colname in the original dataframe
 if (!isGeneric("idname"))

@@ -83,7 +83,7 @@ setReplaceMethod("depths", "data.frame",
 ## in SoilProfileCollection objects
 ##
 if (!isGeneric('site<-'))
-  setGeneric('site<-', function(object, value, ...) 
+  setGeneric('site<-', function(object, value) 
     standardGeneric('site<-'))
 
 setReplaceMethod("site", "SoilProfile",
@@ -158,7 +158,7 @@ setReplaceMethod("site", "SoilProfile",
 }
 
 setReplaceMethod("site", "SoilProfileCollection",
-  function(object, value, site_id=NA) {
+  function(object, value) {
     ids <- unlist(llply(profiles(object), 
       .fun=function(x)rep(profile_id(x), length(x))
       ), use.names=FALSE)
@@ -188,6 +188,11 @@ setReplaceMethod("site", "SoilProfileCollection",
   # creation of site data from external data
       else {
 	if (inherits(value, "data.frame")) {
+	# check for a valid site_id
+	if(is.na(match(object@site_id, names(value)))) {
+	  warning(paste('there is no column in the site table matching the current site id (', object@site_id, ')', sep=''))
+	  # stop('please assign a different site id, or add one to the site table')
+	  }
 	# if this is a data.frame we are actually adding data
 	object <- SoilProfileCollection(profiles=as.list(profiles(object)), site=value)
 	}
@@ -262,7 +267,6 @@ setReplaceMethod("profiles", "SoilProfileCollection",
 
 
 ## profile_id<- setter
-
 # this setter aims at replacing the ID of a SoilProfile
 # 
 if (!isGeneric('profile_id<-'))
@@ -322,4 +326,34 @@ setReplaceMethod("profile_id", "SoilProfileCollection",
     # done
     object
   })
+  
+  
+## site_id<- setter
+## sets the column, by name, within the site data that should be used when 
+## using site data from an external source
+if (!isGeneric('site_id<-'))
+  setGeneric('site_id<-', function(object, value) 
+    standardGeneric('site_id<-'))
+
+#	  # site_id column must exist in the site data
+#	  # but only enforce if the site_id has already been set
+#	  if(!is.na(object@site_id) & is.na(match(object@site_id, names(object@site))))
+#	     stop("site ID is not a column in the site data table")
+
+setReplaceMethod("site_id", "SoilProfileCollection",
+  function(object, value) {
+    # sanity check
+    if(length(value) > 1)
+      stop('site id must be a character vector with 1 element')
+    # ok for now  
+    else 
+      object@site_id <- value
+    
+    # done  
+    object
+  })
+
+
+  
+  
   
