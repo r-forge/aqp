@@ -95,8 +95,6 @@ profile_plot.SoilProfileCollection <- function(data, color='soil_color', width=0
 
   # add horizons in specified order	
   for(i in 1:length(data)) {
-    # convert linear sequence into plotting order
-#     profileprofile_i_i <- plot.order[i]
     
     # generate rectangle geometry
     y0 <- (depths(profiles(data, i))[, 2] * scaling.factor) + y.offset # bottom
