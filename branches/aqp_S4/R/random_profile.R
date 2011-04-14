@@ -1,7 +1,7 @@
 #' Generates a random SoilProfile object
 #'
 #' @param ID a character or numeric id used for this profile
-#' @param n avector of possible number of horizons
+#' @param n_horizons a vector of possible number of horizons
 #' @param min_thick minimum thickness criteria for a simulated horizon
 #' @param max_thick maximum thickness criteria for a simulated horizon
 #' @param n_prop number of simulated soil properties (columns in the returned dataframe)
@@ -10,13 +10,7 @@
 #' @return A SoilProfile object
 #'
 #' @author Dylan Beaudette, Pierre Roudier (S4 port)
-random_profile <- function(
-ID, 
-n=c(3,4,5,6), 
-min_thick=5,
-max_thick=30, 
-n_prop=5,
-units='cm'){
+random_profile <- function(ID, n_horizons=3:6, min_thick=5, max_thick=30, n_prop=1, units='cm'){
   # sanity check
   if(missing(ID))
 	  stop('must specify an ID')
@@ -25,7 +19,7 @@ units='cm'){
 	  stop('illogical horizon thickness constraints')
 
   # choose a number of horizons
-  n_hz <- sample(n, 1)
+  n_hz <- sample(n_horizons, 1)
 
   # generate hz top bnd
   tops <- as.numeric(c(0, aaply(1:(n_hz -1), 1, function(x) sample(min_thick:max_thick, 1))))
@@ -65,16 +59,16 @@ units='cm'){
 
 #' Generates a random SoilProfileCollection object
 #'
-#' @param ID a character or numeric id used for this profile
-#' @param n avector of possible number of horizons
+#' @param IDs a character or numeric vector of profile ids
+#' @param n_horizons a vector of possible number of horizons
 #' @param min_thick minimum thickness criteria for a simulated horizon
 #' @param max_thick maximum thickness criteria for a simulated horizon
 #' @param n_prop number of simulated soil properties (columns in the returned dataframe)
 #' @param units units in which depths are expressed (default to cm)
 #'
-#' @return A SoilProfile object
+#' @return A SoilProfileCollection object
 #'
 #' @author Pierre Roudier
 random_collection <- function(IDs, ...){
-  SoilProfileCollection(profiles=llply(IDs, random_profile))
+  SoilProfileCollection(profiles=llply(IDs, function(x) random_profile(ID=x, ...)))
 }
