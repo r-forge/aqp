@@ -19,23 +19,14 @@ p <- read.csv('CA630-pedon.csv', as.is=TRUE)
 s.vars <- c('longitude_degrees', 'longitude_minutes', 'longitude_seconds', 'latitude_degrees','latitude_minutes','latitude_seconds')
 s.no.missing.idx <- which(complete.cases(s[, s.vars]))
 
-# parse DMS longitude (assume west)
-dms.lon.char <- with(s[s.no.missing.idx, ], 
-paste('-', longitude_degrees, 'd', longitude_minutes, "'", longitude_seconds, '"', sep=''))
-
-# parse DMS longitude (assume west)
-dms.lat.char <- with(s[s.no.missing.idx, ], 
-paste(latitude_degrees, 'd', latitude_minutes, "'", latitude_seconds, '"', sep=''))
-
-
 # add cols to original DF
 s$lon <- NA
 s$lat <- NA
 s$proj4 <- NA
 
 # fix coordinates -- DMS to DD, then add to DF
-s$lon[s.no.missing.idx] <- as.numeric(char2dms(from=dms.lon.char))
-s$lat[s.no.missing.idx] <- as.numeric(char2dms(from=dms.lat.char))
+s$lon <- with(s, -(longitude_degrees + (longitude_minutes/60) + (longitude_seconds/60/60)))
+s$lat <- with(s, latitude_degrees + (latitude_minutes/60) + (latitude_seconds/60/60))
 
 # convert to single datum
 s$datum <- with(s, ifelse(horizontal_datum_name == '', 'WGS84', horizontal_datum_name))
@@ -45,7 +36,7 @@ s$proj4[s.no.missing.idx] <- paste('+proj=longlat +datum=', s$datum[s.no.missing
 # iterate over valid coordinates, and convert to WGS84
 s.final.coords <- ddply(s[s.no.missing.idx, ], .(user_site_id), 
 .progress='text', .fun=function(i) {
-	coordinates(i) <- ~ lon + lat
+  coordinates(i) <- ~ lon + lat
 	proj4string(i) <- CRS(i$proj4)
 	i.t <- spTransform(i, CRS('+proj=longlat +datum=WGS84'))
 	dimnames(i.t@coords)[[2]] <- c('x','y')
@@ -85,4 +76,3 @@ ca630.lab <- lab
 ##############################################################################
 ca630 <- list(site=ca630.site, lab=ca630.lab)
 save(ca630, file='ca630.rda')
-
