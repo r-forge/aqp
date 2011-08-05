@@ -15,3 +15,16 @@ x.new$id <- as.numeric(x.new$Soil)
 
 # give it a try
 d <- profile_compare(x.new, vars=c('Sand.D.','MG.D.','EC.D.'), replace_na=TRUE, max_d=100, k=0, add_soil_flag=TRUE)
+
+# figure out column names / meanings\
+# R,G,B appear to be color data
+x.new$soil_color <- rgb(x.new$R25.D., g=x.new$G25.D., b=x.new$B25.D.)
+plot(Depth.D. ~ id, data=x.new, col=x.new$soil_color, pch=15, ylim=c(400, 0))
+
+x.new$name <- x.new$hor
+x.splist <- initProfileList(x.new)
+profile_plot(x.splist, max.depth=250)
+
+# save to .Rdata
+# document
+# package
