@@ -30,3 +30,7 @@ depths(sp2) <- id ~ top + bottom
 
 # SoilProfileCollection
 depths(spc) <- id ~ top + bottom
+
+# site data
+site(spc) <- ~ x + y + z
+
