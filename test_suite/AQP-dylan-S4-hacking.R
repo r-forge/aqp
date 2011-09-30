@@ -15,3 +15,23 @@ units(sp1) <- 'cm'
 site(sp1) <- ~ group
 
 profile_plot(sp1)
+
+
+
+## test a more realistic data set
+data(ca630)
+
+# combine into single DF
+ca <- join(ca630$lab, ca630$site)
+
+# init SPC
+depths(ca) <- pedon_id ~ top + bottom
+
+# extract site data
+site(ca) <- ~ mlra + ssa + lon + lat + user_pedon_id + control_sec_top + control_sec_bottom + series + soiltax
+
+# extract spatial data as SpatialPoints
+coordinates(ca) <- ~ lon + lat
+
+
+
