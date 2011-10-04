@@ -1,7 +1,7 @@
-library(sp)
+library(aqp)
 library(maptools)
 library(rgdal)
-library(plyr)
+
 
 ## NSSL
 # site data
@@ -39,7 +39,6 @@ s.final.coords <- ddply(s[s.no.missing.idx, ], .(user_site_id),
   coordinates(i) <- ~ lon + lat
 	proj4string(i) <- CRS(i$proj4)
 	i.t <- spTransform(i, CRS('+proj=longlat +datum=WGS84'))
-	dimnames(i.t@coords)[[2]] <- c('x','y')
 	as.matrix(coordinates(i.t))
 	})
 
@@ -47,27 +46,43 @@ s.final.coords <- ddply(s[s.no.missing.idx, ], .(user_site_id),
 # merge with original data
 s.final <- join(s, s.final.coords, by='user_site_id')
 
-# keep only some columns
-s.final.vars <- c('user_site_id','mlra','county','ssa','x','y')
+# keep only some columns: V1=fixed lon, V2= fixed lat
+s.final.vars <- c('user_site_id','mlra','county','ssa','V1','V2')
 # subset columns, and save to temp CSV for now
 ca630.site <- s.final[, s.final.vars]
-
+names(ca630.site) <- c('user_site_id', 'mlra', 'county', 'ssa', 'lon', 'lat')
 
 ##############################################################################
 ############################## pedon data ####################################
 ##############################################################################
 
 # keep only some columns
-# combine with site data
+# combine with site data, throw-out sites missing coordinates
 ca630.pedon <- p[, 1:9]
-ca630.site <- join(ca630.site, ca630.pedon, by='user_site_id')
+ca630.site <- join(ca630.site[!is.na(ca630.site$lon), ], ca630.pedon, by='user_site_id')
 
+# remove some junk
+ca630.site$sampled_class_name <- NULL
+ca630.site$correlated_taxon_name <- NULL
+ca630.site$correlated_taxon_name.1 <- NULL
 
 ##############################################################################
 ############################## lab data #####################################
 ##############################################################################
 
-ca630.lab <- lab
+# remove horizons that are missing top/bottom
+ca630.lab <- lab[!is.na(lab$hzn_top) | !is.na(lab$hzn_bot), ]
+
+# remove samples with only a single horizon
+n.hz <- ddply(ca630.lab, .(pedon_key), nrow)
+ca630.lab <- subset(ca630.lab, subset=pedon_key %in% n.hz$pedon_key[n.hz$V1 > 1])
+
+# id samples with bad horizons
+lab.test <- ddply(ca630.lab, .(pedon_key), test_hz_logic, topcol='hzn_top', bottomcol='hzn_bot')
+bad.ids <- as.character(lab.test$pedon_key[which(lab.test$V1 == FALSE)])
+
+# keep the good ones
+ca630.lab <- subset(ca630.lab, pedon_key %in% lab.test$pedon_key[lab.test$V1 == TRUE])
 
 
 
