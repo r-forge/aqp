@@ -21,9 +21,9 @@ d <- profile_compare(x.new, vars=c('Sand.D.','MG.D.','EC.D.'), replace_na=TRUE, 
 x.new$soil_color <- rgb(x.new$R25.D., g=x.new$G25.D., b=x.new$B25.D.)
 plot(Depth.D. ~ id, data=x.new, col=x.new$soil_color, pch=15, ylim=c(400, 0))
 
-x.new$name <- x.new$hor
-x.splist <- initProfileList(x.new)
-profile_plot(x.splist, max.depth=250)
+xx <- x.new[1:200, ]
+depths(xx) <- id ~ top + bottom
+profile_plot(xx, name='hor', max.depth=250)
 
 # save to .Rdata
 # document
