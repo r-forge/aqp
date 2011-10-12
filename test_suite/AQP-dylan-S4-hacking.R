@@ -1,3 +1,4 @@
+library(plotKML)
 library(aqp)
 
 ## simple example
@@ -41,14 +42,20 @@ plot(ca@sp, pch=16, col=f, axes=TRUE)
 legend('topright', legend=levels(f), col=1:3, pch=16)
 
 
+## TODO: needs more thought
+# convert to SPDF by subsetting horizon data (first horizon)
+ca.SPDF <- ca[1,]
+spplot(ca.SPDF, 'bs_7', col.regions=bpy.colors(10))
 
-# convert to SPDF ... this should be automated... 
+# export as KML
+kml(ca.SPDF, file='ca630_BS7.kml', labels=as.character(ca.SPDF$pedon_key), colour=bs_7, overwrite=TRUE)
+
+# convert to SPDF using only site data
 ca.SPDF <- SpatialPointsDataFrame(ca@sp, data=site(ca))
 ca.SPDF$mlra <- factor(ca.SPDF$mlra, levels=c('18','22A','22'))
 
-# export as KML for checking
-library(plotKML)
-kml(ca.SPDF, labels=as.character(ca.SPDF$mlra), colour=as.numeric(mlra), overwrite=TRUE)
+# export as KML
+kml(ca.SPDF, file='ca630_MLRA.kml',labels=as.character(ca.SPDF$mlra), colour=as.numeric(mlra), overwrite=TRUE)
 
 
 # do some aggregation: 
