@@ -11,7 +11,7 @@ depths(sp1) <- id ~ top + bottom
 
 site(sp1) <- ~ group
 
-profile_plot(sp1)
+profile_plot(sp1, plot.order=order(sp1$group))
 
 
 
