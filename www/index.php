@@ -43,6 +43,8 @@ echo $contents; } ?>
 
 <!-- end of project description -->
 
+<img src="munsell-soil_colors-LAB.png" border="0">
+
 <img src="aqp_profile_plot_example_sjer.png" border="0">
 
 <img src="aqp_profile_plot_example_sfrec.png" border="0">
