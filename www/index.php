@@ -42,6 +42,7 @@ fclose($handle);
 echo $contents; } ?>
 
 <!-- end of project description -->
+<p> You can find the <strong>project summary page</strong> <a href="http://<?php echo $domain; ?>/projects/<?php echo $group_name; ?>/"><strong>here</strong></a>.</p>
 
 <img src="munsell-soil_colors-LAB.png" border="0">
 
@@ -63,9 +64,6 @@ echo $contents; } ?>
 
 <img src="dend_with_profiles.png" border="0">
 
-
-
-<p> You can find the <strong>project summary page</strong> <a href="http://<?php echo $domain; ?>/projects/<?php echo $group_name; ?>/"><strong>here</strong></a>. </p>
 
 </body>
 </html>
