@@ -52,7 +52,7 @@ echo $contents; } ?>
 
 <img src="MVO_morph_vs_depth_by_bedrock_kind-paired.jpg" border="0">
 
-<img src="MVO_morph_vs_depth_by_bedrock_kind.jpg" border="0">
+<img src="MVO_morph_vs_depth_by_bedrock_kind.png" border="0">
 
 <img src="weighted_depth_func_aggregation.png" border="0">
 
