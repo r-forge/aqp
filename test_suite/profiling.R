@@ -4,9 +4,9 @@ library(profr)
 library(RColorBrewer)
 
 # 1. profile_compare: simple case
-d <- ldply(1:100, function(i) random_profile(i))
-p <- profr(dd <- profile_compare(d, vars=c('p1','p2','p3','p4','p5'), max_d=50, k=0))
-plot(p, cex=0.5, minlabel=0.01)
+# d <- ldply(1:100, function(i) random_profile(i))
+# p <- profr(dd <- profile_compare(d, vars=c('p1','p2','p3','p4','p5'), max_d=50, k=0))
+# plot(p, cex=0.5, minlabel=0.01)
 
 
 # 2. compare number of profiles with fixed parameters
@@ -128,13 +128,14 @@ cols <- rev(brewer.pal(n=11, name='Spectral'))
 cols.palette <- colorRampPalette(cols)
 ncuts <- 40
 
-plot.4 <- levelplot(prop ~ factor(n)*factor(v) | f, data=p.2, as.table=TRUE, scales=list(alternating=1), 
-col.regions=cols.palette(ncuts), cuts=ncuts-1, strip=strip.custom(bg=grey(0.8)), 
-xlab='No. Profiles', ylab='No. Variables Used', par.strip.text=list(cex=0.66))
+plot.4 <- levelplot(prop ~ factor(n)*factor(v) | f, data=p.2, as.table=TRUE, 
+scales=list(x=list(cex=0.66, rot=45)), col.regions=cols.palette(ncuts), cuts=ncuts-1, 
+strip=strip.custom(bg=grey(0.8)), xlab='No. Profiles', ylab='No. Variables Used', 
+par.strip.text=list(cex=0.66))
 
-plot.5 <- levelplot(total_time ~ factor(n)*factor(v) | f, data=p.2, as.table=TRUE, scales=list(alternating=1), 
-col.regions=cols.palette(ncuts), cuts=ncuts-1, strip=strip.custom(bg=grey(0.8)), 
-xlab='No. Profiles', ylab='No. Variables Used', par.strip.text=list(cex=0.66))
-
+plot.5 <- levelplot(total_time ~ factor(n)*factor(v) | f, data=p.2, as.table=TRUE, 
+scales=list(x=list(cex=0.66, rot=45)), col.regions=cols.palette(ncuts), cuts=ncuts-1, 
+strip=strip.custom(bg=grey(0.8)), xlab='No. Profiles', ylab='No. Variables Used', 
+par.strip.text=list(cex=0.66))
 
 
