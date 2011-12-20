@@ -4,9 +4,30 @@ library(profr)
 library(RColorBrewer)
 
 # 1. profile_compare: simple case
-# d <- ldply(1:100, function(i) random_profile(i))
+# d <- ldply(1:100, random_profile)
 # p <- profr(dd <- profile_compare(d, vars=c('p1','p2','p3','p4','p5'), max_d=50, k=0))
 # plot(p, cex=0.5, minlabel=0.01)
+
+
+## slice() method
+d <- ldply(1:10, random_profile)
+depths(d) <- id ~ top + bottom
+p <- profr(s <- slice(d, 5 ~ p1 + p2 + p3, just.the.data=TRUE))
+plot(p, cex=0.5, minlabel=0.01)
+
+
+p.i <- ddply(p, .(f), .fun=summarise, total_time=sum(time))
+p.i <- p.i[order(p.i$total_time, decreasing=TRUE), ]
+p.i$prop <- p.i$total_time / p.i$total_time[1]
+p.h <- head(p.i[-1, ], 10)
+	
+dotplot(f ~ total_time, data=p.h)
+dotplot(f ~ prop, data=p.h)
+
+
+
+
+
 
 
 # 2. compare number of profiles with fixed parameters
@@ -15,7 +36,7 @@ p <- list()
 d <- list()
 
 for(i in seq_along(s))
-	d[[i]] <- ldply(1:s[i], function(i) random_profile(i))
+	d[[i]] <- ldply(1:s[i], random_profile)
 
 for(i in seq_along(s))
 	{
