@@ -1,0 +1,10 @@
+Package: nrcs
+Type: Package
+Title: A collection of functions for reading data from USDA-NCSS soil databases.
+Version: 0.1
+Date: 2011-12-23
+Author: D.E. Beaudette
+Maintainer: D.E. Beaudette <dylan.beaudette@ca.usda.gov>
+Description: A collection of functions for reading data from USDA-NCSS soil databases.
+License: gpl
+LazyLoad: yes
