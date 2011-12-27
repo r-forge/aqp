@@ -1,4 +1,4 @@
-Package: nrcs
+Package: soilDB
 Type: Package
 Title: A collection of functions for reading data from USDA-NCSS soil databases.
 Version: 0.1
