@@ -1,10 +1,9 @@
-library(plyr)
 library(aqp)
 
 x <- read.csv('OSACA-example_soil_data.csv')
 
 # assume horizons are measured from 0
-x.new <- ddply(x, .(soil), .fun=function(i) {data.frame(i, top=c(0, i$depth.[-length(i$depth)]), bottom=i$depth)})
+x.new <- ddply(x, .(soil), .fun=function(i) {data.frame(i, top=c(0, i$depth[-length(i$depth)]), bottom=i$depth)})
 
 # fix depths
 x.new$top <- as.integer(x.new$top)
