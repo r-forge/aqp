@@ -44,6 +44,8 @@ echo $contents; } ?>
 <!-- end of project description -->
 <p> You can find the <strong>project summary page</strong> <a href="http://<?php echo $domain; ?>/projects/<?php echo $group_name; ?>/"><strong>here</strong></a>.</p>
 
+<img src="sanguinetti-pedons.png" border="0">
+
 <img src="708x-report-demo.jpg" border="0">
 
 <img src="munsell-soil_colors-LAB.png" border="0">
