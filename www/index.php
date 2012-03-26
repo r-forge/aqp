@@ -44,6 +44,9 @@ echo $contents; } ?>
 <!-- end of project description -->
 <p> You can find the <strong>project summary page</strong> <a href="http://<?php echo $domain; ?>/projects/<?php echo $group_name; ?>/"><strong>here</strong></a>.</p>
 
+<p> You can find <strong></strong>extended examples + discussion</strong> <a href="http://casoilresource.lawr.ucdavis.edu/drupal/taxonomy/term/56"><strong>here</strong></a>.</p>
+
+
 <img src="hz_vs_site-and-hz_dend.png" border="0">
 
 <img src="sanguinetti-pedons.png" border="0">
