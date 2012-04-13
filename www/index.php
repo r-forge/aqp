@@ -47,6 +47,20 @@ echo $contents; } ?>
 <p> You can find <strong></strong>extended examples + discussion</strong> <a href="http://casoilresource.lawr.ucdavis.edu/drupal/taxonomy/term/56"><strong>here</strong></a>.</p>
 
 
+<p>
+Soils are routinely sampled and characterized according to genetic horizons,
+resulting in data that are associated with principle dimensions: location (x,y), 
+depth (z), and property space (p). The high dimensionality and grouped
+nature of this type of data can complicate standard analysis, summarization, and visualization. The <tt>aqp</tt> (algorithms for quantitative pedology)
+package was designed to support data-driven approaches to common soils-related tasks such as visualization, aggregation, and classification of soil
+profile collections. In addition, we sought to advance the study of numerical soil classification by building on previously published methods within an
+extensible and open source framework. Functions in the aqp package have
+been successfully applied to studies involving several thousand soil profiles.
+The stable version of the aqp package is hosted by CRAN (http://cran.r-project.org/web/packages/aqp), and the development version is hosted by
+R-Forge (http://aqp.r-forge.r-project.org).
+</p>
+
+
 <img src="hz_vs_site-and-hz_dend.png" border="0">
 
 <img src="sanguinetti-pedons.png" border="0">
