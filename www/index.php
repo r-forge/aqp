@@ -61,6 +61,8 @@ R-Forge (http://aqp.r-forge.r-project.org).
 </p>
 
 
+<img src="hz_distinctness_demo.png" border="0">
+
 <img src="hz_vs_site-and-hz_dend.png" border="0">
 
 <img src="sanguinetti-pedons.png" border="0">
