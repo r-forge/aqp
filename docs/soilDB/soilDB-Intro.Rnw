@@ -28,13 +28,14 @@
 % knit('soilDB-Intro.Rnw')
 
 \begin{document}
+\SweaveOpts{concordance=TRUE}
 
 % knitr config
 \SweaveOpts{message=FALSE, warning=FALSE, background='#F7F7F7', cache=TRUE, cache.path='cache/', fig.path='cache/', dpi=100, fig.align='center'}
 
 % setup R session
 <<setup, echo=FALSE, results='hide'>>=
-options(replace.assign=TRUE, width=140)
+options(replace.assign=TRUE, width=140, stringsAsFactors=FALSE)
 @
 
 
@@ -91,38 +92,14 @@ The \texttt{soilDB} package provides two layers of functionality for extracting 
 
 <<pedonPC-demo, eval=FALSE>>=
 library(soilDB)
-
-## setup: this will only work if you have a PedonPC Database and Windows :( ##
-
+# this will only work if you have a PedonPC Database and Windows :(
 # get all of the data (you will have to adjust the DSN)
 dsn <- "S:/Service_Center/NRCS/pedon/pedon.mdb"
 s <- fetchPedonPC(dsn)
-e <- get_extended_data_from_pedon_db(dsn)
 
-# subset Gopheridge pedons
-subset.idx <- grep('gopheridge', s$sampled_as, ignore.case=TRUE)
-s <- s[subset.idx, ]
-
-# move peiid into @site, so that we can use as join condition for diagnostic data
-site(s) <- ~ peiid
-
-
-## diagnostic features ##
-
-# extract diagnostic hz data (all records)
-d <- e$diagnostic
-
-# save only those rows with paralithic material/contact
-s.paralithic <- d[grep('paralithic', d$diag_kind, ignore.case=TRUE), ]
-
-
-## adding data to @site slot ##
-
-# save to @site: via LEFT join by peiid
-# this will ignore all pedons not already in 's'
-# note that other diagnostic data could be added to @site, by re-naming the columns in s.paralithic
-# names(s.paralithic) <- c('peiid', 'para', 'para.top', 'para.bottom')
-site(s) <- s.paralithic
+# subset 'Gopheridge' pedons
+subset.idx <- grep('gopheridge', gopheridge$correlated_as, ignore.case=TRUE)
+gopheridge <- s[subset.idx, ]
 @
 
 
@@ -144,25 +121,36 @@ site(s) <- s.paralithic
 <<gopheridge-demo, eval=TRUE>>=
 # libraries: you may have to install these
 library(soilDB)
+library(Hmisc)
 library(ape)
+library(lattice)
+library(cluster)
+library(reshape)
 
-# load stored SoilProfileCollection
+# load example dataset
 data(gopheridge)
 
-# temp hack: save a copy in 's'
-s <- gopheridge
-
 ## aggregates of horizon data, moved into @site
+
+# soil depth using an in-line function, note that max(SPC) returns the bottom-most depth
+# this may not be the same as 'soil depth' when Cr or R horizons are present
+gopheridge$soil.depth <- profileApply(gopheridge, function(x) max(x))
 
 # horizon-thickness weighted mean (beware of NA)
 f.wt.prop <- function(x, prop) {h <- horizons(x); w <- with(h, hzdepb-hzdept); wtd.mean(h[[prop]], weights=w)}
 
-# apply by-profile, returning a vector, assigned to new column in @site
-s$wt.clay <- profileApply(s, f.wt.prop, prop='clay')
-s$wt.rf <- profileApply(s, f.wt.prop, prop='total_frags_pct')
+# get hz mid-point of hz with max clay content
+f.max.clay.depth <- function(x) {
+	h <- horizons(x) 
+	max.clay <- which.max(h$clay) 
+	with(h[max.clay, ], (hzdept+hzdepb) / 2)
+	}
 
-# soil depth using an in-line function, note that max(SPC) returns the bottom-most depth
-s$soil.depth <- profileApply(s, function(x) max(x))
+# apply by-profile, returning a vector, assigned to new column in @site
+gopheridge$wt.clay <- profileApply(gopheridge, f.wt.prop, prop='clay')
+gopheridge$wt.rf <- profileApply(gopheridge, f.wt.prop, prop='total_frags_pct')
+gopheridge$max.clay.depth <- profileApply(gopheridge, f.max.clay.depth)
+
 
 # compute aggregate (wt.mean) clay within particle-size control section
 # note that this requires conditional eval of data that may contain NA
@@ -224,31 +212,65 @@ f.diag.thickness <- function(x, d.hz) {
 	return(thick)
 }
 
+# conditional eval of top hz depth of diagnostic feature or horizon
+# will return a vector of length(x), you can save to @site
+f.diag.top <- function(x, d.hz) {
+	# extract diagnostic horizon data
+	d <- diagnostic_hz(x)
+	# subset to the requested diagnostic hz
+	d <- d[d$diag_kind == d.hz, ]
+	# if missing return NA
+	if(nrow(d) == 0)
+		return(NA)
+	
+	# return top depth
+	return(d$featdept)
+}
 
 
 # compute wt.mean clay within PCS, save to @site
-s$pcs.clay <- profileApply(s, f.pcs.prop, prop='clay')
+gopheridge$pcs.clay <- profileApply(gopheridge, f.pcs.prop, prop='clay')
+
+# compute wt.mean clay within argillic horizon, save to @site
+gopheridge$argillic.clay <- profileApply(gopheridge, f.diag.wt.prop, d.hz='argillic horizon', prop='clay')
+
+# compute argillic hz thickness, save to @site
+gopheridge$argillic.thick <- profileApply(gopheridge, f.diag.thickness, d.hz='argillic horizon')
+
+# compute depth to paralithic contact, if present, save to @site
+gopheridge$paralithic.contact.depth <- profileApply(gopheridge, f.diag.top, d.hz='paralithic contact')
 @
 
 \begin{figure}[h]
 <<basic_plotting, fig.width=15, fig.height=5, out.width='\\linewidth'>>=
-# order by presence of paralithic materials/contact
-new.order <- order(s$diag_kind)
-plot(s, name='hzname', plot.order=new.order)
-# annotate paralithic data with lines
-x.pos <- 1:length(s)
-lines(x.pos, s$featdept[new.order], lty=2, col='black')
-lines(x.pos, s$featdepb[new.order], lty=2, col='black')
+# order by presence of paralithic contact
+new.order <- order(gopheridge$paralithic.contact)
+plot(gopheridge, name='hzname', plot.order=new.order)
+# annotate paralithic contact with lines
+x.pos <- 1:length(gopheridge)
+lines(x.pos, gopheridge$paralithic.contact.depth[new.order], lty=2, col='black')
 @
 \caption{\label{basic_plotting} Basic plotting}
 \end{figure}
 
+\begin{figure}[ht]
+<<profile_plot_annotation, fig.width=12, out.width='0.9\\linewidth'>>=
+# plot and annotate with max clay depths
+plot(gopheridge, name='hzname')
+x.pos <- 1:length(gopheridge)
+points(x.pos, gopheridge$max.clay.depth, col='white', pch=21, cex=0.75, bg='black')
+lines(x.pos, gopheridge$max.clay.depth, col='black', lty=2)
+@
+\caption{\label{profile_plot_annotation} annotating profile plot with additional graphics}
+\end{figure}
+
+
 
 \begin{figure}[h]
 <<slicing-plot, fig.width=12, out.width='0.9\\linewidth'>>=
-# slice all hz data into 1-cm slices, from 0-100cm
-s.sliced <- slice(s, 0:100 ~ . )
-plot(s.sliced)
+# slice all hz data into 1-cm slices, from 0--100cm
+gopheridge.sliced <- slice(gopheridge, 0:100 ~ . )
+plot(gopheridge.sliced)
 @
 \caption{\label{slicing-plot} slicing, plotting}
 \end{figure}
@@ -257,7 +279,7 @@ plot(s.sliced)
 \begin{figure}[h]
 <<indexing_1, fig.width=12, out.width='0.9\\linewidth'>>=
 # extract and plot first 10 slices (0-10 cm)
-plot(s.sliced[, 1:10], name='hzname')
+plot(gopheridge.sliced[, 1:10], name='hzname')
 @
 \caption{\label{indexing_1} simple indexing}
 \end{figure}
@@ -265,7 +287,7 @@ plot(s.sliced[, 1:10], name='hzname')
 \begin{figure}[h]
 <<indexing_2, fig.width=6, out.width='0.9\\linewidth'>>=
 # extract and plot pedons 1-5, slices 25-50 (25-50 cm)
-plot(s.sliced[1:5, 25:50])
+plot(gopheridge.sliced[1:5, 25:50])
 @
 \caption{\label{indexing_2} simple indexing + slice subsetting}
 \end{figure}
@@ -273,33 +295,18 @@ plot(s.sliced[1:5, 25:50])
 \begin{figure}[h]
 <<indexing_3, fig.width=12, out.width='0.9\\linewidth'>>=
 # extract and plot pedons with paralithic materials/contact, slices 50-75 (50-75 cm)
-plot(s.sliced[grep('paralithic', s.sliced$diag_kind, ignore.case=TRUE), 50:75])
+plot(gopheridge.sliced[which(gopheridge$paralithic.contact), 50:75])
 @
 \caption{\label{indexing_3} indexing based on query}
 \end{figure}
 
-\begin{figure}[ht]
-<<profile_plot_annotation, fig.width=12, out.width='0.9\\linewidth'>>=
-## applying a function by profile ##
-
-f <- function(x) {h <- horizons(x) ; max.clay <- which.max(h$clay) ; with(h[max.clay, ], (hzdept+hzdepb) / 2)}
-max.clay.depth <- profileApply(s, f)
-
-# plot and annotate with max clay depths
-plot(s, name='hzname')
-x.pos <- 1:length(s)
-points(x.pos, max.clay.depth, col='white', pch=21, cex=0.75, bg='black')
-lines(x.pos, max.clay.depth, col='black', lty=2)
-@
-\caption{\label{profile_plot_annotation} annotating profile plot with additional graphics}
-\end{figure}
 
 
 
 \begin{figure}[h]
 <<profile_aggregation, fig.width=8, out.width='0.6\\linewidth'>>=
 # all profiles: clay, sand, total RF
-a <- slab(s, ~ clay + sand + total_frags_pct)
+a <- slab(gopheridge, ~ clay + sand + total_frags_pct)
 a$mid <- with(a, (top+bottom)/2)
 
 # plot median +/- IQR of clay, sand, total RF
@@ -313,7 +320,7 @@ xyplot(mid ~ p.q50 | variable, upper=a$p.q75, lower=a$p.q25, id=a$major_bedrock_
 ## assess dissimilarity: only horizon attributes for now ##
 
 # D evaluated to 100 cm depth, using clay, sand, total RF, no depth-weighting
-d <- profile_compare(s, vars=c('clay', 'sand', 'total_frags_pct'), k=0, max_d=100)
+d <- profile_compare(gopheridge, vars=c('clay', 'sand', 'total_frags_pct'), k=0, max_d=100)
 
 # divising hierarchical clustering
 h.hclust <- as.hclust(diana(d))
@@ -326,7 +333,7 @@ p <- as.phylo(h.hclust)
 <<dend_with_profiles, fig.width=12, out.width='0.9\\linewidth'>>=
 # plot dendrogram + profiles
 par(mar=c(0,0,0,1))
-p.plot <- plot(p, cex=0.8, label.offset=-3, direction='up', y.lim=c(85,0), x.lim=c(1, length(s)+1), show.tip.label=FALSE)
+p.plot <- plot(p, cex=0.8, label.offset=-3, direction='up', y.lim=c(85,0), x.lim=c(1, length(gopheridge)+1), show.tip.label=FALSE)
 
 # get the last plot geometry
 lastPP <- get("last_plot.phylo", envir = .PlotPhyloEnv)
@@ -340,33 +347,29 @@ sf <- 0.15
 yoff <- max(lastPP$yy) + 2.2
 
 # add profiles below leaves of the dendrogram
-plot(s, name='hzname', color="soil_color", plot.order=new_order, cex.id=0.5, max.depth=150,  n.depth.ticks=6, scaling.factor=sf, width=0.1, cex.names=0.5, cex.depth.axis=0.75, y.offset=yoff, add=TRUE, id.style='side')
+plot(gopheridge, name='hzname', color="soil_color", plot.order=new_order, cex.id=0.5, max.depth=150,  n.depth.ticks=6, scaling.factor=sf, width=0.1, cex.names=0.5, cex.depth.axis=0.75, y.offset=yoff, add=TRUE, id.style='side')
 @
 \caption{\label{dend_with_profiles} Dendrogram + profiles.}
 \end{figure}
 
 
 <<loafercreek-demo1, eval=TRUE>>=
-library(soilDB)
 data(loafercreek)
 
-##
-## aggregate major horizon types over 1cm intervals
-##
-
+# aggregate major horizon types over 1cm intervals
 # categorize major horizon types
 hz.tab <- rev(sort(table(loafercreek$hzname)))
 hz.tab[hz.tab > 5]
 
 # add generalized hz name
-loafercreek$hz <- rep('other', times=nrow(loafercreek))
+loafercreek$hz <- rep(NA, times=nrow(horizons(loafercreek)))
 
 # generalize horizons
-loafercreek$hz[grep('O', loafercreek@horizons$hzname)] <- 'O'
-loafercreek$hz[grep('A', loafercreek@horizons$hzname)] <- 'A'
-loafercreek$hz[grep('Bt', loafercreek@horizons$hzname)] <- 'Bt'
-loafercreek$hz[grep('Cr', loafercreek@horizons$hzname)] <- 'Cr'
-loafercreek$hz[grep('R', loafercreek@horizons$hzname)] <- 'R'
+loafercreek$hz[grep('O', loafercreek$hzname)] <- 'O'
+loafercreek$hz[grep('A', loafercreek$hzname)] <- 'A'
+loafercreek$hz[grep('Bt', loafercreek$hzname)] <- 'Bt'
+loafercreek$hz[grep('Cr', loafercreek$hzname)] <- 'Cr'
+loafercreek$hz[grep('R', loafercreek$hzname)] <- 'R'
 
 # convert generalized hz to factor
 loafercreek$hz <- factor(loafercreek$hz)
@@ -376,7 +379,9 @@ loafercreek.hz.agg <- slab(loafercreek, fm= ~ hz)
 loafercreek.hz.agg.long <- melt(loafercreek.hz.agg, id.var=c('top','bottom', 'contributing_fraction', 'all.profiles', 'variable'),  variable_name='horizon')
 
 # plot horizon type proportions
-p1 <- xyplot(top ~ value, groups=horizon, data=loafercreek.hz.agg.long, ylim=c(150, -5), type=c('S','g'), horizontal=TRUE, subset=value > 0 & horizon != 'other', asp=2, ylab='', xlab='')
+p1 <- xyplot(top ~ value, groups=horizon, data=loafercreek.hz.agg.long, ylim=c(150, -5), 
+type=c('S','g'), horizontal=TRUE, subset=value > 0, asp=1.5, ylab='', xlab='', 
+auto.key=list(columns=5, lines=TRUE, points=FALSE))
 @
 
 \begin{figure}[h]
@@ -385,50 +390,6 @@ p1 <- xyplot(top ~ value, groups=horizon, data=loafercreek.hz.agg.long, ylim=c(1
 @
 \caption{\label{hz_proportions} horizon proportions}
 \end{figure}
-
-
-\clearpage
-<<andic.properties.example, echo=TRUE, eval=FALSE>>=
-f.andic <- f[which(f$andic.soil.properties), ]
-
-# extract and subset only andic soil properties
-d <- diagnostic_hz(f.andic)
-d <- d[d$diag_kind == 'andic soil properties', c('pedon_id', 'featdept', 'featdepb')]
-
-
-# join these data with existing site data
-site(f.andic) <- d
-
-# check: plot profiles
-plot(f.andic, name='hzname')
-# add lines along top/bottom of "andic soil properties" diagnostic data
-lines(1:length(f.andic), f.andic$featdept, lty=2, lwd=2)
-lines(1:length(f.andic), f.andic$featdepb, lty=2, lwd=2)
-
-# subset horizons, by profile, according to 'andic soil properties' depths
-# this is tricky, as it involves taking apart an SPC
-# convert from SPC -> data.frame: 
-# 1 row / horizon, with site data joined with hz data
-f.andic.df <- as(f.andic, 'data.frame')
-h.andic <- subset(f.andic.df, subset=hzdept >= featdept & hzdepb <= featdepb)
-
-# check: OK
-h.andic[, c('pedon_id', 'hzname', 'hzdept', 'hzdepb', 'featdept', 'featdepb')]
-
-# aggregate / stack / plot
-# two collections of pedons
-a.mvo <- slab(f[which(f$bedrock_kind == 'Metavolcanics'), ], ~ clay + sand + total_frags_pct) # mvo data
-a.slate <- slab(f[which(f$bedrock_kind == 'Slate'), ], ~ clay + sand + total_frags_pct) # mvo data
-a.andic <- slab(f.andic, ~ clay + sand + total_frags_pct) # andic soils
-
-# stack:
-a <- make.groups(metavolcanic=a.mvo, slate=a.slate, andic.soils=a.andic)
-a$mid <- with(a, (top+bottom)/2)
-
-# plot median +/- IQR of clay, sand, total RF
-xyplot(mid ~ p.q50 | variable, groups=which, upper=a$p.q75, lower=a$p.q25, id=a$major_bedrock_kind, data=a, ylim=c(180,-5), ylab='Depth (cm)', xlab=c('% Clay', '% Sand', '% Total RF'), strip=strip.custom(bg=grey(0.8)), par.settings=list(superpose.line=list(col=c('orange', 'RoyalBlue', 'Darkgreen'), lwd=2)), as.table=TRUE, panel=panel.depth_function, prepanel=prepanel.depth_function, scales=list(y=list(tick.number=7, alternating=3), x=list(relation='free', alternating=1)), layout=c(3,1), sync.colors=TRUE, alpha=0.5, auto.key=list(columns=3, lines=TRUE, points=FALSE))
-@
-
 
 
 \clearpage
@@ -518,6 +479,48 @@ arrows(x0=arrow.right, y0=p.right$yy[right.new_order], x1=arrow.right+arrow.leng
 legend('top', legend=c('Paralithic Contact'), pch=15, col='orange', bty='n')
 @
 
+
+\clearpage
+<<andic.properties.example, echo=TRUE, eval=FALSE>>=
+f.andic <- f[which(f$andic.soil.properties), ]
+
+# extract and subset only andic soil properties
+d <- diagnostic_hz(f.andic)
+d <- d[d$diag_kind == 'andic soil properties', c('pedon_id', 'featdept', 'featdepb')]
+
+
+# join these data with existing site data
+site(f.andic) <- d
+
+# check: plot profiles
+plot(f.andic, name='hzname')
+# add lines along top/bottom of "andic soil properties" diagnostic data
+lines(1:length(f.andic), f.andic$featdept, lty=2, lwd=2)
+lines(1:length(f.andic), f.andic$featdepb, lty=2, lwd=2)
+
+# subset horizons, by profile, according to 'andic soil properties' depths
+# this is tricky, as it involves taking apart an SPC
+# convert from SPC -> data.frame: 
+# 1 row / horizon, with site data joined with hz data
+f.andic.df <- as(f.andic, 'data.frame')
+h.andic <- subset(f.andic.df, subset=hzdept >= featdept & hzdepb <= featdepb)
+
+# check: OK
+h.andic[, c('pedon_id', 'hzname', 'hzdept', 'hzdepb', 'featdept', 'featdepb')]
+
+# aggregate / stack / plot
+# two collections of pedons
+a.mvo <- slab(f[which(f$bedrock_kind == 'Metavolcanics'), ], ~ clay + sand + total_frags_pct) # mvo data
+a.slate <- slab(f[which(f$bedrock_kind == 'Slate'), ], ~ clay + sand + total_frags_pct) # mvo data
+a.andic <- slab(f.andic, ~ clay + sand + total_frags_pct) # andic soils
+
+# stack:
+a <- make.groups(metavolcanic=a.mvo, slate=a.slate, andic.soils=a.andic)
+a$mid <- with(a, (top+bottom)/2)
+
+# plot median +/- IQR of clay, sand, total RF
+xyplot(mid ~ p.q50 | variable, groups=which, upper=a$p.q75, lower=a$p.q25, id=a$major_bedrock_kind, data=a, ylim=c(180,-5), ylab='Depth (cm)', xlab=c('% Clay', '% Sand', '% Total RF'), strip=strip.custom(bg=grey(0.8)), par.settings=list(superpose.line=list(col=c('orange', 'RoyalBlue', 'Darkgreen'), lwd=2)), as.table=TRUE, panel=panel.depth_function, prepanel=prepanel.depth_function, scales=list(y=list(tick.number=7, alternating=3), x=list(relation='free', alternating=1)), layout=c(3,1), sync.colors=TRUE, alpha=0.5, auto.key=list(columns=3, lines=TRUE, points=FALSE))
+@
 
 
 
