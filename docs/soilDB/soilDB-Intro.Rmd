@@ -11,12 +11,9 @@ options(width=100, stringsAsFactors=FALSE)
 ## Introduction
 This package provides methods for extracting soils information from local PedonPC and AK Site databases (MS Access format), local NASIS databases (MS SQL Server), and the SDA webservice. Currently USDA-NCSS data sources are supported, however, there are plans to develop interfaces to outside systems such as the Global Soil Mapping project.
 	
-It can be difficult to locate all of the dependencies required for sending/processing SOAP requests, especially on UNIX-like operating systems. Windows binary packages for the dependencies can be found [here](http://www.stats.ox.ac.uk/pub/RWin/bin/windows/contrib/2.14/).
+It can be difficult to locate all of the dependencies required for sending/processing SOAP requests, especially on UNIX-like operating systems. Some of the windows binary packages for the dependencies can be found [here](http://www.stats.ox.ac.uk/pub/RWin/bin/windows/contrib/2.15/). In order to send queries to the SDA system, the [SSOAP](http://www.omegahat.org/SSOAP/) and [XMLSchema](http://www.omegahat.org/XMLSchema/) packages are required. These are source packages and can be installed from the command like with `R CMD INSTALL package.tar.gz`. 
 
 This document is based on `aqp` version `r utils::packageDescription("aqp", field="Version")` and `soilDB` version `r utils::packageDescription("soilDB", field="Version")`.
-
-
-### Inteded Users
 
 
 ### R Notes
@@ -88,6 +85,19 @@ gopheridge <- s[subset.idx, ]
 
 # plot the data
 plot(gopheridge, name='hzname')
+```
+
+
+**Fetch data from Soil Data Access (SDA) Web-Service**
+The `SDA_query()` function submits a query (ANSI SQL) to the SDA web-service using the `SSOAP` package, parses the result, and returns a `data.frame` (rectangular table) object. Note that the [SSOAP](http://www.omegahat.org/SSOAP/) and [XMLSchema](http://www.omegahat.org/XMLSchema/) packages are not installed by default, and must be manually installed.
+```{r sda-example, eval=FALSE}
+# setup a query
+q <- "select cokey, compname, comppct_r 
+from component 
+where compname = 'yolo' and majcompflag = 'Yes' "
+
+# run the query
+res <- SDA_query(q)
 ```
 
 
@@ -264,12 +274,12 @@ gopheridge$paralithic.contact.depth <- profileApply(gopheridge, f.diag.top, d.hz
 
 Re-order the `gopheridge` profiles by presence/absense of paralithic contact, plot, and then annotate depth of Cr contact.
 ```{r basic_plotting, fig.width=10, fig.height=5, out.width='100%'}
-# order by presence of paralithic contact
-new.order <- order(gopheridge$paralithic.contact)
+# order by presence of paralithic contact and its depth
+new.order <- order(gopheridge$paralithic.contact, gopheridge$paralithic.contact.depth)
 # setup margins:
 par(mar=c(0,0,0,0))
 plot(gopheridge, name='hzname', plot.order=new.order)
 # annotate paralithic contact with lines
 x.pos <- 1:length(gopheridge)
-lines(x.pos, gopheridge$paralithic.contact.depth[new.order], lty=2, col='black')
+lines(x.pos, gopheridge$paralithic.contact.depth[new.order], lty=2, lwd=2, col='black')
 ```
