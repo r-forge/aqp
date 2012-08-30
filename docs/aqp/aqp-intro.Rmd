@@ -1,0 +1,111 @@
+
+Generate some aggregates of horizon data, and save as site-level data.
+```{r gopheridge-demo-2, eval=TRUE}
+# compute soil depth using an in-line function, note that max(SPC) returns the bottom-most depth
+# this may not be the same as 'soil depth' when Cr or R horizons are present
+gopheridge$soil.depth <- profileApply(gopheridge, function(x) max(x))
+
+# horizon-thickness weighted mean (beware of missing data!)
+f.wt.prop <- function(x, prop) {h <- horizons(x); w <- with(h, hzdepb-hzdept); wtd.mean(h[[prop]], weights=w)}
+
+# get hz mid-point of hz with max clay content
+f.max.clay.depth <- function(x) {
+	h <- horizons(x) 
+	max.clay <- which.max(h$clay) 
+	with(h[max.clay, ], (hzdept+hzdepb) / 2)
+}
+
+# apply by-profile, returning a vector, assigned to new column in @site
+gopheridge$wt.clay <- profileApply(gopheridge, f.wt.prop, prop='clay')
+gopheridge$wt.rf <- profileApply(gopheridge, f.wt.prop, prop='total_frags_pct')
+gopheridge$max.clay.depth <- profileApply(gopheridge, f.max.clay.depth)
+```
+
+Define functions for weighted-mean properties within the PCS or diagnostic horizon, then apply to each profile. Also extract diagnostic horizon thickness and top depths, then save as site-level data.
+```{r gopheridge-demo-3, eval=TRUE}
+# compute aggregate (wt.mean) clay within particle-size control section
+# note that this requires conditional eval of data that may contain NA
+# see ?slab and ?soil.slot for details on the syntax
+f.pcs.prop <- function(x, prop) {
+	# these are accessed from @site
+	sv <- c(x$psctopdepth, x$pscbotdepth)
+	# test for missing PCS data
+	if(any(is.na(sv)))
+		return(NA)
+	
+	# create formula from named property
+	fm <- as.formula(paste('~', prop))
+	# return just the (weighted) mean, accessed from @horizons
+	s <- slab(x, fm, seg_vect=sv)$p.mean
+	return(s)
+}
+
+# compute the weighted-mean of some property within a given diagnostic horizon
+# note that this requires conditional eval of data that may contain NA
+# see ?slab and ?soil.slot for details on the syntax
+# note that function expects certain columns within 'x'
+f.diag.wt.prop <- function(x, d.hz, prop) {
+	# extract diagnostic horizon data
+	d <- diagnostic_hz(x)
+	# subset to the requested diagnostic hz
+	d <- d[d$diag_kind == d.hz, ]
+	# if missing return NA
+	if(nrow(d) == 0)
+		return(NA)
+	
+	# extract depths and check for missing
+	sv <- c(d$featdept, d$featdepb)
+	if(any(is.na(sv)))
+		return(NA)
+	
+	# create formula from named property
+	fm <- as.formula(paste('~', prop))
+	# return just the (weighted) mean, accessed from @horizons
+	s <- slab(x, fm, seg_vect=sv)$p.mean
+	return(s)
+}
+
+# conditional eval of thickness of some diagnostic feature or horizon
+# will return a vector of length(x), you can save to @site
+f.diag.thickness <- function(x, d.hz) {
+	# extract diagnostic horizon data
+	d <- diagnostic_hz(x)
+	# subset to the requested diagnostic hz
+	d <- d[d$diag_kind == d.hz, ]
+	# if missing return NA
+	if(nrow(d) == 0)
+		return(NA)
+	
+	# compute thickness
+	thick <- d$featdepb - d$featdept
+	return(thick)
+}
+
+# conditional eval of top hz depth of diagnostic feature or horizon
+# will return a vector of length(x), you can save to @site
+f.diag.top <- function(x, d.hz) {
+	# extract diagnostic horizon data
+	d <- diagnostic_hz(x)
+	# subset to the requested diagnostic hz
+	d <- d[d$diag_kind == d.hz, ]
+	# if missing return NA
+	if(nrow(d) == 0)
+		return(NA)
+	
+	# return top depth
+	return(d$featdept)
+}
+
+
+# compute wt.mean clay within PCS, save to @site
+gopheridge$pcs.clay <- profileApply(gopheridge, f.pcs.prop, prop='clay')
+
+# compute wt.mean clay within argillic horizon, save to @site
+gopheridge$argillic.clay <- profileApply(gopheridge, f.diag.wt.prop, d.hz='argillic horizon', prop='clay')
+
+# compute argillic hz thickness, save to @site
+gopheridge$argillic.thick <- profileApply(gopheridge, f.diag.thickness, d.hz='argillic horizon')
+
+# compute depth to paralithic contact, if present, save to @site
+gopheridge$paralithic.contact.depth <- profileApply(gopheridge, f.diag.top, d.hz='paralithic contact')
+```
