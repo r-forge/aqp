@@ -227,6 +227,30 @@ sort(round(tapply(x$effective.area, x$suborder, sum)))
 ```
 
 
+### Fetch SSURGO Polygons from SDA
+Map unit polygons can also be queried from SDA, using a similar bounding box query, with the `mapunit_geom_by_ll_bbox()` function. This function returns a `SpatialPolygonsDataFrame` class object, containing all map unit delineations that *overlap* with the supplied bounding box. Post-processing with functions from the `rgeos` package can be used to extract the spatial intersection between map unit polygons and a region of interest.
+
+```{r ssurgo-polygons-demo-1, fig.width=5, fig.height=5, results='hide'}
+# define bounding box
+b <- c(-120.54,38.61,-120.41,38.70)
+# query geometry
+x <- mapunit_geom_by_ll_bbox(b) # about 20 seconds
+
+# reset margins, and plot the results
+par(mar=c(0,0,0,0))
+plot(x)
+# add our original bounding box in red
+rect(b[1], b[2], b[3], b[4], border='red', lwd=2)
+# add a title at the bottom of the figure
+title(sub='SSURGO Map Unit Delineations', line=-2, font=2)
+
+# follow-up by retrieving corresponding map unit data from SDA
+in.statement <- format_SQL_in_statement(unique(x$MUKEY))
+q <- paste("SELECT mukey, muname FROM mapunit WHERE mukey IN ", in.statement, sep="")
+res <- SDA_query(q)
+```
+
+
 ### The `Gopheridge` Sample Dataset
 The `gopheridge` sample dataset is very similar to the type of data returned from `fetchNASIS()` or `fetchPedonPC()`. The following demonstration is geared towards intermediate users of R and who are familiar with the classes and methods defined by the `aqp` package. Before proceeding it may be helpful to review the `aqp` manual pages: `library(aqp) ; help(aqp)`, or the [AQP kick-start](http://casoilresource.lawr.ucdavis.edu/drupal/node/1028).
 
@@ -247,90 +271,9 @@ gopheridge
 ```
 
 
-Generate some aggregates of horizon data, and save as site-level data.
+Define a simple function for extracting the top depth of a diagnostic feature, and use to compute the top depth of Cr contact for each pedon. Note that the arguments to this function are `x` (a 1-item `SoilProfileCollection`, i.e. a single soil profile), and `d.hz` (the name of the diagnostic feature or horizon that we are querying). If the queried diagnostic feature/horizon is not present for any given pedon, `NA` is returned. This function is used in conjunction with `profileApply()`, such that it is evaluated for each pedon within a collection. The result is a vector of the same length as the number of pedons in the collection.
 ```{r gopheridge-demo-2, eval=TRUE}
-# compute soil depth using an in-line function, note that max(SPC) returns the bottom-most depth
-# this may not be the same as 'soil depth' when Cr or R horizons are present
-gopheridge$soil.depth <- profileApply(gopheridge, function(x) max(x))
-
-# horizon-thickness weighted mean (beware of missing data!)
-f.wt.prop <- function(x, prop) {h <- horizons(x); w <- with(h, hzdepb-hzdept); wtd.mean(h[[prop]], weights=w)}
-
-# get hz mid-point of hz with max clay content
-f.max.clay.depth <- function(x) {
-	h <- horizons(x) 
-	max.clay <- which.max(h$clay) 
-	with(h[max.clay, ], (hzdept+hzdepb) / 2)
-	}
-
-# apply by-profile, returning a vector, assigned to new column in @site
-gopheridge$wt.clay <- profileApply(gopheridge, f.wt.prop, prop='clay')
-gopheridge$wt.rf <- profileApply(gopheridge, f.wt.prop, prop='total_frags_pct')
-gopheridge$max.clay.depth <- profileApply(gopheridge, f.max.clay.depth)
-```
-
-Define functions for weighted-mean properties within the PCS or diagnostic horizon, then apply to each profile. Also extract diagnostic horizon thickness and top depths, then save as site-level data.
-```{r gopheridge-demo-3, eval=TRUE}
-# compute aggregate (wt.mean) clay within particle-size control section
-# note that this requires conditional eval of data that may contain NA
-# see ?slab and ?soil.slot for details on the syntax
-f.pcs.prop <- function(x, prop) {
-  # these are accessed from @site
-  sv <- c(x$psctopdepth, x$pscbotdepth)
-  # test for missing PCS data
-  if(any(is.na(sv)))
-    return(NA)
-
-  # create formula from named property
-  fm <- as.formula(paste('~', prop))
-  # return just the (weighted) mean, accessed from @horizons
-  s <- slab(x, fm, seg_vect=sv)$p.mean
-  return(s)
-}
-
-# compute the weighted-mean of some property within a given diagnostic horizon
-# note that this requires conditional eval of data that may contain NA
-# see ?slab and ?soil.slot for details on the syntax
-# note that function expects certain columns within 'x'
-f.diag.wt.prop <- function(x, d.hz, prop) {
-	# extract diagnostic horizon data
-	d <- diagnostic_hz(x)
-	# subset to the requested diagnostic hz
-	d <- d[d$diag_kind == d.hz, ]
-	# if missing return NA
-	if(nrow(d) == 0)
-		return(NA)
-	
-	# extract depths and check for missing
-	sv <- c(d$featdept, d$featdepb)
-	if(any(is.na(sv)))
-		return(NA)
-	
-	# create formula from named property
-	fm <- as.formula(paste('~', prop))
-	# return just the (weighted) mean, accessed from @horizons
-	s <- slab(x, fm, seg_vect=sv)$p.mean
-	return(s)
-}
-
-# conditional eval of thickness of some diagnostic feature or horizon
-# will return a vector of length(x), you can save to @site
-f.diag.thickness <- function(x, d.hz) {
-	# extract diagnostic horizon data
-	d <- diagnostic_hz(x)
-	# subset to the requested diagnostic hz
-	d <- d[d$diag_kind == d.hz, ]
-	# if missing return NA
-	if(nrow(d) == 0)
-		return(NA)
-	
-	# compute thickness
-	thick <- d$featdepb - d$featdept
-	return(thick)
-}
-
 # conditional eval of top hz depth of diagnostic feature or horizon
-# will return a vector of length(x), you can save to @site
 f.diag.top <- function(x, d.hz) {
 	# extract diagnostic horizon data
 	d <- diagnostic_hz(x)
@@ -344,17 +287,7 @@ f.diag.top <- function(x, d.hz) {
 	return(d$featdept)
 }
 
-
-# compute wt.mean clay within PCS, save to @site
-gopheridge$pcs.clay <- profileApply(gopheridge, f.pcs.prop, prop='clay')
-
-# compute wt.mean clay within argillic horizon, save to @site
-gopheridge$argillic.clay <- profileApply(gopheridge, f.diag.wt.prop, d.hz='argillic horizon', prop='clay')
-
-# compute argillic hz thickness, save to @site
-gopheridge$argillic.thick <- profileApply(gopheridge, f.diag.thickness, d.hz='argillic horizon')
-
-# compute depth to paralithic contact, if present, save to @site
+# compute depth to paralithic contact, save the results as site-level data
 gopheridge$paralithic.contact.depth <- profileApply(gopheridge, f.diag.top, d.hz='paralithic contact')
 ```
 
