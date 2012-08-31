@@ -1,3 +1,10 @@
+<!--
+manually process like this:
+library(knitr); library(markdown)
+knit('soilDB-Intro.Rmd')
+markdownToHTML('soilDB-Intro.md', 'soilDB-Intro.html')
+-->
+
 <title>Soil Database Interface: the soilDB package</title>
 # Soil Database Interface: the <tt>soilDB</tt> package
 
@@ -14,11 +21,9 @@ This package provides methods for extracting soils information from local PedonP
 ### Installation
 With a recent version of R, it should be possible to get all of the packages that `soilDB` depends on via:
 ```{r ssoap-deps, eval=FALSE}
-install.packages('soilDB', dep=TRUE)
-install.packages('RCurl', dep=TRUE)
-install.packages('XML', dep=TRUE)
-install.packages("SSOAP", repos = "http://www.omegahat.org/R", type="source")
-install.packages("XMLSchema", repos = "http://www.omegahat.org/R", type="source")
+install.packages('soilDB', dep=TRUE) # stable version from CRAN + dependencies
+install.packages("soilDB", repos="http://R-Forge.R-project.org") # most recent copy from r-forge
+install.packages("SSOAP", repos = "http://www.omegahat.org/R", type="source") # SSOAP and XMLSchema
 ```
 
 
@@ -294,7 +299,7 @@ gopheridge$paralithic.contact.depth <- profileApply(gopheridge, f.diag.top, d.hz
 
 
 Re-order the `gopheridge` profiles by presence/absence of paralithic contact, plot, and then annotate depth of Cr contact.
-```{r basic_plotting, fig.width=10, fig.height=5, out.width='100%'}
+```{r basic_plotting, fig.width=12, fig.height=5, out.width='100%'}
 # order by presence of paralithic contact and its depth
 new.order <- order(gopheridge$paralithic.contact, gopheridge$paralithic.contact.depth)
 # setup margins:

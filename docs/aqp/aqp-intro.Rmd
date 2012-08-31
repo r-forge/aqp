@@ -1,3 +1,9 @@
+<!--
+manually process like this:
+library(knitr); library(markdown)
+knit('aqp-intro.Rmd')
+markdownToHTML('aqp-intro.md', 'aqp-intro.html')
+-->
 
 Generate some aggregates of horizon data, and save as site-level data.
 ```{r gopheridge-demo-2, eval=TRUE}
