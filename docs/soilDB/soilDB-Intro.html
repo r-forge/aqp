@@ -205,6 +205,10 @@ install.packages(&quot;soilDB&quot;, repos=&quot;http://R-Forge.R-project.org&qu
 install.packages(&quot;SSOAP&quot;, repos = &quot;http://www.omegahat.org/R&quot;, type=&quot;source&quot;) # SSOAP and XMLSchema
 </code></pre>
 
+<h3>ODBC Connection to the Local NASIS database</h3>
+
+<p>Setting up this connection is simple, and outlined in this <a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/setup_local_nasis.html?root=aqp">guide</a>. Queries submitted to the national database will load pedons or DMU data into your local database. Functions in <code>soilDB</code> can only access data in your local database, and do not depend on the selected set. While it is possible to filter pedon or DMU records within <strong>R</strong>, it is generally best to also filter via queries to the national database. In other words, load up your local database with pedons associated with your office, project, or MLRA&ndash; then load these pedons in <strong>R</strong> for further filtering/processing.</p>
+
 <h3>R Notes</h3>
 
 <p>A basic understanding of R syntax, object structure, package management system, and programming style will greatly help with integration of the <code>soilDB</code> and <code>aqp</code> packages into standard workflows. Here are some reminders. Recall that online help documents can be accessed via :</p>
@@ -251,8 +255,17 @@ mean(x, na.rm=TRUE) # mean computed after removal of missing data
 
 <h3>High-Level Functions</h3>
 
+<p>When loading pedons with the <code>fetchNASIS()</code> or <code>fetchPedonPC()</code> functions, checks are performed for:</p>
+
+<ul>
+<li>multiple map datums</li>
+<li>inconsistent horizon boundaries</li>
+<li>missing lower horizon depths</li>
+<li>sites missing pedon records</li>
+</ul>
+
 <p><strong>Fetch Pedons or DMU data from Local NASIS</strong><br/>
-The <code>fetchNASIS()</code> function will load all pedons from the local NASIS database. Pedon records are returned for <em>all</em> pedons/DMU in the local database, regardless of the selected set. An ODBC connection named &#39;nasis_local&#39; must <strong>first</strong> be established (details pending).</p>
+The <code>fetchNASIS()</code> function will load all pedons from the local NASIS database. Pedon records are returned for <em>all</em> pedons/DMU in the local database, regardless of the selected set. An ODBC connection named &#39;nasis_local&#39; must <strong>first</strong> be <a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/setup_local_nasis.html?root=aqp">established</a>.</p>
 
 <pre><code class="r">library(soilDB)
 # pedons

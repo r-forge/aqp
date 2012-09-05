@@ -18,6 +18,7 @@ options(width=100, stringsAsFactors=FALSE)
 ## Introduction
 This package provides methods for extracting soils information from local PedonPC and AK Site databases (MS Access format), local NASIS databases (MS SQL Server), and the SDA web-service. Currently USDA-NCSS data sources are supported, however, there are plans to develop interfaces to outside systems such as the Global Soil Mapping project.
 
+
 ### Installation
 With a recent version of R, it should be possible to get all of the packages that `soilDB` depends on via:
 ```{r ssoap-deps, eval=FALSE}
@@ -26,7 +27,8 @@ install.packages("soilDB", repos="http://R-Forge.R-project.org") # most recent c
 install.packages("SSOAP", repos = "http://www.omegahat.org/R", type="source") # SSOAP and XMLSchema
 ```
 
-
+### ODBC Connection to the Local NASIS database
+Setting up this connection is simple, and outlined in this [guide](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/setup_local_nasis.html?root=aqp). Queries submitted to the national database will load pedons or DMU data into your local database. Functions in `soilDB` can only access data in your local database, and do not depend on the selected set. While it is possible to filter pedon or DMU records within **R**, it is generally best to also filter via queries to the national database. In other words, load up your local database with pedons associated with your office, project, or MLRA-- then load these pedons in **R** for further filtering/processing.
 
 ### R Notes
 A basic understanding of R syntax, object structure, package management system, and programming style will greatly help with integration of the `soilDB` and `aqp` packages into standard workflows. Here are some reminders. Recall that online help documents can be accessed via :
@@ -74,9 +76,15 @@ mean(x, na.rm=TRUE) # mean computed after removal of missing data
 The `soilDB` package provides two layers of functionality for extracting data from file-based databases (PedonPC), relational databases (local NASIS), and online data sources (Soil Data Access). High-level functions `fetchPedonPC()` and `fetchNASIS()` query, combine, verify horizon logic, and return `SoilProfileCollection` class objects containing the most commonly used site/pedon/horizon data. Low-level functions such as `get_site_data_from_pedon_db()` and `get_hz_data_from_pedon_db()` extract specific data from a designated source, and return the results as a `data.frame` class object.
 
 ### High-Level Functions
+When loading pedons with the `fetchNASIS()` or `fetchPedonPC()` functions, checks are performed for:
+ * multiple map datums
+ * inconsistent horizon boundaries
+ * missing lower horizon depths
+ * sites missing pedon records
+
 
 **Fetch Pedons or DMU data from Local NASIS**
-The `fetchNASIS()` function will load all pedons from the local NASIS database. Pedon records are returned for *all* pedons/DMU in the local database, regardless of the selected set. An ODBC connection named 'nasis_local' must **first** be established (details pending).
+The `fetchNASIS()` function will load all pedons from the local NASIS database. Pedon records are returned for *all* pedons/DMU in the local database, regardless of the selected set. An ODBC connection named 'nasis_local' must **first** be [established](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/setup_local_nasis.html?root=aqp).
 
 ```{r local-nasis-demo, eval=FALSE}
 library(soilDB)

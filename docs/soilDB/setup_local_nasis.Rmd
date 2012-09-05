@@ -1,0 +1,42 @@
+## Setup an ODBC Connection to the Local NASIS Database
+NASIS 6.2
+2012-09-05
+DEB
+
+### Introduction
+This document describes how setup an ODBC link between a local NASIS database and **R**, so that pedon and DMU records can be queried with the [soilDB](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/soilDB-Intro.html?root=aqp) package.
+
+
+### Open the ODBC Data Source Administrator
+Access via control panels, or click: Start->Run, then paste in `odbccp32.cpl` and hit enter. This will open a small panel of ODBC connections. With the "User DSN" tab selected, create a new data source by clicking on the "Add..." button. 
+
+
+**Step by Step:**
+ * Select the "SQL Server Native Client" driver.
+ * Name the data source `nasis_local`, the data source description is optional.
+ * The server location is `XXXXXX\NASISSQLEXPRESS`, where `XXXXXX` is the full name of your local machine. It is usually on the outside of your computer somewhere, or can be accessed by right-clicking on the "My Computer" icon and then clicking on the "Properties" tab. It will look something like: `CASONORA00L354`. When finished click "Next".
+ * Choose the second option: "SQL Server authentication...":
+  * login: `NASISSQLRO`
+  * password: `nasisRe@d0n1y`
+ * On the next screen, select "Nasis-local" as the default data base.
+ * Click "Next" and then "Finish" the finalize the connection.
+
+
+### Example
+```{r example, eval=FALSE}
+# load the library
+library(soilDB)
+
+# fetch all pedons from the local database
+fp <- fetchNASIS()
+
+# check for horizonation errors:
+fp.errors <- getHzErrorsNASIS()
+
+# fetch all DMU records from the local database
+fc <- fetchNASIS_component_data()
+
+# access the online manual
+help(soilDB)
+```
+
