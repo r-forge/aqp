@@ -184,6 +184,13 @@ hljs.initHighlightingOnLoad();
 </head>
 
 <body>
+<!--
+manually process like this:
+library(knitr); library(markdown)
+knit('vertical_vs_perpendicular.Rmd')
+markdownToHTML('vertical_vs_perpendicular.md', 'vertical_vs_perpendicular.html')
+-->
+
 <h3>Introduction</h3>
 
 <p>This is a simple demonstration of how to do some soils-related stuff in <strong>R</strong> with the <code>aqp</code> package.</p>
@@ -344,7 +351,7 @@ print(xtable(diff.by.pedon.df), type=&#39;html&#39;)
 
 <!-- html table generated in R 2.15.0 by xtable 1.7-0 package -->
 
-<!-- Thu Aug 30 09:53:59 2012 -->
+<!-- Wed Sep 05 13:38:59 2012 -->
 
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> mean.diff.cm </TH> <TH> total.diff.cm </TH> <TH> slope </TH>  </TR>
