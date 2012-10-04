@@ -22,6 +22,7 @@ This package provides methods for extracting soils information from local PedonP
 ### Installation
 With a recent version of R, it should be possible to get all of the packages that `soilDB` depends on via:
 ```{r ssoap-deps, eval=FALSE}
+# run these commands in the R console
 install.packages('soilDB', dep=TRUE) # stable version from CRAN + dependencies
 install.packages("soilDB", repos="http://R-Forge.R-project.org") # most recent copy from r-forge
 install.packages("SSOAP", repos = "http://www.omegahat.org/R", type="source") # SSOAP and XMLSchema
