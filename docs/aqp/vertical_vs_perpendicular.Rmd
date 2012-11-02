@@ -6,7 +6,7 @@ markdownToHTML('vertical_vs_perpendicular.md', 'vertical_vs_perpendicular.html')
 -->
 
 ```{r setup, echo=FALSE, results='hide'}
-opts_chunk$set(message=FALSE, warning=FALSE, background='#F7F7F7', dpi=100, fig.align='center', dev='png', tidy=FALSE)
+opts_chunk$set(message=FALSE, warning=FALSE, background='#F7F7F7', dpi=100, fig.align='center', dev='CairoPNG', tidy=FALSE)
 options(width=100, stringsAsFactors=FALSE)
 ```
 
