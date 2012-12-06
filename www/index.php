@@ -42,9 +42,11 @@ fclose($handle);
 echo $contents; } ?>
 
 <!-- end of project description -->
-<p> You can find the <strong>project summary page</strong> <a href="http://<?php echo $domain; ?>/projects/<?php echo $group_name; ?>/"><strong>here</strong></a>.</p>
+<p>You can find the <strong>project summary page</strong> <a href="http://<?php echo $domain; ?>/projects/<?php echo $group_name; ?>/"><strong>here</strong></a>.</p>
 
-<p> You can find <strong></strong>extended examples + discussion</strong> <a href="http://casoilresource.lawr.ucdavis.edu/drupal/taxonomy/term/56"><strong>here</strong></a>.</p>
+<p>You can find <strong>extended examples + discussion</strong> <a href="http://casoilresource.lawr.ucdavis.edu/drupal/taxonomy/term/56"><strong>here</strong></a>.</p>
+
+<p><strong>Technical details</strong> <a href="http://dx.doi.org/10.1016/j.cageo.2012.10.020"><strong>here</strong></a>.</p>
 
 <p> Vignettes:
 <ol>
