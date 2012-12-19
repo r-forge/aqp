@@ -1,0 +1,80 @@
+```{r setup, echo=FALSE, results='hide'}
+# setup
+opts_chunk$set(message=FALSE, warning=FALSE, background='#F7F7F7', dpi=100, fig.align='center', dev='CairoPNG', tidy=TRUE, verbose=FALSE)
+options(width=100, stringsAsFactors=FALSE)
+```
+
+## Getting, Plotting, and Saving Soil Series Extent Data from SoilWeb
+2012-12-19
+Dylan Beaudette
+
+### Introduction
+This document demonstrates how to use the [soilDB](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/soilDB-Intro.html?root=aqp) package to access detailed soil series extent maps via SoilWeb. These maps can be directly displayed in **R**, overlayed on Google Maps, or saved as local files (e.g. shapefiles). Data returned from SoilWeb represent bounding-boxes that enclose SSURGO polygons associated with map units containing the search criteria.
+
+
+### Examples 
+You will need the ```soilDB``` and ```dismo``` packages in order to run these examples. See [this](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/soilDB-Intro.html?root=aqp) document for examples on how to install ```soilDB``` and related packages.
+
+
+**Illustrate the extent of SSURGO map units associated with the Amador series.**
+```{r example-1, results='hide'}
+# load required libraries
+library(soilDB)
+library(dismo)
+
+# plot map
+seriesExtentAsGmap('amador')
+```
+
+**Illustrate the extent of SSURGO map units associated with several soil series from MLRA 17 and 18.**
+```{r example-2, results='hide'}
+# load required libraries
+library(maps)
+library(RColorBrewer)
+
+# define some nice colors
+cols <- brewer.pal('Set1', n=3)
+
+# get the spatial extent of select series
+amador <- seriesExtent('amador')
+pardee <- seriesExtent('pardee')
+san.joaquin <- seriesExtent('san joaquin', timeout=120)
+
+# plot the results:
+# set figure margins to 0
+par(mar=c(0,0,0,0))
+
+# plot select counties from California
+map(database='county', regions='california,calaveras|tuolumne|amador|san joaquin|stanislaus|merced|mariposa|sacramento')
+
+# add each soil series extent object
+plot(amador, col=cols[1], add=TRUE)
+plot(pardee, col=cols[2], add=TRUE)
+plot(san.joaquin, col=cols[3], add=TRUE)
+
+# add a neatline around the map
+box()
+
+# make a simple legend
+legend('topright', col=cols, pch=15, legend=c('Amador','Pardee','San Joaquin'))
+```
+
+
+**Investigate the structure of soil series extent data.**
+```{r example-3}
+# internal structure / class
+str(amador, 2)
+
+# coordinate reference system in PROJ4 notation
+proj4string(amador)
+```
+
+**Save soil series extent data as a shapefile.**
+```{r example-4, eval=FALSE}
+# save using the coordinate reference system associated with this object (GCS WGS84)
+writeOGR(amador, dsn='.', layer='amador-extent', driver='ESRI Shapefile')
+
+# project to UTM zone 10 NAD83 and save
+amador.utm <- spTransform(amador, CRS('+proj=utm +zone=10 +datum=NAD83'))
+writeOGR(amador.utm, dsn='.', layer='amador-extent-utm', driver='ESRI Shapefile')
+```
