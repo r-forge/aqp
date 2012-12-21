@@ -11,11 +11,18 @@ Dylan Beaudette
 ### Introduction
 This document demonstrates how to use the [soilDB](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/soilDB-Intro.html?root=aqp) package to access detailed soil series extent maps via SoilWeb. These maps can be directly displayed in **R**, overlayed on Google Maps, or saved as local files (e.g. shapefiles). Data returned from SoilWeb represent bounding-boxes that enclose SSURGO polygons associated with map units containing the search criteria.
 
+### Installation
+With a recent version of R, it should be possible to get all of the packages that this tutorial depends on via:
+```{r install-deps, eval=FALSE}
+# run these commands in the R console
+install.packages('soilDB', dep=TRUE) # stable version from CRAN + dependencies
+install.packages("soilDB", repos="http://R-Forge.R-project.org") # most recent copy from r-forge
+install.packages('dismo', dep=TRUE)
+install.packages('RColorBrewer', dep=TRUE)
+install.packages('maps', dep=TRUE)
+```
 
 ### Examples 
-You will need the ```soilDB``` and ```dismo``` packages in order to run these examples. See [this](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/soilDB-Intro.html?root=aqp) document for examples on how to install ```soilDB``` and related packages.
-
-
 **Illustrate the extent of SSURGO map units associated with the Amador series.**
 ```{r example-1, results='hide'}
 # load required libraries

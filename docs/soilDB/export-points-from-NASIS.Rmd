@@ -1,0 +1,71 @@
+```{r setup, echo=FALSE, results='hide'}
+# setup
+opts_chunk$set(message=FALSE, warning=FALSE, background='#F7F7F7', dpi=100, fig.align='center', dev='CairoPNG', tidy=TRUE, verbose=FALSE)
+options(width=100, stringsAsFactors=FALSE)
+```
+
+## Export Pedon Spatial Data from NASIS
+2012-12-20
+Dylan Beaudette
+
+### Introduction
+This document demonstrates how to use the [soilDB](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/soilDB-Intro.html?root=aqp) package to export pedon locations from the local NASIS database to shapefile.
+
+### Installation
+With a recent version of R, it should be possible to get all of the packages that this tutorial depends on via:
+```{r install-deps, eval=FALSE}
+# run these commands in the R console
+install.packages('soilDB', dep=TRUE) # stable version from CRAN + dependencies
+install.packages("soilDB", repos="http://R-Forge.R-project.org") # most recent copy from r-forge
+install.packages('rgdal', dep=TRUE)
+install.packages('rgeos', dep=TRUE)
+```
+
+### Examples 
+
+**Save soil series extent data as a shapefile.**
+```{r example, eval=FALSE}
+## 1. "PEDON by MLRA" for each MLRA of interest
+## 		... this assumes that the map unit overlap table has been populated correctly
+
+library(soilDB)
+library(rgdal)
+library(rgeos)
+
+# read in the quad boundaries to spatially subset NASIS data
+b <- readOGR(dsn="L:\\Geodata\\Boundaries", layer = "CA_630_Quad_Boundaries")
+
+# extend boundary with + 20km buffer
+b <- gBuffer(b, byid=FALSE, width=20000)
+
+# inverse-project to GCS
+b <- spTransform(b, CRS('+proj=latlong +datum=NAD83'))
+
+# load entire contents of local database (pedon data)
+f <- fetchNASIS()
+
+# keep only those pedons with real coordinates
+good.idx <- which(!is.na(f$x))
+f <- f[good.idx, ]
+
+# init coordinates
+coordinates(f) <- ~ x + y
+proj4string(f) <- '+proj=latlong +datum=NAD83'
+
+# extract only site data
+s <- as(f, 'SpatialPointsDataFrame')
+
+# this subsets points by spatial intersection with the quad boundary
+idx <- gIntersects(s, b, byid = TRUE)
+ids <- which(apply(idx, 2, any))
+s <- s[ids,]
+
+# project to UTM z10 NAD83
+s <- spTransform(s, CRS('+proj=utm +zone=10 +datum=NAD83'))
+
+# subsetting the columns useful for analysis
+s <- s[, c("pedon_id","taxonname", "hillslope_pos", "elev_field", "slope_field", "aspect_field", "plantassocnm", "bedrckdepth", "bedrock_kind")]
+
+# write to SHP
+writeOGR(s, dsn='.', layer='NASIS-pedons', driver='ESRI Shapefile', overwrite_layer=TRUE)
+```
