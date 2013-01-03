@@ -285,7 +285,7 @@ head(agg)
 library(lattice)
 xyplot(top ~ p.q50 | variable, data=agg, ylab='Depth',
 			 xlab='median bounded by 25th and 75th percentiles',
-			 lower=agg$p.q25, upper=agg$p.q75, ylim=c(50,-5), alpha=0.5, 
+			 lower=agg$p.q25, upper=agg$p.q75, ylim=c(50,-5),
 			 panel=panel.depth_function, 
 			 prepanel=prepanel.depth_function,
 			 cf=agg$contributing_fraction,
