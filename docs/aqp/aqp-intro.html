@@ -187,11 +187,19 @@ markdownToHTML('aqp-intro.md', 'aqp-intro.html')
 
 <h2>Introduction to SoilProfileCollection Objects</h2>
 
-<p>This is a very basic introduction to the <code>SoilProfileCollection</code> class object defined in the <code>aqp</code> package for <strong>R</strong>. The <code>SoilProfileCollection</code> class was designed to simplifiy the process of working with the collection of data associated with soil profiles: site-level data, horizon-level data, spatial data, diagnostic horizon data, metadata, etc. Examples listed below are meant to be copied/pasted from this document and interactively run within <strong>R</strong>. Comments (green text) briefly describe what the code in each line does. This document assumes a basic level of proficiency with <strong>R</strong> which can be gained by reviewing some of the material in <a href="http://cran.r-project.org/doc/contrib/Verzani-SimpleR.pdf">tutorials like this</a>.</p>
+<p>This is a very basic introduction to the <code>SoilProfileCollection</code> class object defined in the <code>aqp</code> package for <strong>R</strong>. The <code>SoilProfileCollection</code> class was designed to simplifiy the process of working with the collection of data associated with soil profiles: site-level data, horizon-level data, spatial data, diagnostic horizon data, metadata, etc. Examples listed below are meant to be copied/pasted from this document and interactively run within <strong>R</strong>. Comments (green text) briefly describe what the code in each line does. This document assumes a basic level of proficiency with <strong>R</strong> which can be gained by reviewing some of the material in <a href="http://cran.r-project.org/doc/contrib/Verzani-SimpleR.pdf">tutorials like this</a>. Further documentation on objects and functions from the <code>aqp</code> package can be accessed by typing <code>?aqp</code> (e.g. &ldquo;?function_name&rdquo;) at the <strong>R</strong> console.</p>
 
 <h3>Object Creation</h3>
 
-<p><code>SoilProfileCollection</code> are typically created by &ldquo;promoting&rdquo; <code>data.frame</code> objects (rectangular tables of data) that contain at least three essential columns: 1) an ID column uniquely identifying groups of horizons, 2) horizon top boundaries, and, 3) horizon bottom boundaries. Ideally the <code>data.frame</code> is pre-sorted according to the profile ID and horizon top boundary. Formula notation is used to define these columns using the pattern: </p>
+<p><code>SoilProfileCollection</code> are typically created by &ldquo;promoting&rdquo; <code>data.frame</code> objects (rectangular tables of data) that contain at least three essential columns: </p>
+
+<ul>
+<li>1) an ID column uniquely identifying groups of horizons</li>
+<li>2) horizon top boundaries</li>
+<li>3) horizon bottom boundaries</li>
+</ul>
+
+<p>Ideally the <code>data.frame</code> is pre-sorted according to the profile ID and horizon top boundary. Formula notation is used to define these columns using the pattern: </p>
 
 <pre><code class="r">idcolumn ~ hz_top_column + hz_bottom_column
 </code></pre>
@@ -272,7 +280,7 @@ class(sp4) # class name
 ## 6      napa
 </code></pre>
 
-<h3>Accessing, Setting, and Replacing Components of a <code>SoilProfileCollection</code></h3>
+<h3>Accessing, Setting, and Replacing Data</h3>
 
 <p>&ldquo;Accessor&rdquo; functions are used to extract specfic components from within <code>SoilProfileCollection</code> objects.</p>
 
@@ -298,7 +306,7 @@ max(sp4) # deepest profile depth in collection
 
 <p>will extract horizon data and </p>
 
-<pre><code class="r">horizons(sp4) &lt;- x` 
+<pre><code class="r">horizons(sp4) &lt;- x
 </code></pre>
 
 <p>will replace horizon data. Further examples include:</p>
@@ -310,6 +318,41 @@ diagnostic_hz(sp4) # get or set diagnostic horizons
 </code></pre>
 
 <h3>Horizon and Site Data</h3>
+
+<p>Typically, horizon and site data are the most important components of <code>SoilProfileCollection</code> objects. Both are internally stored as <code>data.frame</code> objects; with one or more rows (per profile ID) in the horizon table and one row (per profile ID) in the site table. Columns from either table can be accessed with the <code>$</code> style notation of <code>data.frames</code>. New data can be assigned to either table in the same manner, as long as the length of the new data is either: </p>
+
+<ul>
+<li>1) same lenght as the number of profiles in the collection (target is the site table)</li>
+<li>2) same length as the number of horizons in the collection (target is the horizon table)</li>
+</ul>
+
+<pre><code class="r"># assignment of new data to existing or new attributes
+sp4$elevation &lt;- rnorm(n=length(sp4), mean=1000, sd=150) # site-level, based on length of assigned data
+sp4$thickness &lt;- sp4$bottom - sp4$top # horizon-level
+
+# extraction of specific attributes by name
+sp4$clay # vector of clay content (horizon data)
+</code></pre>
+
+<pre><code>##  [1] 21 27 32 55 25 34  3 15 27 32 25 31 33 13 21 23 15 17 12 19 14 14 22 25 40 51 67 24 25 32
+</code></pre>
+
+<pre><code class="r">sp4$elevation # vector of group membership (site data)
+</code></pre>
+
+<pre><code>##  [1] 1192.7  982.7 1271.8 1122.3  927.2  987.8 1025.9 1232.5  921.3 1028.4
+</code></pre>
+
+<pre><code class="r">
+# assign a single single value into horizon-level attributes
+sp4$constant &lt;- rep(1, times=nrow(sp4))
+
+# promote horizon-level data to site-level data (when it makes sense to do so)
+# note that this _moves_ the named column from horizon to site
+site(sp4) &lt;- ~ constant 
+</code></pre>
+
+<p>Horizon and site data can also be modified via extraction to <code>data.frame</code> followed by replacement (horizon data) or join (site data). Note that while this approach gives the most flexibility, it is also the most dangerous&ndash; replacement of horizon data with new data that don&#39;t exactly conform to the original sorting may corrupt your <code>SoilProfileCollection</code>.</p>
 
 <pre><code class="r"># extract horizon data to data.frame
 h &lt;- horizons(sp4)
@@ -327,36 +370,13 @@ s &lt;- site(sp4)
 # add a fake group to the site data
 s$group &lt;- rep(c(&#39;A&#39;, &#39;B&#39;), length.out=nrow(s))
 
-# merge-in new site data, old data are _not_ replaced
+# join new site data with previous data: old data are _not_ replaced
 site(sp4) &lt;- s
-
-# extraction of specific attributes by name
-sp4$clay # vector of clay content (horizon data)
-</code></pre>
-
-<pre><code>##  [1] 21 27 32 55 25 34  3 15 27 32 25 31 33 13 21 23 15 17 12 19 14 14 22 25 40 51 67 24 25 32
-</code></pre>
-
-<pre><code class="r">sp4$group # vector of group membership (site data)
-</code></pre>
-
-<pre><code>##  [1] &quot;A&quot; &quot;B&quot; &quot;A&quot; &quot;B&quot; &quot;A&quot; &quot;B&quot; &quot;A&quot; &quot;B&quot; &quot;A&quot; &quot;B&quot;
-</code></pre>
-
-<pre><code class="r">
-# assignment of new data to existing or new attributes
-sp4$elevation &lt;- rnorm(n=length(sp4), mean=1000, sd=150) # site-level, based on length of assigned data
-sp4$thickness &lt;- sp4$bottom - sp4$top # horizon-level
-
-# assign a single single value into horizon-level attributes
-sp4$constant &lt;- rep(1, times=nrow(sp4))
-
-# promote horizon-level data to site-level data (when it makes sense to do so)
-# note that this _moves_ the named column from horizon to site
-site(sp4) &lt;- ~ constant 
 </code></pre>
 
 <h3>Diagnostic Horizons</h3>
+
+<p>Diagnostic horizons typically span several genetic horizons and may or may not be present in all profiles. To accomodate the wide range of possibilities, diagnostic horizon data are stored as a <code>data.frame</code> in &ldquo;long format&rdquo;: each row corresponds to a diagnostic horizon, identified with a column matching the ID column used to initialize the <code>SoilProfileCollection</code> object.</p>
 
 <pre><code class="r"># manually create some diagnostic horizon data
 # there is no restrictions on data format, as long as each row has an ID that exists within the collection
@@ -391,16 +411,16 @@ coordinates(sp4)
 </code></pre>
 
 <pre><code>##         x       y
-## 1  353780 4109251
-## 2  354018 4109438
-## 3  354027 4109503
-## 4  353853 4109536
-## 5  353771 4109432
-## 6  354126 4109410
-## 7  353972 4109396
-## 8  353975 4109836
-## 9  354180 4109578
-## 10 353887 4109539
+## 1  353857 4109634
+## 2  353922 4109499
+## 3  354151 4109517
+## 4  353913 4109624
+## 5  353974 4109585
+## 6  354067 4109600
+## 7  354039 4109624
+## 8  354059 4109608
+## 9  353924 4109594
+## 10 354011 4109401
 </code></pre>
 
 <pre><code class="r">
@@ -427,7 +447,7 @@ plot(sp4.sp)
 box()
 </code></pre>
 
-<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZAAAAGQCAIAAAAP3aGbAAAABmJLR0QA/wD/AP+gvaeTAAAHK0lEQVR4nO3dMW7bWBRAUXLgdNkFO1XZQQJkMdlKlpAlBC6ykjQpVFLITjhFYGEG8GQsz1if1zqnYiU8uLj4FKnnedu2CaDgj9EDADyVYAEZggVkCBaQIVhAhmABGYIFZAgWkCFYQIZgARmCBWQIFpAhWECGYAEZggVkCBaQIVhAhmABGYIFZAgWkCFYQIZgARmCBWQIFpAhWECGYAEZggVkCBaQIVhAhmABGYIFZAgWkCFYQIZgARmCBWQIFpAhWECGYAEZggVkCBaQIVhAhmABGYIFZAgWkCFYQIZgARmCBWQIFpAhWECGYAEZggVkCBaQIVhAhmABGYIFZAgWkCFYQMbd6AEu8/Pnz/v7+23bRg8CPO7u7u7Tp09v3759kQ9/iQ99Off399++ffvw4cPoQYDHff369d27dx8/fnyJD48Fa5qm9+/ff/78efQUwOO+f//+ch/uOywgQ7CADMECMgQLyBAsBluWZfQIZAgWg51Op9EjkCFYQIZgMcCyLPODaZp+Xbg35F/1XhzlFVjX9Xw9z7PfWvFETlhAhmABGYLFYIfDYfQIZAgWgx2Px9EjkCFYQIZgARmCBWQIFpAhWECGYAEZggVkCBaQIVhAhmABGYIFZAgWkCFYQIZgARmCBWQIFpAhWECGYAEZggVkCBaQIVhAhmABGYIFZAgWkCFYQIZgARmCBWQIFpAhWECGYAEZggVkCBaQIVhAhmABGYIFZAgWkCFYQIZgARmCBWQIFpAhWECGYAEZggVkCBaQIVhAhmABGYIFZAgWkCFYQIZgARmCBWQIFpAhWECGYAEZggVkCBaQIVhAhmABGYIFZAgWkCFYQIZgARmCBWQIFpAhWECGYAEZggVkCBaQIVhAhmABGYIFZAgWkCFYQIZgARmCBWQIFpAhWECGYAEZggVkCBaQIVhAhmABGYIFZAgWkCFYQIZgARmCBWQIFpAhWECGYAEZggVkCBaQIVhAhmABGYIFZAgWkCFYQIZgARmCBWQIFpAhWDDesiyjR2gQLBjvdDqNHqFBsIAMwQIyBAvGWJZlfjBN068LX2b93t3oAeBGret6vp7nedu2gcNUOGEBGYIF4x0Oh9EjNAgWjHc8HkeP0CBYQIZgARmCBWQIFpAhWECGYAEZggVkCBZ/47ds7Jlg3YSnZ8hiJvZMsG6CDPE6CBaQIVhM0192M00Pi5nsZmKHBOvVenQ/3D9laF3Xbdt+rWTaHvx1YRPsgQV+r5b9cLw+TlhAhmDxNzbJsWeCdROeniGb5NgzwboJMsTrIFhAhmABGYIFZAgWkCFYQIZgkec3j7dDsMizPOd2CBaQIVgkXbSLglfDtgaS7KK4TU5YQIZgARmCRZ6VOLdDsMizi+J2CBaQIVhAhmABGYIFZAgWkCFYQIZgARmCBWQIFpAhWECGYAEZggVkCBaQIVhAhmABGYIFZAgWkCFYQIZgkeT/D94mwSLJv6e/TYIFZAjWSO5r4CKCNZL7mossyzI/mKbpfK37t+Nu9ADwVOu6nq/ned62beAwDOGEBWQI1rW5r4Fnc0t4be5r/heHw2H0CAzghEXS8XgcPQIDCNZIjglwEcEayTEBLiJY8HwelVyZYMHzefX3ygQLyBAsIEOw4GLnt38nr/5elxdH4WLnt3+9+ntlTlgM40jCpQSLYTxi41KCBc/ntwpXJljwfH6rcGWCxVXZrsN/4SkhV2W7Dv+FExaQIVhAhmAxjEdsXEqwGMYjNi4lWECGYAEZggVkCBaQIVhAhmABGYIFZAgWkCFYQIZgARmCBWQIFpAhWECGYAEZggVkCBaQIVhAhmABGYIFZAgWkCFYQIZgARmCBWQIFpAhWECGYAEZggVkCBaQIVhAhmABGYIFZAgWkCFYQIZgARmCBWQIFpAhWECGYAEZggVkCBaQIVhAhmABGYIFZAgWkCFYQIZgARmCBWQIFpAhWECGYAEZggVkCNZeLMsyegTYO8Hai9PpNHoE2DvBAjIEC8gQrJGWZZkfTNN0vvZ9FjzqbvQAN21d1/P1PM/btg0cBvbPCQvIECwgQ7D24nA4jB4B9k6w9uJ4PI4eAfZOsIAMwQIyBAvIECygY0v58uXL6D8Y8Dtv3rz58ePHCxXA29VAhltCIEOwgAzBAjIEC8gQLCBDsIAMwQIyBAvIECwgQ7CADMECMgQLyBAsIEOwgAzBAjIEC8gQLCBDsIAMwQIyBAvIECwgQ7CADMECMgQLyBAsIEOwgAzBAjIEC8gQLCBDsIAMwQIyBAvIECwgQ7CADMECMgQLyBAsIEOwgAzBAjIEC8gQLCBDsIAMwQIyBAvIECwgQ7CADMECMgQLyBAsIEOwgAzBAjIEC8gQLCBDsIAMwQIyBAvIECwgQ7CADMECMgQLyBAsIEOwgAzBAjIEC8gQLCBDsIAMwQIyBAvIECwgQ7CADMECMgQLyPgT7Iiynx/DKW4AAAAASUVORK5CYII=" alt="plot of chunk spatial"/> </p>
+<p><img src="data:image/png;base64,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" alt="plot of chunk spatial"/> </p>
 
 <h3>Subsetting SoilProfileCollection Objects</h3>
 
@@ -440,30 +460,30 @@ sp4[1:2, ] # profiles 1--2 from the collection
 ## Depth range: 34-42 cm
 ## 
 ## Horizon attributes:
-##       id name top bottom   K   Mg  Ca CEC_7 ex_Ca_to_Mg sand silt clay   CF random.numbers
-## 1 colusa    A   0      3 0.3 25.7 9.0  23.0        0.35   46   33   21 0.12        -0.1374
-## 2 colusa  ABt   3      8 0.2 23.7 5.6  21.4        0.23   42   31   27 0.27         0.5981
-## 3 colusa  Bt1   8     30 0.1 23.2 1.9  23.7        0.08   40   28   32 0.27         0.1986
-## 4 colusa  Bt2  30     42 0.1 44.3 0.3  43.0        0.01   27   18   55 0.16         0.1934
-## 5  glenn    A   0      9 0.2 21.9 4.4  18.8        0.20   54   20   25 0.55        -0.1757
-## 6  glenn   Bt   9     34 0.3 18.9 4.5  27.5        0.20   49   18   34 0.84        -0.3603
-##   thickness
-## 1         3
-## 2         5
-## 3        22
-## 4        12
-## 5         9
-## 6        25
+##       id name top bottom   K   Mg  Ca CEC_7 ex_Ca_to_Mg sand silt clay   CF thickness
+## 1 colusa    A   0      3 0.3 25.7 9.0  23.0        0.35   46   33   21 0.12         3
+## 2 colusa  ABt   3      8 0.2 23.7 5.6  21.4        0.23   42   31   27 0.27         5
+## 3 colusa  Bt1   8     30 0.1 23.2 1.9  23.7        0.08   40   28   32 0.27        22
+## 4 colusa  Bt2  30     42 0.1 44.3 0.3  43.0        0.01   27   18   55 0.16        12
+## 5  glenn    A   0      9 0.2 21.9 4.4  18.8        0.20   54   20   25 0.55         9
+## 6  glenn   Bt   9     34 0.3 18.9 4.5  27.5        0.20   49   18   34 0.84        25
+##   random.numbers
+## 1        -0.4626
+## 2         0.5839
+## 3        -0.5241
+## 4         1.3313
+## 5         1.1239
+## 6         0.2986
 ## 
 ## Sampling site attributes:
-##       id group elevation constant
-## 1 colusa     A     957.0        1
-## 2  glenn     B     884.8        1
+##       id elevation constant group
+## 1 colusa    1192.7        1     A
+## 2  glenn     982.7        1     B
 ## 
 ## Spatial Data:
 ##       min     max
-## x  353780  354018
-## y 4109251 4109438
+## x  353857  353922
+## y 4109499 4109634
 ## CRS arguments: +proj=utm +zone=11 +datum=NAD83 
 </code></pre>
 
@@ -475,34 +495,34 @@ sp4[1:2, ] # profiles 1--2 from the collection
 ## Depth range: 5-40 cm
 ## 
 ## Horizon attributes:
-##       id name top bottom   K   Mg  Ca CEC_7 ex_Ca_to_Mg sand silt clay   CF random.numbers
-## 1 colusa    A   0      3 0.3 25.7 9.0  23.0        0.35   46   33   21 0.12       -0.13737
-## 2 colusa  ABt   3      8 0.2 23.7 5.6  21.4        0.23   42   31   27 0.27        0.59813
-## 3  glenn    A   0      9 0.2 21.9 4.4  18.8        0.20   54   20   25 0.55       -0.17574
-## 4  glenn   Bt   9     34 0.3 18.9 4.5  27.5        0.20   49   18   34 0.84       -0.36030
-## 5  kings    A   0      4 0.2 12.1 1.4  23.7        0.58   43   55    3 0.50        0.07507
-## 6  kings  Bt1   4     13 0.6 12.1 7.0  18.0        0.51   36   49   15 0.75       -2.35721
-##   thickness
-## 1         3
-## 2         5
-## 3         9
-## 4        25
-## 5         4
-## 6         9
+##       id name top bottom   K   Mg  Ca CEC_7 ex_Ca_to_Mg sand silt clay   CF thickness
+## 1 colusa    A   0      3 0.3 25.7 9.0  23.0        0.35   46   33   21 0.12         3
+## 2 colusa  ABt   3      8 0.2 23.7 5.6  21.4        0.23   42   31   27 0.27         5
+## 3  glenn    A   0      9 0.2 21.9 4.4  18.8        0.20   54   20   25 0.55         9
+## 4  glenn   Bt   9     34 0.3 18.9 4.5  27.5        0.20   49   18   34 0.84        25
+## 5  kings    A   0      4 0.2 12.1 1.4  23.7        0.58   43   55    3 0.50         4
+## 6  kings  Bt1   4     13 0.6 12.1 7.0  18.0        0.51   36   49   15 0.75         9
+##   random.numbers
+## 1        -0.4626
+## 2         0.5839
+## 3         1.1239
+## 4         0.2986
+## 5        -1.5153
+## 6         0.3293
 ## 
 ## Sampling site attributes:
-##          id group elevation constant
-## 1    colusa     A     957.0        1
-## 2     glenn     B     884.8        1
-## 3     kings     A    1002.3        1
-## 4  mariposa     B    1023.2        1
-## 5 mendocino     A    1128.7        1
-## 6      napa     B     901.0        1
+##          id elevation constant group
+## 1    colusa    1192.7        1     A
+## 2     glenn     982.7        1     B
+## 3     kings    1271.8        1     A
+## 4  mariposa    1122.3        1     B
+## 5 mendocino     927.2        1     A
+## 6      napa     987.8        1     B
 ## 
 ## Spatial Data:
 ##       min     max
-## x  353771  354180
-## y 4109251 4109836
+## x  353857  354151
+## y 4109401 4109634
 ## CRS arguments: +proj=utm +zone=11 +datum=NAD83 
 </code></pre>
 
@@ -539,31 +559,31 @@ subsetProfiles(sp4, h=&#39;clay &lt; 20&#39;, s=&#39;group == &quot;A&quot;&#39;
 ## Depth range: 20-40 cm
 ## 
 ## Horizon attributes:
-##           id name top bottom   K   Mg  Ca CEC_7 ex_Ca_to_Mg sand silt clay   CF random.numbers
-## 7      kings    A   0      4 0.2 12.1 1.4  23.7        0.58   43   55    3 0.50        0.07507
-## 8      kings  Bt1   4     13 0.6 12.1 7.0  18.0        0.51   36   49   15 0.75       -2.35721
-## 9      kings  Bt2  13     40 0.8 17.7 4.4  20.0        0.25   27   45   27 0.67       -0.21974
-## 23 mendocino    A   0      2 0.5 12.8 2.2  19.3        0.18   57   30   13 0.16       -0.45533
-## 24 mendocino  Bt1   2      8 0.2 27.1 3.4  19.8        0.13   51   28   21 0.14       -1.34421
-## 25 mendocino  Bt2   8     30 0.2 30.5 3.7  22.9        0.12   51   26   23 0.80        2.00286
-##    thickness
-## 7          4
-## 8          9
-## 9         27
-## 23         2
-## 24         6
-## 25        22
+##           id name top bottom   K   Mg  Ca CEC_7 ex_Ca_to_Mg sand silt clay   CF thickness
+## 7      kings    A   0      4 0.2 12.1 1.4  23.7        0.58   43   55    3 0.50         4
+## 8      kings  Bt1   4     13 0.6 12.1 7.0  18.0        0.51   36   49   15 0.75         9
+## 9      kings  Bt2  13     40 0.8 17.7 4.4  20.0        0.25   27   45   27 0.67        27
+## 23 mendocino    A   0      2 0.5 12.8 2.2  19.3        0.18   57   30   13 0.16         2
+## 24 mendocino  Bt1   2      8 0.2 27.1 3.4  19.8        0.13   51   28   21 0.14         6
+## 25 mendocino  Bt2   8     30 0.2 30.5 3.7  22.9        0.12   51   26   23 0.80        22
+##    random.numbers
+## 7         -1.5153
+## 8          0.3293
+## 9         -0.9883
+## 23        -2.6345
+## 24        -1.0488
+## 25         0.6932
 ## 
 ## Sampling site attributes:
-##           id group elevation constant
-## 3      kings     A      1002        1
-## 5  mendocino     A      1129        1
-## 7 san benito     A       881        1
+##           id elevation constant group
+## 3      kings    1271.8        1     A
+## 5  mendocino     927.2        1     A
+## 7 san benito    1025.9        1     A
 ## 
 ## Spatial Data:
 ##       min     max
-## x  353771  354027
-## y 4109396 4109503
+## x  353974  354151
+## y 4109517 4109624
 ## CRS arguments: +proj=utm +zone=11 +datum=NAD83 
 </code></pre>
 
@@ -624,6 +644,8 @@ print(soil.depths)
 
 <pre><code class="r">
 # compute the max Ca/Mg value per profile and save as a site-level attribute
+# note that in this case we define an in-line function, 
+# operating on a temporary SoilProfileCollection object &quot;i&quot; each time
 sp4$max_ca_to_mg &lt;- profileApply(sp4, function(i) max(i$ex_Ca_to_Mg, na.rm=TRUE))
 
 # use site-level data to alter plotting order
