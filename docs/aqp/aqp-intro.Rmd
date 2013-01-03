@@ -11,10 +11,17 @@ options(width=100, stringsAsFactors=FALSE)
 ```
 
 ## Introduction to SoilProfileCollection Objects
-This is a very basic introduction to the `SoilProfileCollection` class object defined in the `aqp` package for *R*. The `SoilProfileCollection` class was designed to simplifiy the process of working with the collection of data associated with soil profiles: site-level data, horizon-level data, spatial data, diagnostic horizon data, metadata, etc. Examples listed below are meant to be copied/pasted from this document and interactively run within *R*. Comments (green text) briefly describe what the code in each line does.
+This is a very basic introduction to the `SoilProfileCollection` class object defined in the `aqp` package for **R**. The `SoilProfileCollection` class was designed to simplifiy the process of working with the collection of data associated with soil profiles: site-level data, horizon-level data, spatial data, diagnostic horizon data, metadata, etc. Examples listed below are meant to be copied/pasted from this document and interactively run within **R**. Comments (green text) briefly describe what the code in each line does. This document assumes a basic level of proficiency with **R** which can be gained by reviewing some of the material in [tutorials like this](http://cran.r-project.org/doc/contrib/Verzani-SimpleR.pdf).
 
 
 ### Object Creation
+`SoilProfileCollection` are typically created by "promoting" `data.frame` objects (rectangular tables of data) that contain at least three essential columns: 1) an ID column uniquely identifying groups of horizons, 2) horizon top boundaries, and, 3) horizon bottom boundaries. Ideally the `data.frame` is pre-sorted according to the profile ID and horizon top boundary. Formula notation is used to define these columns using the pattern: 
+
+```{r promote_to_spc, eval=FALSE} 
+idcolumn ~ hz_top_column + hz_bottom_column
+```
+
+In this tutorial we will use some sample data included with the `aqp` package, based on characterization data from 10 soils sampled on serpentinitic parent material as described in [McGahan et al, 2009](https://www.soils.org/publications/sssaj/articles/73/6/2087). The [scales](http://cran.at.r-project.org/web/packages/scales/index.html) and [RColorBrewer](http://cran.at.r-project.org/web/packages/RColorBrewer/index.html) packages are used to translate soil properties into colors.
 ```{r creation}
 # load required packages, you may have to install these if missing:
 # install.packages('aqp', dep=TRUE)
@@ -43,27 +50,41 @@ print(sp4)
 ```
 
 
-### Accessor Functions
-```{r accessor-functions}
+### Accessing, Setting, and Replacing Components of a `SoilProfileCollection`
+"Accessor" functions are used to extract specfic components from within `SoilProfileCollection` objects.
+```{r accessor-functions, eval=FALSE}
 # methods for object inspection
 idname(sp4) # self-explanitory
 horizonDepths(sp4) # self-explanitory
 depth_units(sp4) # defaults to 'cm'
 metadata(sp4) # not much to start with
-
+profile_id(sp4) # vector of profile IDs
 
 # further inspection with common function overloads
 length(sp4) # number of profiles in the collection
 nrow(sp4) # number of horizons in the collection
-names(sp4) # column names
+names(sp4) # column names from site and horizon data
 min(sp4) # shallowest profile depth in collection
 max(sp4) # deepest profile depth in collection
+```
 
+
+Several accessor functions can also be used to define, modify, or replace components within `SoilProfileCollection` objects. For example, 
+```{r get-example, eval=FALSE}
+horizons(sp4)
+``` 
+will extract horizon data and 
+
+```{r set-example, eval=FALSE}
+horizons(sp4) <- x` 
+```
+
+will replace horizon data. Further examples include:
+```{r setter-functions, eval=FALSE}
 # extraction of soil profile components
-profile_id(sp4) # vector of profile IDs
-horizons(sp4) # horizon data
-site(sp4)  # site data (none defined)
-diagnostic_hz(sp4) # diagnostic horizons (none defined)
+horizons(sp4) # get or set horizon data
+site(sp4)  # get or set site data
+diagnostic_hz(sp4) # get or set diagnostic horizons
 ```
 
 
@@ -110,7 +131,7 @@ site(sp4) <- ~ constant
 # manually create some diagnostic horizon data
 # there is no restrictions on data format, as long as each row has an ID that exists within the collection
 # be sure to use the ID column name that was used to initialize the SoilProfileCollection object
-idname(sp4)
+# check via: idname(sp4)
 dh <- data.frame(id='colusa', kind='argillic', top=8, bottom=42, stringsAsFactors=FALSE)
 
 # overwrite any existing diagnostic horizon data
@@ -124,7 +145,9 @@ dh.new <- data.frame(id='napa', kind='argillic', top=6, bottom=20, stringsAsFact
 diagnostic_hz(sp4) <- rbind(dh, dh.new)
 ```
 
+
 ### Spatial Data
+Spatial data can be explicitly stored within a `SoilProfileCollection` object and accessed with methods imported from the [sp](http://cran.at.r-project.org/web/packages/sp/index.html) package. The use of `sp` objects (in this case `SpatialPoints` and `SpatialPoints`) simplifies operations such as [plotting spatial data, coordinate system transformations, and spatial queries](http://cran.at.r-project.org/web/packages/sp/vignettes/intro_sp.pdf).
 ```{r spatial, fig.width=4, fig.height=4}
 # generate some fake coordinates as site level attributes
 sp4$x <- rnorm(n=length(sp4), mean=354000, sd=100)
@@ -256,7 +279,7 @@ xyplot(top ~ p.q50 | variable, data=agg, ylab='Depth',
 
 
 ### Object Metadata
-```{r metadata}
+```{r metadata, eval=FALSE}
 # print metadata:
 metadata(sp4)
 
@@ -289,4 +312,7 @@ str(sp4)
 
 # deconstruct SoilProfileCollection into a data.frame, with horizon+site data
 as(sp4, 'data.frame')
+
+# extraction of site + spatial data as SpatialPointsDataFrame
+as(sp4, 'SpatialPointsDataFrame')
 ```
