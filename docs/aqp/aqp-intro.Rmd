@@ -11,11 +11,16 @@ options(width=100, stringsAsFactors=FALSE)
 ```
 
 ## Introduction to SoilProfileCollection Objects
-This is a very basic introduction to the `SoilProfileCollection` class object defined in the `aqp` package for **R**. The `SoilProfileCollection` class was designed to simplifiy the process of working with the collection of data associated with soil profiles: site-level data, horizon-level data, spatial data, diagnostic horizon data, metadata, etc. Examples listed below are meant to be copied/pasted from this document and interactively run within **R**. Comments (green text) briefly describe what the code in each line does. This document assumes a basic level of proficiency with **R** which can be gained by reviewing some of the material in [tutorials like this](http://cran.r-project.org/doc/contrib/Verzani-SimpleR.pdf).
+This is a very basic introduction to the `SoilProfileCollection` class object defined in the `aqp` package for **R**. The `SoilProfileCollection` class was designed to simplifiy the process of working with the collection of data associated with soil profiles: site-level data, horizon-level data, spatial data, diagnostic horizon data, metadata, etc. Examples listed below are meant to be copied/pasted from this document and interactively run within **R**. Comments (green text) briefly describe what the code in each line does. This document assumes a basic level of proficiency with **R** which can be gained by reviewing some of the material in [tutorials like this](http://cran.r-project.org/doc/contrib/Verzani-SimpleR.pdf). Further documentation on objects and functions from the `aqp` package can be accessed by typing `?aqp` (e.g. "?function_name") at the **R** console.
 
 
 ### Object Creation
-`SoilProfileCollection` are typically created by "promoting" `data.frame` objects (rectangular tables of data) that contain at least three essential columns: 1) an ID column uniquely identifying groups of horizons, 2) horizon top boundaries, and, 3) horizon bottom boundaries. Ideally the `data.frame` is pre-sorted according to the profile ID and horizon top boundary. Formula notation is used to define these columns using the pattern: 
+`SoilProfileCollection` are typically created by "promoting" `data.frame` objects (rectangular tables of data) that contain at least three essential columns: 
+ * 1) an ID column uniquely identifying groups of horizons
+ * 2) horizon top boundaries
+ * 3) horizon bottom boundaries
+
+Ideally the `data.frame` is pre-sorted according to the profile ID and horizon top boundary. Formula notation is used to define these columns using the pattern: 
 
 ```{r promote_to_spc, eval=FALSE} 
 idcolumn ~ hz_top_column + hz_bottom_column
@@ -50,7 +55,7 @@ print(sp4)
 ```
 
 
-### Accessing, Setting, and Replacing Components of a `SoilProfileCollection`
+### Accessing, Setting, and Replacing Data
 "Accessor" functions are used to extract specfic components from within `SoilProfileCollection` objects.
 ```{r accessor-functions, eval=FALSE}
 # methods for object inspection
@@ -76,7 +81,7 @@ horizons(sp4)
 will extract horizon data and 
 
 ```{r set-example, eval=FALSE}
-horizons(sp4) <- x` 
+horizons(sp4) <- x
 ```
 
 will replace horizon data. Further examples include:
@@ -89,7 +94,30 @@ diagnostic_hz(sp4) # get or set diagnostic horizons
 
 
 ### Horizon and Site Data
+Typically, horizon and site data are the most important components of `SoilProfileCollection` objects. Both are internally stored as `data.frame` objects; with one or more rows (per profile ID) in the horizon table and one row (per profile ID) in the site table. Columns from either table can be accessed with the `$` style notation of `data.frames`. New data can be assigned to either table in the same manner, as long as the length of the new data is either: 
+ * 1) same lenght as the number of profiles in the collection (target is the site table)
+ * 2) same length as the number of horizons in the collection (target is the horizon table)
+ 
 ```{r hz_and_site_data}
+# assignment of new data to existing or new attributes
+sp4$elevation <- rnorm(n=length(sp4), mean=1000, sd=150) # site-level, based on length of assigned data
+sp4$thickness <- sp4$bottom - sp4$top # horizon-level
+
+# extraction of specific attributes by name
+sp4$clay # vector of clay content (horizon data)
+sp4$elevation # vector of group membership (site data)
+
+# assign a single single value into horizon-level attributes
+sp4$constant <- rep(1, times=nrow(sp4))
+
+# promote horizon-level data to site-level data (when it makes sense to do so)
+# note that this _moves_ the named column from horizon to site
+site(sp4) <- ~ constant 
+```
+
+
+Horizon and site data can also be modified via extraction to `data.frame` followed by replacement (horizon data) or join (site data). Note that while this approach gives the most flexibility, it is also the most dangerous-- replacement of horizon data with new data that don't exactly conform to the original sorting may corrupt your `SoilProfileCollection`.
+```{r hz_and_site_data_2}
 # extract horizon data to data.frame
 h <- horizons(sp4)
 
@@ -106,27 +134,13 @@ s <- site(sp4)
 # add a fake group to the site data
 s$group <- rep(c('A', 'B'), length.out=nrow(s))
 
-# merge-in new site data, old data are _not_ replaced
+# join new site data with previous data: old data are _not_ replaced
 site(sp4) <- s
-
-# extraction of specific attributes by name
-sp4$clay # vector of clay content (horizon data)
-sp4$group # vector of group membership (site data)
-
-# assignment of new data to existing or new attributes
-sp4$elevation <- rnorm(n=length(sp4), mean=1000, sd=150) # site-level, based on length of assigned data
-sp4$thickness <- sp4$bottom - sp4$top # horizon-level
-
-# assign a single single value into horizon-level attributes
-sp4$constant <- rep(1, times=nrow(sp4))
-
-# promote horizon-level data to site-level data (when it makes sense to do so)
-# note that this _moves_ the named column from horizon to site
-site(sp4) <- ~ constant 
 ```
 
 
 ### Diagnostic Horizons
+Diagnostic horizons typically span several genetic horizons and may or may not be present in all profiles. To accomodate the wide range of possibilities, diagnostic horizon data are stored as a `data.frame` in "long format": each row corresponds to a diagnostic horizon, identified with a column matching the ID column used to initialize the `SoilProfileCollection` object.
 ```{r diagnostic}
 # manually create some diagnostic horizon data
 # there is no restrictions on data format, as long as each row has an ID that exists within the collection
@@ -229,6 +243,8 @@ print(soil.depths)
 all.equal(names(soil.depths), profile_id(sp4))
 
 # compute the max Ca/Mg value per profile and save as a site-level attribute
+# note that in this case we define an in-line function, 
+# operating on a temporary SoilProfileCollection object "i" each time
 sp4$max_ca_to_mg <- profileApply(sp4, function(i) max(i$ex_Ca_to_Mg, na.rm=TRUE))
 
 # use site-level data to alter plotting order
