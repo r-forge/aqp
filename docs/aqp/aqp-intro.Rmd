@@ -348,12 +348,23 @@ plot(sliced[, c(10:20, 40:50)])
 
 
 ### Aggregating Soil Profile Collections Along Regular "Slabs"
+Depth-wise summary of horizon-level attributes is performed with the `slab()` function. Profile grouping criterial and horizon attribute selection is parametrized via formula: either `groups ~ var1 + var2 + var3` where named variables are aggregated within `groups` OR where named variables are aggregated across the entire collection ` ~ var1 + var2 + var3`. The default summary function (`slab.fun`) computes the 5th, 25th, 50th, 75th, and 95th percentiles via Harrell-Davis quantile estimator.
+
+The depth structure ("slabs") over which summaries are computed is defined with the `slab.structure` argument using:
+
+  * a single integer (e.g. `10`): data are aggregated over a regular sequence of 10-unit thickness slabs
+  * a vector of 2 integers (e.g. `c(50, 60)`): data are aggregated over depths spanning 50--60 units
+  * a vector of 3 or more integers (e.g. `c(0, 5, 10, 50, 100)`): data are aggregated over the depths spanning 0--5, 5--10, 10--50, 50--100 units
+
 ```{r slab, fig.height=4, fig.width=8}
 # aggregate a couple of the horizon-level attributes, 
 # across the entire collection, 
 # from 0--10 cm
 # computing the mean value ignoring missing data
 slab(sp4, fm= ~ sand + silt + clay, slab.structure=c(0,10), slab.fun=mean, na.rm=TRUE)
+
+# again, this time within groups defined by a site-level attribute:
+slab(sp4, fm= group ~ sand + silt + clay, slab.structure=c(0,10), slab.fun=mean, na.rm=TRUE)
 
 # again, this time over several depth ranges
 slab(sp4, fm= ~ sand + silt + clay, slab.structure=c(0,10,25,40), slab.fun=mean, na.rm=TRUE)
@@ -379,6 +390,8 @@ xyplot(top ~ p.q50 | variable, data=agg, ylab='Depth',
 			 )
 ```
 
+
+Depth-wise aggregation can be useful for visual evaluation of multivariate similarity among groups of profiles.
 ```{r slab-2, fig.height=4, fig.width=8}
 # processing the "napa" and tehama profiles
 idx <- which(profile_id(sp4) %in% c('napa', 'tehama'))
