@@ -11,7 +11,7 @@ options(width=100, stringsAsFactors=FALSE)
 ```
 
 ## Introduction to SoilProfileCollection Objects
-This is a very basic introduction to the `SoilProfileCollection` class object defined in the `aqp` package for **R**. The `SoilProfileCollection` class was designed to simplifiy the process of working with the collection of data associated with soil profiles: site-level data, horizon-level data, spatial data, diagnostic horizon data, metadata, etc. Examples listed below are meant to be copied/pasted from this document and interactively run within **R**. Comments (green text) briefly describe what the code in each line does. This document assumes a basic level of proficiency with **R** which can be gained by reviewing some of the material in [tutorials like this](http://cran.r-project.org/doc/contrib/Verzani-SimpleR.pdf). Further documentation on objects and functions from the `aqp` package can be accessed by typing `?aqp` (e.g. "?function_name") at the **R** console.
+This is a very basic introduction to the `SoilProfileCollection` class object defined in the `aqp` package for **R**. The `SoilProfileCollection` class was designed to simplifiy the process of working with the collection of data associated with soil profiles: site-level data, horizon-level data, spatial data, diagnostic horizon data, metadata, etc. Examples listed below are meant to be copied/pasted from this document and interactively run within **R**. Comments (green text) briefly describe what the code in each line does. This document assumes a basic level of proficiency with **R** which can be gained by reviewing some of the material in [tutorials like this](http://cran.r-project.org/doc/contrib/Verzani-SimpleR.pdf). Further documentation on objects and functions from the `aqp` package can be accessed by typing `help(aqp)` (or more generally, `?function_name`) at the **R** console.
 
 
 ### Object Creation
@@ -35,6 +35,8 @@ In this tutorial we will use some sample data included with the `aqp` package, b
 library(aqp)
 library(scales)
 library(RColorBrewer)
+library(Hmisc)
+library(lattice)
 
 # load sample data set, a simple data.frame object with horizon-level data from 10 profiles
 data(sp4)
@@ -188,7 +190,15 @@ box()
 
 
 ### Subsetting SoilProfileCollection Objects
-```{r subsetting}
+`SoilProfileCollection` objects can be subset using the familiar `[`-style notiation used by matrix and `data.frame` objects, such that: `spc[i, j]` will return profiles identified by the integer vector `i`, and horizons identified by the integer vector `j`. Ommitting either index will result in all profiles (`i` ommitted) or all horizons (`j` ommitted). Typically, site-level attributes will be used as the subsetting criteria. Functions that return an index to matches (such as `grep()` or `which()`) provide the link between attributes and an index to matching profiles. For example :
+
+```{r subsetting-1, eval=FALSE}
+idx <- which(sp4$group == 'A')
+sp4[idx, ]
+```
+would generate an index identifying those profiles that are in group "A", which could then be used to perform the subset. The `subsetProfiles()` function can be used to subset collections based on criteria from both horizon and site level attributes. Several examples are given below.
+
+```{r subsetting-2, eval=FALSE}
 # matrix-style subsetting
 sp4[1:2, ] # profiles 1--2 from the collection
 sp4[, 1:2] # horizons 1--2 from each profile
@@ -204,20 +214,39 @@ subsetProfiles(sp4, h='clay < 20', s='group == "A"')
 ```
 
 
+### Concatenation of SoilProfileCollection Objects
+If the internal structures of several `SoilProfileCollection` objects are identical (e.g. same ID name, horizon, site, diagnostic horizon, and spatial attributes) they can be safely combined into a new object. This is typically only possible when re-combining subsets of the same original object.
+```{r concatenation, eval=FALSE}
+# subset data into chunks
+s1 <- sp4[1:2, ]
+s2 <- sp4[4, ]
+s3 <- sp4[c(6, 8, 9), ]
+
+# re-combine: think "row-bind"
+s <- rbind(s1, s2, s3)
+```
+
+
 ### Plotting SoilProfileCollection Objects
+The `plot()` method for `SoilProfileCollection` objects generates sketches of profiles within the collection based on horizon boundaries, vertically aligned to an integer sequence from 1 to the number of profiles. Horizon names are automatically extracted from a horizon-level attribute `name` (if present), or via an alternate attributed given as an argument: `name='column.name'`. Horizon colors are automatically generated from the horizon-level attribute `soil_color`, or any other attribute of **R**-compatible color description given as an argument: `color='column.name'`. This function is highly customizable, therefore, it is prudent to consult `help(plotSPC)` from time to time. Soil colors in Munsell notation can be converted to **R**-compatible colors via `munsell2rgb()`.
 ```{r plotting, fig.height=4, fig.width=8}
-# basic plot method, highly customizable: see manual page ?plotSPC
+# plot uses base graphics, so it is simple to add low-level annotation layers
 plot(sp4)
 
 # inspect plotting area, very simple to overlay graphical elements
 abline(v=1:length(sp4), lty=3, col='blue')
 
 # profiles are centered at integers, from 1 to length(obj)
-axis(1, line=-1.5, at=1:10, cex.axis=0.75, font=4, col='blue', lwd=2)
+axis(1, line=0, at=1:10, cex.axis=0.75, font=4, col='blue', col.axis='blue', lwd=2)
+mtext('profile axis', side=1, line=2, font=4, col='blue')
 
 # y-axis is based on profile depths
-axis(2, line=-1, at=pretty(1:max(sp4)), cex.axis=0.75, font=4, las=1, col='blue', lwd=2)
+axis(2, line=-1, at=pretty(1:max(sp4)), cex.axis=0.75, font=4, las=1, col='blue', col.axis='blue', lwd=2)
+mtext('depth axis', side=2, line=1, font=4, col='blue')
+```
 
+Horizon-level attributes can be symbolized with color using a combination of a color palette and color ramp function:
+```{r plotting-with-color, fig.height=4, fig.width=8}
 # setup some colors to symbolize soil properties
 cols <- rev(brewer.pal(8, 'Spectral'))
 
@@ -228,43 +257,98 @@ cr <- colorRamp(cols)
 sp4$soil_color <- rgb(cr(rescale(sp4$ex_Ca_to_Mg)), max=255)
 
 # plot again, this time using new colors
+par(mar=c(0,0,0,0)) # reset figure margins to 0
 plot(sp4) # how does it know about horizon names / colors? see the manual page.
 ```
 
 
 ### Iterating Over Profiles in a Collection
-```{r util-functions, fig.height=4, fig.width=8}
-# apply a function to each profile, returning a single value per profile,
-# in the same order as profile_id(sp4)
-soil.depths <- profileApply(sp4, max) # recall that max() gives the depth of a soil profile
+The `profileApply()` function is an extension of the familiar *apply()* family of functions that operate on vectors (`sapply` and `tapply`), matrices (`apply`), and lists (`lapply`)-- extended to `SoilProfileCollection` objects. The function named in the `FUN` argument is evaluated once for each profile in the collection, typicially returning a single value per profile. In this case, the ordering of the results would match the ordering of values in the site level attribute table.
+```{r profileApply-1}
+# max() returns the depth of a soil profile
+sp4$soil.depth <- profileApply(sp4, FUN=max)
+# nrow() returns the number of horizons
+sp4$n.hz <- profileApply(sp4, FUN=nrow)
+# compute the mean clay content by profile using an inline function
+sp4$mean.clay <- profileApply(sp4, FUN=function(i) mean(i$clay)) 
+```
 
-# check that the order is correct
-print(soil.depths)
-all.equal(names(soil.depths), profile_id(sp4))
+When `FUN` returns a vector of the same length as the number of horizons in a profile, `profileApply()` can be used to create new horizon-level attributes. For example, the change in clay content with depth could be calculated via:
+```{r profileApply-2}
+# save as horizon-level attribute
+sp4$delta.clay <- profileApply(sp4, FUN=function(i) c(NA, diff(i$clay)))
 
-# compute the max Ca/Mg value per profile and save as a site-level attribute
-# note that in this case we define an in-line function, 
-# operating on a temporary SoilProfileCollection object "i" each time
-sp4$max_ca_to_mg <- profileApply(sp4, function(i) max(i$ex_Ca_to_Mg, na.rm=TRUE))
-
-# use site-level data to alter plotting order
-new.order <- order(sp4$max_ca_to_mg) # the result is an index of rank
-plot(sp4, plot.order=new.order)
-# add an axis labeled with the sorting criteria
-axis(1, at=1:length(sp4), labels=sp4$max_ca_to_mg)
+# check results:
+horizons(sp4)[1:6, c('id', 'top', 'bottom', 'clay', 'delta.clay')]
 ```
 
 
-### Slicing and Aggregating Objects
-```{r slice_slab, fig.height=4, fig.width=8}
-# slice from 0--15 cm in 1-cm intervals
-# formula notation is used to selection which variables are included
-# the result is a new SoilProfileCollection object, site data are retained
+More complex summaries can be generated by writing a custom function that is then called by `profileApply()`. Note that each profile is passed into this function and accessed via a temporary variable (`i`), which is a `SoilProfileCollection` object containing a single profile.
+```{r profileApply-3}
+# compute hz-thickness weighted mean exchangeable-Ca:Mg
+wt.mean.ca.mg <- function(i) {
+	# use horizon thickness as a weight
+	thick <- i$bottom - i$top
+	# compute the weighted mean, accounting for the possibility of missing data
+	m <- wtd.mean(i$ex_Ca_to_Mg, weights=thick, na.rm=TRUE)
+	return(m)
+	}
+
+# apply our custom function and save results as a site-level attribute
+sp4$wt.mean.ca.to.mg <- profileApply(sp4, wt.mean.ca.mg)
+```
+
+We can now use our some of our new site-level attributes to order the profiles when plotting. In this case profiles are ordered based on the horizon-thickness weighted mean, exchageable Ca:Mg values.
+```{r profileApply-4, fig.height=4, fig.width=8}
+# the result is an index of rank
+new.order <- order(sp4$wt.mean.ca.to.mg)
+# plot the data using our new order based on Ca:Mg
+par(mar=c(0,0,0,0)) # reset figure margins to 0
+plot(sp4, plot.order=new.order)
+# add an axis labeled with the sorting criteria
+axis(1, at=1:length(sp4), labels=round(sp4$wt.mean.ca.to.mg, 3), cex.axis=0.75)
+```
+
+
+### Slicing Soil Profile Collections
+Collections of soil profiles can be sliced (or re-sampled) into regular depth-intervals with the `slice()` function. The slicing structure and variables of interest are defined via formula notation:
+
+```{r slice-formula, eval=FALSE}
+# slice select horizon-level attributes
+seq ~ var.1 + var.2 + var.3 + ...
+# slice all horizon-level attributes
+seq ~ .
+```
+
+where `seq` is a sequence of integers (e.g. `0:15`, `c(5,10,15,20)`, etc.) and `var.1 + var.2 + var.3 + ...` are horizon-level attributes to slice. Both continuous and categorical variables can be named on the right-hand-side of the formula. The results returned by `slice()` is either a `SoilProfileCollection`, or `data.frame` when called with the optional argument `just.the.data=TRUE`. For example, to slice our sample data set into 1-cm intervals, from 0--15 cm:
+
+
+```{r slice, fig.height=4, fig.width=8}
+# slice data
 sliced <- slice(sp4, fm= 0:15 ~ sand + silt + clay + name + soil_color)
+# check the result
+class(sliced)
+# plot sliced data
+par(mar=c(0,0,0,0)) # reset figure margins to 0
 plot(sliced)
+```
 
-# see ?slice for details
+Once soil profile data have been sliced, it is simple to extract "chunks" of data by depth interval via matrix-style subsetting:
 
+```{r slice-subset, eval=FALSE}
+# slice from 0 to max depth in the collection
+sliced <- slice(sp4, fm= 0:max(sp4) ~ sand + silt + clay + name + soil_color)
+# extract all data over the range of 5--10 cm:
+plot(sliced[, 5:10])
+# extract all data over the range of 25--50 cm:
+plot(sliced[, 25:50])
+# extract all data over the range of 10--20 and 40--50 cm:
+plot(sliced[, c(10:20, 40:50)])
+```
+
+
+### Aggregating Soil Profile Collections Along Regular "Slabs"
+```{r slab, fig.height=4, fig.width=8}
 # aggregate a couple of the horizon-level attributes, 
 # across the entire collection, 
 # from 0--10 cm
@@ -275,22 +359,47 @@ slab(sp4, fm= ~ sand + silt + clay, slab.structure=c(0,10), slab.fun=mean, na.rm
 slab(sp4, fm= ~ sand + silt + clay, slab.structure=c(0,10,25,40), slab.fun=mean, na.rm=TRUE)
 
 # again, this time along 1-cm slices, computing quantiles
-agg <- slab(sp4, fm= ~ sand + silt + clay)
+agg <- slab(sp4, fm= ~ Mg + Ca + ex_Ca_to_Mg + CEC_7 + clay)
 
 # see ?slab for details on the default aggregate function
 head(agg)
 
 # plot median +/i bounds defined by the 25th and 75th percentiles
 # this is lattice graphics, syntax is a little rough
-library(lattice)
 xyplot(top ~ p.q50 | variable, data=agg, ylab='Depth',
 			 xlab='median bounded by 25th and 75th percentiles',
-			 lower=agg$p.q25, upper=agg$p.q75, ylim=c(50,-5),
-			 panel=panel.depth_function, 
+			 lower=agg$p.q25, upper=agg$p.q75, ylim=c(42,-2),
+			 panel=panel.depth_function,
+			 alpha=0.25, sync.colors=TRUE,
+			 par.settings=list(superpose.line=list(col='RoyalBlue', lwd=2)),
 			 prepanel=prepanel.depth_function,
 			 cf=agg$contributing_fraction,
-			 layout=c(3,1), scales=list(x=list(alternating=1))
+			 layout=c(5,1), strip=strip.custom(bg=grey(0.8)),
+			 scales=list(x=list(tick.number=4, alternating=3, relation='free'))
 			 )
+```
+
+```{r slab-2, fig.height=4, fig.width=8}
+# processing the "napa" and tehama profiles
+idx <- which(profile_id(sp4) %in% c('napa', 'tehama'))
+napa.and.tehama <- slab(sp4[idx, ], fm= ~ Mg + Ca + ex_Ca_to_Mg + CEC_7 + clay)
+
+# combine with the collection-wide aggregate data
+g <- make.groups(collection=agg, napa.and.tehama=napa.and.tehama)
+
+# compare graphically:
+xyplot(top ~ p.q50 | variable, groups=which, data=g, ylab='Depth',
+			 xlab='median bounded by 25th and 75th percentiles',
+			 lower=g$p.q25, upper=g$p.q75, ylim=c(42,-2),
+			 panel=panel.depth_function,
+			 alpha=0.25, sync.colors=TRUE,
+			 par.settings=list(superpose.line=list(col=c('RoyalBlue', 'Red4'), lwd=2, lty=c(1,2))),
+			 prepanel=prepanel.depth_function,
+			 layout=c(5,1), strip=strip.custom(bg=grey(0.8)),
+			 scales=list(x=list(tick.number=4, alternating=3, relation='free')),
+			 auto.key=list(columns=2, lines=TRUE, points=FALSE)
+			 )
+
 ```
 
 
