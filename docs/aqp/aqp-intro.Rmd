@@ -30,13 +30,12 @@ In this tutorial we will use some sample data included with the `aqp` package, b
 ```{r creation}
 # load required packages, you may have to install these if missing:
 # install.packages('aqp', dep=TRUE)
-# install.packages('scales', dep=TRUE)
-# install.packages('RColorBrewer', dep=TRUE)
 library(aqp)
 library(scales)
 library(RColorBrewer)
 library(Hmisc)
 library(lattice)
+library(MASS)
 
 # load sample data set, a simple data.frame object with horizon-level data from 10 profiles
 data(sp4)
@@ -163,7 +162,7 @@ diagnostic_hz(sp4) <- rbind(dh, dh.new)
 
 
 ### Spatial Data
-Spatial data can be explicitly stored within a `SoilProfileCollection` object and accessed with methods imported from the [sp](http://cran.at.r-project.org/web/packages/sp/index.html) package. The use of `sp` objects (in this case `SpatialPoints` and `SpatialPoints`) simplifies operations such as [plotting spatial data, coordinate system transformations, and spatial queries](http://cran.at.r-project.org/web/packages/sp/vignettes/intro_sp.pdf).
+Spatial data can be explicitly stored within a `SoilProfileCollection` object and accessed with methods imported from the [sp](http://cran.at.r-project.org/web/packages/sp/index.html) package. The use of `sp` classes (in this case `SpatialPoints` and `SpatialPointsDataFrame` objects) simplifies operations such as [plotting spatial data, coordinate system transformations, and spatial queries](http://cran.at.r-project.org/web/packages/sp/vignettes/intro_sp.pdf).
 ```{r spatial, fig.width=4, fig.height=4}
 # generate some fake coordinates as site level attributes
 sp4$x <- rnorm(n=length(sp4), mean=354000, sd=100)
@@ -416,6 +415,25 @@ xyplot(top ~ p.q50 | variable, groups=which, data=g, ylab='Depth',
 ```
 
 
+### Pair-Wise Dissimilarity
+Calculation of between-profile dissimilarity is performed using the `profile_compare()` function. Dissimilarity values depend on attributes selection (e.g. clay, CEC, pH , etc.), optional depth-weighting parameter (`k`), and a maximum depth of evaluation (`max_d`). This topic is further documented in a [related tutorial](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/aqp/aqp-profile-dissimilarity.html?root=aqp), the function manual page (type `help(profile_compare)` in the **R** console), and [this paper](http://dx.doi.org/10.1016/j.cageo.2012.10.020).
+```{r dissimilarity, fig.height=4.5, fig.width=7}
+# eval dissimilarity:
+# using Ex-Ca:Mg and CEC at pH 7
+# with no depth-weighting (k=0)
+# to a maximum depth of 40 cm
+d <- profile_compare(sp4, vars=c('ex_Ca_to_Mg', 'CEC_7'), k=0, max_d=40)
+
+# check distance matrix:
+round(d, 1)
+
+# vizualize dissimilarity matrix via hierarchical clustering
+h <- hclust(d)
+plot(as.dendrogram(h))
+```
+
+
+
 ### Object Metadata
 ```{r metadata, eval=FALSE}
 # print metadata:
@@ -454,3 +472,7 @@ as(sp4, 'data.frame')
 # extraction of site + spatial data as SpatialPointsDataFrame
 as(sp4, 'SpatialPointsDataFrame')
 ```
+
+
+----------------------------
+This document is based on `aqp` version `r utils::packageDescription("aqp", field="Version")` and `soilDB` version `r utils::packageDescription("soilDB", field="Version")`.
