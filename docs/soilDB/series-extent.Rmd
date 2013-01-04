@@ -85,3 +85,6 @@ writeOGR(amador, dsn='.', layer='amador-extent', driver='ESRI Shapefile')
 amador.utm <- spTransform(amador, CRS('+proj=utm +zone=10 +datum=NAD83'))
 writeOGR(amador.utm, dsn='.', layer='amador-extent-utm', driver='ESRI Shapefile')
 ```
+
+----------------------------
+This document is based on `aqp` version `r utils::packageDescription("aqp", field="Version")` and `soilDB` version `r utils::packageDescription("soilDB", field="Version")`.
