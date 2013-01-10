@@ -8,7 +8,7 @@ This document describes how setup an ODBC link between a local NASIS database an
 
 
 ### Open the ODBC Data Source Administrator
-Access via control panels, or click: Start->Run, then paste in `odbccp32.cpl` and hit enter. This will open a small panel of ODBC connections. With the "User DSN" tab selected, create a new data source by clicking on the "Add..." button. 
+Access via control panels, or click: Start->Run, then paste in `odbccp32.cpl` and hit enter. This will open a small panel of ODBC connections in Windows XP. For Windows 7 see [this page](http://msdn.microsoft.com/en-us/library/ms188691.aspx). With the "User DSN" tab selected, create a new data source by clicking on the "Add..." button. 
 
 
 **Step by Step:**
