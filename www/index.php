@@ -58,7 +58,12 @@ echo $contents; } ?>
 </ol>
 </p>
 
-
+<p> Manual Pages c/o <a href="http://yihui.name/knitr/">knitr</a>:
+<ol>
+<li><a href="aqp-html-manual/index.html">aqp manual pages with figures</a></li>
+<li><a href="soilDB-html-manual/index.html">soilDB manual pages with figures</a></li>
+</ol>
+</p>
 
 
 <p>

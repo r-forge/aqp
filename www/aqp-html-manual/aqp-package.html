@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Algorithms for Quantitative Pedology</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+</head><body>
+
+<table width="100%" summary="page for aqp-package {aqp}"><tr><td>aqp-package {aqp}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>
+Algorithms for Quantitative Pedology
+</h2>
+
+<h3>Description</h3>
+
+
+<p>The aqp (Algorithms for Quantitative Pedology) package for R was developed to address some of the difficulties associated with processing soils information, specifically related to visualization, aggregation, and classification of soil profile data. This package is based on a mix of S3/S4 functions and classes, and most functions use basic dataframes as input, where rows represent soil horizons and columns define properties of those horizons. Common to most functions are the requirements that horizon boundaries are defined as depth from 0, and that profiles are uniquely defined by an id column. The aqp package defines an S4 class, &quot;SoilProfileCollection&quot;, for storage of profile-level metadata, as well as summary, print, and plotting methods that have been customized for common tasks related to soils data.
+</p>
+<p>Demos:
+<code>demo(aqp)</code>
+</p>
+<p><code>demo(slope_effect_hz_thickness)</code>
+</p>
+<p>Extended Examples:
+<a href="http://casoilresource.lawr.ucdavis.edu/drupal/taxonomy/term/56">AQP-related blog posts</a>
+</p>
+<p><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/aqp/aqp-profile-dissimilarity.html?root=aqp">Soil profile dissimilarity demo</a>
+</p>
+<p><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/aqp/vertical_vs_perpendicular.html?root=aqp">Vertical vs. perpendicular horizon depth measurement demo</a>
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Dylan E. Beaudette &lt;debeaudette@ucdavis.edu&gt;</p>
+
+
+<h3>References</h3>
+
+<p><a href="http://casoilresource.lawr.ucdavis.edu/">http://casoilresource.lawr.ucdavis.edu/</a></p>
+
+
+<h3>See Also</h3>
+
+<p><a href="ca630.html">ca630</a>, <code><a href="sp1.html">sp1</a>, <a href="sp2.html">sp2</a>, <a href="sp3.html">sp3</a>, <a href="sp4.html">sp4</a>, <a href="sp5.html">sp5</a></code></p>
+
+<hr><div align="center">[Package <em>aqp</em> version 1.4-6 <a href="00Index.html">Index</a>]</div>
+</body></html>
