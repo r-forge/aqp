@@ -1,0 +1,131 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Test Horizon Logic</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+
+<link rel="stylesheet" href="highlight.css">
+<script src="highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</head><body>
+
+<table width="100%" summary="page for test_hz_logic {aqp}"><tr><td>test_hz_logic {aqp}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Test Horizon Logic</h2>
+
+<h3>Description</h3>
+
+<p>Simple tests for horizon logic, based on a simple data.frame of ordered horizons.</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+test_hz_logic(i, topcol, bottomcol, test.NA = TRUE, strict = FALSE)
+</pre>
+
+
+<h3>Arguments</h3>
+
+
+<table summary="R argblock">
+<tr valign="top"><td><code>i</code></td>
+<td>
+<p>a data.frame associated with a single soil profile, ordered by depth</p>
+</td></tr>
+<tr valign="top"><td><code>topcol</code></td>
+<td>
+<p>character, giving the name of the column in <code>i</code> that describes horizon top depth</p>
+</td></tr>
+<tr valign="top"><td><code>bottomcol</code></td>
+<td>
+<p>character, giving the name of the column in <code>i</code> that describes horizon bottom depth</p>
+</td></tr>
+<tr valign="top"><td><code>test.NA</code></td>
+<td>
+<p>logicial, should tests for missing (NA) horizon top OR bottom boundaries be performed?</p>
+</td></tr>
+<tr valign="top"><td><code>strict</code></td>
+<td>
+<p>logical, should continuity tests be performed&ndash; i.e. for non-contiguous horizon boundaries</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>This function is used as part of the validity-methods for SoilProfileCollection objects.</p>
+
+
+<h3>Value</h3>
+
+<p>logical: TRUE &ndash;&gt; pass, FALSE &ndash;&gt; fail</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Dylan E. Beaudette</p>
+
+
+<h3>References</h3>
+
+<p>http://casoilresource.lawr.ucdavis.edu/</p>
+
+
+<h3>See Also</h3>
+
+<p><a href="SPC-utils.html">depths&lt;-</a></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="r">
+# simple example: just one profile
+data(sp1)
+depths(sp1) &lt;- id ~ top + bottom
+s &lt;- horizons(sp1[1, ])
+
+# apply tests
+# passes:
+test_hz_logic(s, &#39;top&#39;, &#39;bottom&#39;, test.NA=TRUE, strict=FALSE)
+</code></pre>
+
+<pre><code>## hz_logic_pass 
+##          TRUE
+</code></pre>
+
+<pre><code class="r"># passes:
+test_hz_logic(s, &#39;top&#39;, &#39;bottom&#39;, test.NA=TRUE, strict=TRUE)
+</code></pre>
+
+<pre><code>## hz_logic_pass 
+##          TRUE
+</code></pre>
+
+<pre><code class="r">
+# add-in some bad data
+s$bottom[6] &lt;- NA # missing horizon boundary, common on bottom-most hz
+s$bottom[3] &lt;- 30 # inconsistent hz boundary
+
+# apply tests
+# fails due to missing hz boundary
+test_hz_logic(s, &#39;top&#39;, &#39;bottom&#39;, test.NA=TRUE, strict=FALSE)
+</code></pre>
+
+<pre><code>## hz_logic_pass 
+##         FALSE
+</code></pre>
+
+<pre><code class="r"># fails due to inconsistent hz boundary
+test_hz_logic(s, &#39;top&#39;, &#39;bottom&#39;, test.NA=FALSE, strict=TRUE)
+</code></pre>
+
+<pre><code>## hz_logic_pass 
+##         FALSE
+</code></pre>
+
+<pre><code class="r">
+</code></pre>
+
+
+<hr><div align="center">[Package <em>aqp</em> version 1.4-6 <a href="00Index.html">Index</a>]</div>
+</body></html>

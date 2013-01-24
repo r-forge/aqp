@@ -1,0 +1,98 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Fetch Map Unit Geometry from SDA</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+
+<link rel="stylesheet" href="highlight.css">
+<script src="highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</head><body>
+
+<table width="100%" summary="page for mapunit_geom_by_ll_bbox {soilDB}"><tr><td>mapunit_geom_by_ll_bbox {soilDB}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Fetch Map Unit Geometry from SDA</h2>
+
+<h3>Description</h3>
+
+<p>Fetch map unit geometry from the SDA website by WGS84 bounding box.</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+mapunit_geom_by_ll_bbox(bbox, source = 'sda')
+</pre>
+
+
+<h3>Arguments</h3>
+
+
+<table summary="R argblock">
+<tr valign="top"><td><code>bbox</code></td>
+<td>
+<p>a bounding box in WGS coordinates</p>
+</td></tr>
+<tr valign="top"><td><code>source</code></td>
+<td>
+<p>the source database, currently limited to soil data access (SDA)</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>The SDA website can be found at <a href="http://sdmdataaccess.nrcs.usda.gov">http://sdmdataaccess.nrcs.usda.gov</a>. See examples for bounding box formatting.</p>
+
+
+<h3>Value</h3>
+
+<p>A SpatialPolygonsDataFrame of map unit polygons, in WGS84 (long,lat) coordinates.</p>
+
+
+<h3>Note</h3>
+
+<p>It appears that SDA does not actually return the spatial intersecion of map unit polygons and bounding box. Rather, just those polygons that are completely within the bounding box / overlap with the bbox. This function requires the 'rgdal' (<a href="http://cran.r-project.org/web/packages/rgdal/index.html">http://cran.r-project.org/web/packages/rgdal/index.html</a>) package.</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Dylan E Beaudette</p>
+
+
+<h3>References</h3>
+
+<p>http://casoilresource.lawr.ucdavis.edu/</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="r">
+# fetch map unit geometry from a bounding-box:
+# 
+#         +------------- (-120.41, 38.70)
+#         |                     |
+#         |                     |
+# (-120.54, 38.61) --------------+
+
+## Not run: 
+##D # basic usage
+##D b &lt;- c(-120.54,38.61,-120.41,38.70)
+##D x &lt;- mapunit_geom_by_ll_bbox(b) # about 20 seconds
+##D 
+##D # note that the returned geometry is everything overlapping the bbox
+##D # and not an intersection... why?
+##D plot(x)
+##D rect(b[1], b[2], b[3], b[4], border=&#39;red&#39;, lwd=2)
+##D 
+##D 
+##D # get map unit data for matching map unit keys
+##D in.statement &lt;- format_SQL_in_statement(unique(x$MUKEY))
+##D q &lt;- paste(&quot;SELECT mukey, muname FROM mapunit WHERE mukey IN &quot;, in.statement, sep=&quot;&quot;)
+##D res &lt;- SDA_query(q)
+## End(Not run)
+
+</code></pre>
+
+
+<hr><div align="center">[Package <em>soilDB</em> version 0.9-3 <a href="00Index.html">Index</a>]</div>
+</body></html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Determine ML Horizon Boundaries</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+
+<link rel="stylesheet" href="highlight.css">
+<script src="highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</head><body>
+
+<table width="100%" summary="page for get.ml.hz {aqp}"><tr><td>get.ml.hz {aqp}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Determine ML Horizon Boundaries</h2>
+
+<h3>Description</h3>
+
+<p>This function accepts input from <code>slab()</code> along with a vector of horizon names, and returns a data.frame of the most likely horizonat boundaries.</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+get.ml.hz(x, hz.names)
+</pre>
+
+
+<h3>Arguments</h3>
+
+
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+<p>output from <code><a href="SPC-slab-methods.html">slab</a></code></p>
+</td></tr>
+<tr valign="top"><td><code>hz.names</code></td>
+<td>
+<p>vector of horizon names</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>This function is expecting that <code>x</code> is a data.frame containing columns identified in <code>hz.names</code>.</p>
+
+
+<h3>Value</h3>
+
+
+<p>A dataframe with the following columns:
+</p>
+<table summary="R valueblock">
+<tr valign="top"><td><code>hz</code></td>
+<td>
+<p>horizon names</p>
+</td></tr>
+<tr valign="top"><td><code>top</code></td>
+<td>
+<p>top boundary</p>
+</td></tr>
+<tr valign="top"><td><code>bottom</code></td>
+<td>
+<p>bottom boundary</p>
+</td></tr>
+<tr valign="top"><td><code>confidence</code></td>
+<td>
+<p>integrated probability / ML horizon thickness, rounded to the nearest integer</p>
+</td></tr>
+</table>
+
+
+<h3>Author(s)</h3>
+
+<p>D.E. Beaudette</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="SPC-slab-methods.html">slab</a></code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="r">
+data(sp1)
+depths(sp1) &lt;- id ~ top + bottom
+
+# normalize horizon names: result is a factor
+sp1$name &lt;- generalize.hz(sp1$name, 
+  new=c(&#39;O&#39;,&#39;A&#39;,&#39;B&#39;,&#39;C&#39;), 
+  pat=c(&#39;O&#39;, &#39;^A&#39;,&#39;^B&#39;,&#39;C&#39;))
+
+# compute slice-wise probability so that it sums to contributing fraction, from 0-150
+a &lt;- slab(sp1, fm= ~ name, cpm=1, slab.structure=0:150)
+
+# generate table of ML horizonation
+get.ml.hz(a, c(&#39;O&#39;,&#39;A&#39;,&#39;B&#39;,&#39;C&#39;))
+</code></pre>
+
+<pre><code>##   hz top bottom confidence
+## 4  O   0      1         28
+## 1  A   1     31         75
+## 2  B  31    144         57
+## 3  C 144    149         67
+</code></pre>
+
+<pre><code class="r">
+</code></pre>
+
+
+<hr><div align="center">[Package <em>aqp</em> version 1.4-6 <a href="00Index.html">Index</a>]</div>
+</body></html>

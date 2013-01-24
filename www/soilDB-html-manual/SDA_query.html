@@ -1,0 +1,123 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Soil Data Access Query</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+
+<link rel="stylesheet" href="highlight.css">
+<script src="highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</head><body>
+
+<table width="100%" summary="page for SDA_query {soilDB}"><tr><td>SDA_query {soilDB}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Soil Data Access Query</h2>
+
+<h3>Description</h3>
+
+<p>Submit a query to the Soil Data Acccess (SDA) website in SQL, get the results as a dataframe.</p>
+
+
+<h3>Usage</h3>
+
+<pre>SDA_query(q)</pre>
+
+
+<h3>Arguments</h3>
+
+
+<table summary="R argblock">
+<tr valign="top"><td><code>q</code></td>
+<td>
+<p>a text string containing valid SQL</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>The SDA website can be found at <a href="http://sdmdataaccess.nrcs.usda.gov">http://sdmdataaccess.nrcs.usda.gov</a> and query examples can be found at <a href="http://sdmdataaccess.nrcs.usda.gov/QueryHelp.aspx">http://sdmdataaccess.nrcs.usda.gov/QueryHelp.aspx</a></p>
+
+
+<h3>Value</h3>
+
+<p>A dataframe containing the results.</p>
+
+
+<h3>Note</h3>
+
+<p>This function requires the 'SSOAP' (<a href="http://www.omegahat.org/SSOAP/">http://www.omegahat.org/SSOAP/</a>), 'RCurl' (<a href="http://www.omegahat.org/RCurl/">http://www.omegahat.org/RCurl/</a>), 'XML' (<a href="http://www.omegahat.org/RSXML/">http://www.omegahat.org/RSXML/</a>), and 'XMLSchema' (<a href="http://www.omegahat.org/XMLSchema/">http://www.omegahat.org/XMLSchema/</a>) packages. Some Windows binary packages can be found here <a href="http://www.stats.ox.ac.uk/pub/RWin/bin/windows/contrib/2.15/">http://www.stats.ox.ac.uk/pub/RWin/bin/windows/contrib/2.15/</a>. This function has been successfully tested on all Windows, MacOS, and Linux using SSOAP 0.8-1, XMLSchema 0.6-0, and XML 3.7-1.</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Dylan E. Beaudette</p>
+
+
+<h3>References</h3>
+
+<p>http://casoilresource.lawr.ucdavis.edu/</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="MUKEYS_by_ll_bbox.html">MUKEYS_by_ll_bbox</a></code>, <code><a href="mapunit_geom_by_ll_bbox.html">mapunit_geom_by_ll_bbox</a></code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="r">
+# install the required packages
+## Not run: 
+##D install.packages(&#39;RCurl&#39;, dep=TRUE)
+##D install.packages(&#39;XML&#39;, dep=TRUE)
+##D install.packages(&quot;SSOAP&quot;, repos = &quot;http://www.omegahat.org/R&quot;, type=&quot;source&quot;)
+##D install.packages(&quot;XMLSchema&quot;, repos = &quot;http://www.omegahat.org/R&quot;, type=&quot;source&quot;)
+## End(Not run)
+
+# NASIS export metadata:
+## Not run: 
+##D res &lt;- SDA_query(&#39;select areasymbol, exportcertdate from distlegendmd order by areasymbol&#39;)
+##D res$exportcertdate &lt;- as.Date(as.POSIXct(res$exportcertdate, format=&quot;%m/%d/%Y %H:%M:%S&quot;))
+##D recently_updated &lt;- res$areasymbol[res$exportcertdate &gt; as.Date(&#39;2011-01-01&#39;)]
+## End(Not run)
+
+# basic query:
+## Not run: 
+##D res &lt;- SDA_query(&quot;select cokey, compname, comppct_r 
+##D from component 
+##D where compname = &#39;yolo&#39; and majcompflag = &#39;Yes&#39; &quot;)
+## End(Not run)
+
+# get tabular data based on result from spatial query:
+## Not run: 
+##D # bbox
+##D b &lt;- c(-120.9,37.7,-120.8,37.8)
+##D # get map unit keys for this bbox
+##D m &lt;- MUKEYS_by_ll_bbox(b)
+##D # make an SQL-compliant &quot;in&quot; statment
+##D in.statement &lt;- format_SQL_in_statement(m)
+##D # format query:
+##D q &lt;- paste(&quot;SELECT component.cokey, compname, comppct_r, hzdept_r, hzdepb_r, hzname, sandtotal_r, silttotal_r, claytotal_r
+##D FROM component JOIN chorizon ON component.cokey = chorizon.cokey
+##D WHERE majcompflag = &#39;Yes&#39; AND mukey IN &quot;, in.statement, &quot;ORDER BY cokey, comppct_r DESC, hzdept_r ASC&quot;, sep=&quot;&quot;)
+##D # now get component and horizon-level data for these map unit keys
+##D res &lt;- SDA_query(q)
+## End(Not run)
+
+# get component-level data for a specific soil survey area (Yolo county, CA)
+## Not run: 
+##D q &lt;- &quot;SELECT 
+##D component.mukey, cokey, comppct_r, compname, taxclname, taxorder, taxsuborder, taxgrtgroup, taxsubgrp
+##D FROM legend
+##D INNER JOIN mapunit ON mapunit.lkey = legend.lkey
+##D LEFT OUTER JOIN component ON component.mukey = mapunit.mukey
+##D WHERE legend.areasymbol = &#39;CA113&#39;&quot;
+##D 
+##D res &lt;- SDA_query(q)
+## End(Not run)
+
+</code></pre>
+
+
+<hr><div align="center">[Package <em>soilDB</em> version 0.9-3 <a href="00Index.html">Index</a>]</div>
+</body></html>

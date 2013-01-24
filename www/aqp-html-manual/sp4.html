@@ -1,0 +1,545 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Soil Chemical Data from Serpentinitic Soils of California</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+
+<link rel="stylesheet" href="highlight.css">
+<script src="highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</head><body>
+
+<table width="100%" summary="page for sp4 {aqp}"><tr><td>sp4 {aqp}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Soil Chemical Data from Serpentinitic Soils of California</h2>
+
+<h3>Description</h3>
+
+<p>Soil Chemical Data from Serpentinitic Soils of California</p>
+
+
+<h3>Usage</h3>
+
+<pre>data(sp4)</pre>
+
+
+<h3>Format</h3>
+
+
+<p>A data frame with 30 observations on the following 13 variables.
+</p>
+
+<dl>
+<dt><code>id</code></dt><dd><p>site name</p>
+</dd>
+<dt><code>name</code></dt><dd><p>horizon designation</p>
+</dd>
+<dt><code>top</code></dt><dd><p>horizon top boundary in cm</p>
+</dd>
+<dt><code>bottom</code></dt><dd><p>horizon bottom boundary in cm</p>
+</dd>
+<dt><code>K</code></dt><dd><p>exchangeable K in c mol/kg</p>
+</dd>
+<dt><code>Mg</code></dt><dd><p>exchangeable Mg in cmol/kg</p>
+</dd>
+<dt><code>Ca</code></dt><dd><p>exchangeable Ca in cmol/kg</p>
+</dd>
+<dt><code>CEC_7</code></dt><dd><p>cation exchange capacity (NH4OAc at pH 7)</p>
+</dd>
+<dt><code>ex_Ca_to_Mg</code></dt><dd><p>extractable Ca:Mg ratio</p>
+</dd>
+<dt><code>sand</code></dt><dd><p>sand content by weight percentage</p>
+</dd>
+<dt><code>silt</code></dt><dd><p>silt content by weight percentage</p>
+</dd>
+<dt><code>clay</code></dt><dd><p>clay content by weight percentage</p>
+</dd>
+<dt><code>CF</code></dt><dd><p>&gt;2mm fraction by volume percentage</p>
+</dd>
+</dl>
+
+
+
+<h3>Details</h3>
+
+<p>Selected soil physical and chemical data from (McGahan et al., 2009).</p>
+
+
+<h3>Source</h3>
+
+<p>https://www.soils.org/publications/sssaj/articles/73/6/2087</p>
+
+
+<h3>References</h3>
+
+<p>McGahan, D.G., Southard, R.J, Claassen, V.P. 2009. Plant-Available Calcium Varies Widely in Soils on Serpentinite Landscapes. Soil Sci. Soc. Am. J. 73: 2087-2095.</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="r">
+# setup environment
+library(aqp)
+library(scales)
+library(RColorBrewer)
+
+# load sample data set, a simple data.frame object with horizon-level data from 10 profiles
+data(sp4)
+str(sp4)
+</code></pre>
+
+<pre><code>## &#39;data.frame&#39;:    30 obs. of  13 variables:
+##  $ id         : chr  &quot;colusa&quot; &quot;colusa&quot; &quot;colusa&quot; &quot;colusa&quot; ...
+##  $ name       : chr  &quot;A&quot; &quot;ABt&quot; &quot;Bt1&quot; &quot;Bt2&quot; ...
+##  $ top        : int  0 3 8 30 0 9 0 4 13 0 ...
+##  $ bottom     : int  3 8 30 42 9 34 4 13 40 6 ...
+##  $ K          : num  0.3 0.2 0.1 0.1 0.2 0.3 0.2 0.6 0.8 0.4 ...
+##  $ Mg         : num  25.7 23.7 23.2 44.3 21.9 18.9 12.1 12.1 17.7 16.4 ...
+##  $ Ca         : num  9 5.6 1.9 0.3 4.4 4.5 1.4 7 4.4 24.1 ...
+##  $ CEC_7      : num  23 21.4 23.7 43 18.8 27.5 23.7 18 20 31.1 ...
+##  $ ex_Ca_to_Mg: num  0.35 0.23 0.08 0.01 0.2 0.2 0.58 0.51 0.25 1.47 ...
+##  $ sand       : int  46 42 40 27 54 49 43 36 27 43 ...
+##  $ silt       : int  33 31 28 18 20 18 55 49 45 42 ...
+##  $ clay       : int  21 27 32 55 25 34 3 15 27 15 ...
+##  $ CF         : num  0.12 0.27 0.27 0.16 0.55 0.84 0.5 0.75 0.67 0.02 ...
+</code></pre>
+
+<pre><code class="r">
+# optionally read about it...
+# ?sp4
+
+# upgrade to SoilProfileCollection
+# &#39;id&#39; is the name of the column containing the profile ID
+# &#39;top&#39; is the name of the column containing horizon upper boundaries
+# &#39;bottom&#39; is the name of the column containing horizon lower boundaries
+depths(sp4) &lt;- id ~ top + bottom
+
+# check it out
+class(sp4) # class name
+</code></pre>
+
+<pre><code>## [1] &quot;SoilProfileCollection&quot;
+## attr(,&quot;package&quot;)
+## [1] &quot;aqp&quot;
+</code></pre>
+
+<pre><code class="r">str(sp4) # internal structure
+</code></pre>
+
+<pre><code>## Formal class &#39;SoilProfileCollection&#39; [package &quot;aqp&quot;] with 7 slots
+##   ..@ idcol     : chr &quot;id&quot;
+##   ..@ depthcols : chr [1:2] &quot;top&quot; &quot;bottom&quot;
+##   ..@ metadata  :&#39;data.frame&#39;:   1 obs. of  1 variable:
+##   .. ..$ depth_units: chr &quot;cm&quot;
+##   ..@ horizons  :&#39;data.frame&#39;:   30 obs. of  13 variables:
+##   .. ..$ id         : chr [1:30] &quot;colusa&quot; &quot;colusa&quot; &quot;colusa&quot; &quot;colusa&quot; ...
+##   .. ..$ name       : chr [1:30] &quot;A&quot; &quot;ABt&quot; &quot;Bt1&quot; &quot;Bt2&quot; ...
+##   .. ..$ top        : int [1:30] 0 3 8 30 0 9 0 4 13 0 ...
+##   .. ..$ bottom     : int [1:30] 3 8 30 42 9 34 4 13 40 3 ...
+##   .. ..$ K          : num [1:30] 0.3 0.2 0.1 0.1 0.2 0.3 0.2 0.6 0.8 0.6 ...
+##   .. ..$ Mg         : num [1:30] 25.7 23.7 23.2 44.3 21.9 18.9 12.1 12.1 17.7 28.3 ...
+##   .. ..$ Ca         : num [1:30] 9 5.6 1.9 0.3 4.4 4.5 1.4 7 4.4 5.8 ...
+##   .. ..$ CEC_7      : num [1:30] 23 21.4 23.7 43 18.8 27.5 23.7 18 20 29.3 ...
+##   .. ..$ ex_Ca_to_Mg: num [1:30] 0.35 0.23 0.08 0.01 0.2 0.2 0.58 0.51 0.25 0.2 ...
+##   .. ..$ sand       : int [1:30] 46 42 40 27 54 49 43 36 27 42 ...
+##   .. ..$ silt       : int [1:30] 33 31 28 18 20 18 55 49 45 26 ...
+##   .. ..$ clay       : int [1:30] 21 27 32 55 25 34 3 15 27 32 ...
+##   .. ..$ CF         : num [1:30] 0.12 0.27 0.27 0.16 0.55 0.84 0.5 0.75 0.67 0.25 ...
+##   ..@ site      :&#39;data.frame&#39;:   10 obs. of  1 variable:
+##   .. ..$ id: chr [1:10] &quot;colusa&quot; &quot;glenn&quot; &quot;kings&quot; &quot;mariposa&quot; ...
+##   ..@ sp        :Formal class &#39;SpatialPoints&#39; [package &quot;sp&quot;] with 3 slots
+##   .. .. ..@ coords     : num [1, 1] 0
+##   .. .. ..@ bbox       : logi [1, 1] NA
+##   .. .. ..@ proj4string:Formal class &#39;CRS&#39; [package &quot;sp&quot;] with 1 slots
+##   .. .. .. .. ..@ projargs: chr NA
+##   ..@ diagnostic:&#39;data.frame&#39;:   0 obs. of  0 variables
+</code></pre>
+
+<pre><code class="r">
+# inspect object properties
+idname(sp4) # self-explanitory
+</code></pre>
+
+<pre><code>## [1] &quot;id&quot;
+</code></pre>
+
+<pre><code class="r">horizonDepths(sp4) # self-explanitory
+</code></pre>
+
+<pre><code>## [1] &quot;top&quot;    &quot;bottom&quot;
+</code></pre>
+
+<pre><code class="r">
+# you can change these:
+depth_units(sp4) # defaults to &#39;cm&#39;
+</code></pre>
+
+<pre><code>## [1] &quot;cm&quot;
+</code></pre>
+
+<pre><code class="r">metadata(sp4) # not much to start with
+</code></pre>
+
+<pre><code>##   depth_units
+## 1          cm
+</code></pre>
+
+<pre><code class="r">
+# alter the depth unit metadata
+depth_units(sp4) &lt;- &#39;inches&#39; # units are really &#39;cm&#39;
+
+# more generic interface for adjusting metadata
+md &lt;- metadata(sp4) # save original metadata
+
+# add columns
+md$describer &lt;- &#39;DGM&#39;
+md$date &lt;- as.Date(&#39;2009-01-01&#39;)
+md$citation &lt;- &#39;McGahan, D.G., Southard, R.J, Claassen, V.P. 2009. Plant-Available Calcium Varies Widely in Soils on Serpentinite Landscapes. Soil Sci. Soc. Am. J. 73: 2087-2095.&#39;
+
+# re-assign
+metadata(sp4) &lt;- md
+depth_units(sp4) &lt;- &#39;cm&#39; # fix depth units, back to &#39;cm&#39;
+
+# further inspection with common function overloads
+length(sp4) # number of profiles in the collection
+</code></pre>
+
+<pre><code>## [1] 10
+</code></pre>
+
+<pre><code class="r">nrow(sp4) # number of horizons in the collection
+</code></pre>
+
+<pre><code>## [1] 30
+</code></pre>
+
+<pre><code class="r">names(sp4) # column names
+</code></pre>
+
+<pre><code>## $horizons
+##  [1] &quot;id&quot;          &quot;name&quot;        &quot;top&quot;         &quot;bottom&quot;      &quot;K&quot;          
+##  [6] &quot;Mg&quot;          &quot;Ca&quot;          &quot;CEC_7&quot;       &quot;ex_Ca_to_Mg&quot; &quot;sand&quot;       
+## [11] &quot;silt&quot;        &quot;clay&quot;        &quot;CF&quot;         
+## 
+## $site
+## [1] &quot;id&quot;
+</code></pre>
+
+<pre><code class="r">min(sp4) # shallowest profile depth in collection
+</code></pre>
+
+<pre><code>## [1] 16
+</code></pre>
+
+<pre><code class="r">max(sp4) # deepest profile depth in collection
+</code></pre>
+
+<pre><code>## [1] 49
+</code></pre>
+
+<pre><code class="r">
+# extraction of soil profile components
+profile_id(sp4) # vector of profile IDs
+</code></pre>
+
+<pre><code>##  [1] &quot;colusa&quot;         &quot;glenn&quot;          &quot;kings&quot;          &quot;mariposa&quot;      
+##  [5] &quot;mendocino&quot;      &quot;napa&quot;           &quot;san benito&quot;     &quot;shasta&quot;        
+##  [9] &quot;shasta-trinity&quot; &quot;tehama&quot;
+</code></pre>
+
+<pre><code class="r">horizons(sp4) # horizon data
+</code></pre>
+
+<pre><code>##                id name top bottom   K   Mg   Ca CEC_7 ex_Ca_to_Mg sand
+## 1          colusa    A   0      3 0.3 25.7  9.0  23.0        0.35   46
+## 2          colusa  ABt   3      8 0.2 23.7  5.6  21.4        0.23   42
+## 3          colusa  Bt1   8     30 0.1 23.2  1.9  23.7        0.08   40
+## 4          colusa  Bt2  30     42 0.1 44.3  0.3  43.0        0.01   27
+## 5           glenn    A   0      9 0.2 21.9  4.4  18.8        0.20   54
+## 6           glenn   Bt   9     34 0.3 18.9  4.5  27.5        0.20   49
+## 7           kings    A   0      4 0.2 12.1  1.4  23.7        0.58   43
+## 8           kings  Bt1   4     13 0.6 12.1  7.0  18.0        0.51   36
+## 9           kings  Bt2  13     40 0.8 17.7  4.4  20.0        0.25   27
+## 19       mariposa    A   0      3 0.6 28.3  5.8  29.3        0.20   42
+## 20       mariposa  Bt1   3     14 0.4 33.7  6.2  27.9        0.18   41
+## 21       mariposa  Bt2  14     34 0.3 44.3  6.2  34.1        0.14   36
+## 22       mariposa  Bt3  34     49 0.1 78.2  4.4  43.6        0.06   36
+## 23      mendocino    A   0      2 0.5 12.8  2.2  19.3        0.18   57
+## 24      mendocino  Bt1   2      8 0.2 27.1  3.4  19.8        0.13   51
+## 25      mendocino  Bt2   8     30 0.2 30.5  3.7  22.9        0.12   51
+## 10           napa    A   0      6 0.4 16.4 24.1  31.1        1.47   43
+## 11           napa   Bt   6     20 0.1 16.2 21.5  27.9        1.32   54
+## 12     san benito    A   0      8  NA  3.0  0.7   3.1        0.24   80
+## 13     san benito   Bt   8     20 0.0  0.1  5.6   5.6        0.11   74
+## 14         shasta    A   0      3 0.3  9.7  3.5  13.2        0.36   37
+## 15         shasta   Bt   3     40 0.2 10.1  2.0  12.2        0.20   39
+## 26 shasta-trinity   A1   0      2 0.2 18.8  6.6  23.0        0.35   34
+## 27 shasta-trinity   A2   2      5 0.2 25.5  4.1  21.5        0.16   33
+## 28 shasta-trinity   AB   5     12 0.3 29.3  3.5  29.6        0.12   24
+## 29 shasta-trinity  Bt1  12     23 0.2 30.3  1.5  26.5        0.05   20
+## 30 shasta-trinity  Bt2  23     40 0.1 64.9  0.8  48.7        0.01   11
+## 16         tehama    A   0      3 0.4 12.4 16.3  40.2        1.31   57
+## 17         tehama  Bt1   3      7 0.5 20.2 16.5  32.7        0.82   55
+## 18         tehama  Bt2   7     16 0.2 27.7 13.7  30.0        0.50   51
+##    silt clay   CF
+## 1    33   21 0.12
+## 2    31   27 0.27
+## 3    28   32 0.27
+## 4    18   55 0.16
+## 5    20   25 0.55
+## 6    18   34 0.84
+## 7    55    3 0.50
+## 8    49   15 0.75
+## 9    45   27 0.67
+## 19   26   32 0.25
+## 20   34   25 0.38
+## 21   33   31 0.71
+## 22   31   33 0.67
+## 23   30   13 0.16
+## 24   28   21 0.14
+## 25   26   23 0.80
+## 10   42   15 0.02
+## 11   29   17 0.07
+## 12    8   12 0.43
+## 13    7   19 0.60
+## 14   49   14 0.78
+## 15   46   14 0.88
+## 26   44   22 0.17
+## 27   42   25 0.13
+## 28   36   40 0.09
+## 29   29   51 0.05
+## 30   22   67 0.05
+## 16   19   24 0.43
+## 17   20   25 0.10
+## 18   17   32 0.34
+</code></pre>
+
+<pre><code class="r">
+# extraction of specific horizon attributes
+sp4$clay # vector of clay content
+</code></pre>
+
+<pre><code>##  [1] 21 27 32 55 25 34  3 15 27 32 25 31 33 13 21 23 15 17 12 19 14 14 22
+## [24] 25 40 51 67 24 25 32
+</code></pre>
+
+<pre><code class="r">
+# subsetting SoilProfileCollection objects
+sp4[1, ] # first profile in the collection
+</code></pre>
+
+<pre><code>## Object of class SoilProfileCollection
+## Number of profiles: 1
+## 
+## Horizon attributes:
+##       id name top bottom   K   Mg  Ca CEC_7 ex_Ca_to_Mg sand silt clay
+## 1 colusa    A   0      3 0.3 25.7 9.0  23.0        0.35   46   33   21
+## 2 colusa  ABt   3      8 0.2 23.7 5.6  21.4        0.23   42   31   27
+## 3 colusa  Bt1   8     30 0.1 23.2 1.9  23.7        0.08   40   28   32
+## 4 colusa  Bt2  30     42 0.1 44.3 0.3  43.0        0.01   27   18   55
+##     CF
+## 1 0.12
+## 2 0.27
+## 3 0.27
+## 4 0.16
+## 
+## Sampling site attributes:
+##       id
+## 1 colusa
+## 
+## Spatial Data:
+##      [,1]
+## [1,]   NA
+## CRS arguments: NA
+</code></pre>
+
+<pre><code class="r">sp4[, 1] # first horizon from each profile
+</code></pre>
+
+<pre><code>## Object of class SoilProfileCollection
+## Number of profiles: 10
+## Depth range: 2-9 cm
+## 
+## Horizon attributes:
+##          id name top bottom   K   Mg   Ca CEC_7 ex_Ca_to_Mg sand silt clay
+## 1    colusa    A   0      3 0.3 25.7  9.0  23.0        0.35   46   33   21
+## 2     glenn    A   0      9 0.2 21.9  4.4  18.8        0.20   54   20   25
+## 3     kings    A   0      4 0.2 12.1  1.4  23.7        0.58   43   55    3
+## 4  mariposa    A   0      3 0.6 28.3  5.8  29.3        0.20   42   26   32
+## 5 mendocino    A   0      2 0.5 12.8  2.2  19.3        0.18   57   30   13
+## 6      napa    A   0      6 0.4 16.4 24.1  31.1        1.47   43   42   15
+##     CF
+## 1 0.12
+## 2 0.55
+## 3 0.50
+## 4 0.25
+## 5 0.16
+## 6 0.02
+## 
+## Sampling site attributes:
+##          id
+## 1    colusa
+## 2     glenn
+## 3     kings
+## 4  mariposa
+## 5 mendocino
+## 6      napa
+</code></pre>
+
+<pre><code class="r">
+# basic plot method, highly customizable: see manual page ?plotSPC
+plot(sp4)
+# inspect plotting area, very simple to overlay graphical elements
+abline(v=1:length(sp4), lty=3, col=&#39;blue&#39;)
+# profiles are centered at integers, from 1 to length(obj)
+axis(1, line=-1.5, at=1:10, cex.axis=0.75, font=4, col=&#39;blue&#39;, lwd=2)
+# y-axis is based on profile depths
+axis(2, line=-1, at=pretty(1:max(sp4)), cex.axis=0.75, font=4, las=1, col=&#39;blue&#39;, lwd=2)
+</code></pre>
+
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAArwAAAK8CAMAAAA6ZJxxAAAA+VBMVEX9/v0AAAAAABQAACAAACsAAEYAAEgAAHMAAHQAAJwAAL8AAN8AAP8AKyAARkYARnMARpoAV1YAdHMAdJoAdL0+RgBGAABGADVGAEZGRgBGRkZGRppGdL1Gm95Wvv1exP1zAABzAEZzAHNzIABzRgBzRppzdABzdEZzdHNzdL1zm95zp5pzvr1zvt5zvv1z3/2aRgCaRnOadACadHOadJqam0aam3OavpqaxJqa372a396a3/29dAC9dEa9dHO9m0a935q93/29/r29/v3eiCvem0bevnPe35re397e/r3e/t7e/v39vnP935r93739/r39/t79/v3////3q/RoAAAAU3RSTlP///////////////////////////////////////////////////////////////////////////////////////////////////////////8A/9ivbKYAAAAJcEhZcwAAD2EAAA9hAag/p2kAACAASURBVHic7Z0Nn+JYVoc3Klu6i1quWM62XcqOzqw9rsj60roD0zNai6tdIITv/2HMTSAFxSU39+bccE/qeX411T1VJyeH5OnwBxL4UQ6glB/degCAUJAX1IK8oBbkBbUgL6gFeUEtyAtqQV5QC/KCWpAX1IK8oBbkBbUgL6gFeUEtyAtqQV5QC/KCWpAX1IK8oBbkBbUgL6gFeUEtyAtqQV5QC/KCWpAX1IK8oBbkBbUgL6gFeUEtyAtqQV5QC/KCWpAX1IK8oBbkBbUgL6gFeUEtyAtqQV5QC/KCWpAX1IK8oBbkBbUgL6gFeUEtyAtqQV5QC/KCWpAX1IK8oBbkBbUgL6gFeUEtyAtqQV5QC/KCWpAX1IK8oBbkBbUgL6gFeUEtyAtqQV5QC/KCWpAX1IK8oBbkBbUgL6gFeUEtyAtqQV5QC/KCWpAX1IK8oBbkBbUgL6gFeUEtyAtqQV5Qy63kHb+d8rSmiXxbewV5o5enNQ3yAiQA8oJaiA3Ry9OahtjQnaQ2OfJKlfcLsQHUgrygFmJD9PK0piE2dCepTY68UuX9QmwAtSAvqIXYEL08rWmIDd1JapMjr1R5vxAbQC3IC2ohNkQvT2saYkN3ktrkyCtV3i/EBlAL8oJaiA3Ry9OahtjQ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" alt="plot of chunk unnamed-chunk-1"/> </p>
+
+<pre><code class="r">
+
+# setup some colors- to symbolize soil properties
+cols &lt;- rev(brewer.pal(8, &#39;Spectral&#39;))
+# generate a color ramp function based on the color pallette defined above
+cr &lt;- colorRamp(cols)
+# associate colors with exchangeable Ca:Mg, and save to new horizon-level attribute
+sp4$soil_color &lt;- rgb(cr(rescale(sp4$ex_Ca_to_Mg)), max=255)
+
+# plot again, this time using new colors
+plot(sp4) # how does it know about horizon names / colors? see the manual page.
+</code></pre>
+
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAArwAAAK8CAMAAAA6ZJxxAAABI1BMVEX9/v0AAAAAABQAACAAACsAAEYAAHMAKyAARkYARnMARpoAV1YAdHMAdJoAdL0yiL07k7g+RgA+lbdDm7RGAABGADVGAEZGRgBGRkZGRppGdL1Gm95Ko7FNprBPqa9SrK5Wvv1Xsatct6lexP1hvKdpw6RtxKRwxqRzAABzAEZzAHNzIABzRgBzRppzdABzdEZzdHNzdL1zm95zp5pzvr1zvt5zvv1z3/2R06SU1KSaRgCaRnOadHOadJqam0aam3OavpqaxJqa372a396a3/29dAC9dEa9dHO9m0a935q93/29/r29/v2/5Z/C5p/VPk/W7pveiCvem0bevnPe397e/r3e/t7e/v3rX0bsYkX74oz9vnP935r93739/r39/t79/v1uv/QOAAAAYXRSTlP///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////8AroBvMQAAAAlwSFlzAAAPYQAAD2EBqD+naQAAHEFJREFUeJztnQl7G1lWhj8BDjAMYQszTcy+Zga6h24GA8PSMOPeICwjlgAy7vr/vwJJJSu269xK7tE990jy+z5+3Gn51Fef5DeVKkml0gBwoii7AIAXZRcA8KLsAgBelF0AwIuyCwB4UXYBAC/KLgDgRdkFALwouwCAF2UXAPCi7AIAXpRdAMCLsgsAeFF2AQAvyi4A4EXZBQC8KLsAgBdlFwDwouwCAF6UXQDAi7ILAHhRdgEAL8ouAOBF2QUAvCi7AIAXZRcA8KLsAgBelF0AwIuyCwB4UXYBAC/KLgDgRdkFALwouwCAF2UXAPCi7AIAXpRdAMCLsgsAeFF2AQAvyi4A4EXZBQC8KLsAgBdlFwDwouwCAF6UXQDAi7ILAHhRdgEAL8ouAOBF2QUAvCi7AIAXZRcA8KLsAgBelF0AwIuyCwB4UXYBAC/KLgDgRdkFALwouwCAF2UXAPCi7AIAXpRdAMCLsgsAeFF2AQAvyi4A4EXZBQC8KLsAgBdlFwDwouwCAF6UXQDAi7ILAHhRdgEAL8ouAOBF2QUAvCi7AIAXZRcA8KLsAgBelF0A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" alt="plot of chunk unnamed-chunk-1"/> </p>
+
+<pre><code class="r">
+# apply a function to each profile, returning a single value per profile,
+# in the same order as profile_id(sp4)
+soil.depths &lt;- profileApply(sp4, max) # recall that max() gives the depth of a soil profile
+
+# check that the order is correct
+all.equal(names(soil.depths), profile_id(sp4))
+</code></pre>
+
+<pre><code>## [1] TRUE
+</code></pre>
+
+<pre><code class="r">
+# a vector of values that is the same length as the number of profiles
+# can be stored into site-level data
+sp4$depth &lt;- soil.depths
+# check: looks good
+max(sp4[1, ]) == sp4$depth[1]
+</code></pre>
+
+<pre><code>## [1] TRUE
+</code></pre>
+
+<pre><code class="r">
+# extract site-level data 
+site(sp4) # as a data.frame
+</code></pre>
+
+<pre><code>##                id depth
+## 1          colusa    42
+## 2           glenn    34
+## 3           kings    40
+## 4        mariposa    49
+## 5       mendocino    30
+## 6            napa    20
+## 7      san benito    20
+## 8          shasta    40
+## 9  shasta-trinity    40
+## 10         tehama    16
+</code></pre>
+
+<pre><code class="r">sp4$depth # specific columns as a vector
+</code></pre>
+
+<pre><code>##  [1] 42 34 40 49 30 20 20 40 40 16
+</code></pre>
+
+<pre><code class="r">
+# use site-level data to alter plotting order
+new.order &lt;- order(sp4$depth) # the result is an index of rank
+plot(sp4, plot.order=new.order)
+</code></pre>
+
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAArwAAAK8CAMAAAA6ZJxxAAABGlBMVEX9/v0AAAAAACAAADUAAD4AAEYAAHMARkYARnMARpoASDUAV1YAdHMAdJoAdL0yiL07k7g+lbdDm7RGAABGAEZGAHNGRgBGRkZGRppGdL1Gm95Ko7FNprBPqa9SrK5Xsatct6lhvKdpw6RtxKRwxqRzAABzAEZzAHNzRgBzRppzdABzdEZzdHNzdL1zj3Nzm95zvr1zvt5zvv2R06SU1KSaRgCaRnOadHOadJqam0aam3OavpqaxJqa372a396a3/2mSACmm0a9VwC9dAC9dEa9dHO9m0a935q93/29/r29/v2/5Z/C5p/VPk/W7pvem0bevnPe397e/r3e/t7e/v3rX0bsYkX74oz9vnP935r93739/r39/t79/v0ZnlpdAAAAXnRSTlP///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////8AscguJgAAAAlwSFlzAAAPYQAAD2EBqD+naQAAF6xJREFUeJzt3QubG8lZhuE0MAMLYTjMEuPhfJgsdjAOgg1gSETiw5JJQBwGkJD1//8G3WqpR1bVV+2urlLXKz3P5ctrz3xdamnubeusb22IRPvW1DtAFBt4STbwkmzgJdnAS7KBl2QDL8kGXpINvCQbeEk28JJs4CXZwEuygZdkAy/JBl6SDbwkG3hJNvCSbOAl2cBLsoGXZAMvyQZekg28JBt4STbwkmzgJdnAS7KBl2QDL8kGXpINvCQbeEk28JJs4CXZwEuygZdkAy/JBl6SDbwkG3hJNvCSbOAl2cBLsoGXZAMvyQZekg28JBt4STbwkmzgJdnAS7KBl2QDL8kGXpINvCQbeEk28JJs4CXZwEuygZdkAy/JBl6SDbwkG3hJNvCSbOAl2cBLsoGXZAMvyQZekg28JBt4STbwkmzgJdnAS7KBl2QDL8kGXpINvCQbeEk28JJs4CXZwEuygZdkAy/JBl6SDbwkG3hJNvCSbOAl2cBLsoGXZAMvyQZekg28JBt4STbwkmzgJdnAS7KBl2QDL8kGXpINvCQbeEk28JJs4CXZwEuygZdkAy/JBl6SDbwkG3hJNvCS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" alt="plot of chunk unnamed-chunk-1"/> </p>
+
+<pre><code class="r">
+# deconstruct SoilProfileCollection into a data.frame, with horizon+site data
+as(sp4, &#39;data.frame&#39;)
+</code></pre>
+
+<pre><code>##                id name top bottom   K   Mg   Ca CEC_7 ex_Ca_to_Mg sand
+## 1          colusa    A   0      3 0.3 25.7  9.0  23.0        0.35   46
+## 2          colusa  ABt   3      8 0.2 23.7  5.6  21.4        0.23   42
+## 3          colusa  Bt1   8     30 0.1 23.2  1.9  23.7        0.08   40
+## 4          colusa  Bt2  30     42 0.1 44.3  0.3  43.0        0.01   27
+## 5           glenn    A   0      9 0.2 21.9  4.4  18.8        0.20   54
+## 6           glenn   Bt   9     34 0.3 18.9  4.5  27.5        0.20   49
+## 7           kings    A   0      4 0.2 12.1  1.4  23.7        0.58   43
+## 8           kings  Bt1   4     13 0.6 12.1  7.0  18.0        0.51   36
+## 9           kings  Bt2  13     40 0.8 17.7  4.4  20.0        0.25   27
+## 10       mariposa    A   0      3 0.6 28.3  5.8  29.3        0.20   42
+## 11       mariposa  Bt1   3     14 0.4 33.7  6.2  27.9        0.18   41
+## 12       mariposa  Bt2  14     34 0.3 44.3  6.2  34.1        0.14   36
+## 13       mariposa  Bt3  34     49 0.1 78.2  4.4  43.6        0.06   36
+## 14      mendocino    A   0      2 0.5 12.8  2.2  19.3        0.18   57
+## 15      mendocino  Bt1   2      8 0.2 27.1  3.4  19.8        0.13   51
+## 16      mendocino  Bt2   8     30 0.2 30.5  3.7  22.9        0.12   51
+## 17           napa    A   0      6 0.4 16.4 24.1  31.1        1.47   43
+## 18           napa   Bt   6     20 0.1 16.2 21.5  27.9        1.32   54
+## 19     san benito    A   0      8  NA  3.0  0.7   3.1        0.24   80
+## 20     san benito   Bt   8     20 0.0  0.1  5.6   5.6        0.11   74
+## 21         shasta    A   0      3 0.3  9.7  3.5  13.2        0.36   37
+## 22         shasta   Bt   3     40 0.2 10.1  2.0  12.2        0.20   39
+## 23 shasta-trinity   A1   0      2 0.2 18.8  6.6  23.0        0.35   34
+## 24 shasta-trinity   A2   2      5 0.2 25.5  4.1  21.5        0.16   33
+## 25 shasta-trinity   AB   5     12 0.3 29.3  3.5  29.6        0.12   24
+## 26 shasta-trinity  Bt1  12     23 0.2 30.3  1.5  26.5        0.05   20
+## 27 shasta-trinity  Bt2  23     40 0.1 64.9  0.8  48.7        0.01   11
+## 28         tehama    A   0      3 0.4 12.4 16.3  40.2        1.31   57
+## 29         tehama  Bt1   3      7 0.5 20.2 16.5  32.7        0.82   55
+## 30         tehama  Bt2   7     16 0.2 27.7 13.7  30.0        0.50   51
+##    silt clay   CF soil_color depth
+## 1    33   21 0.12    #91D3A4    42
+## 2    31   27 0.27    #69C3A4    42
+## 3    28   32 0.27    #439BB4    42
+## 4    18   55 0.16    #3288BD    42
+## 5    20   25 0.55    #61BCA7    34
+## 6    18   34 0.84    #61BCA7    34
+## 7    55    3 0.50    #D6EE9B    40
+## 8    49   15 0.75    #C2E69F    40
+## 9    45   27 0.67    #70C6A4    40
+## 10   26   32 0.25    #61BCA7    49
+## 11   34   25 0.38    #5CB7A9    49
+## 12   33   31 0.71    #52ACAE    49
+## 13   31   33 0.67    #3E95B7    49
+## 14   30   13 0.16    #5CB7A9    30
+## 15   28   21 0.14    #4FA9AF    30
+## 16   26   23 0.80    #4DA6B0    30
+## 17   42   15 0.02    #D53E4F    20
+## 18   29   17 0.07    #EB5F46    20
+## 19    8   12 0.43    #6DC4A4    20
+## 20    7   19 0.60    #4AA3B1    20
+## 21   49   14 0.78    #94D4A4    40
+## 22   46   14 0.88    #61BCA7    40
+## 23   44   22 0.17    #91D3A4    40
+## 24   42   25 0.13    #57B1AB    40
+## 25   36   40 0.09    #4DA6B0    40
+## 26   29   51 0.05    #3B93B8    40
+## 27   22   67 0.05    #3288BD    40
+## 28   19   24 0.43    #EC6245    16
+## 29   20   25 0.10    #FBE28C    16
+## 30   17   32 0.34    #BFE59F    16
+</code></pre>
+
+<pre><code class="r">
+</code></pre>
+
+
+<hr><div align="center">[Package <em>aqp</em> version 1.4-6 <a href="00Index.html">Index</a>]</div>
+</body></html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Unroll Genetic Horizons</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+
+<link rel="stylesheet" href="highlight.css">
+<script src="highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</head><body>
+
+<table width="100%" summary="page for unroll {aqp}"><tr><td>unroll {aqp}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Unroll Genetic Horizons</h2>
+
+<h3>Description</h3>
+
+
+<p>Generate a descretized vector of genetic horizons along a user-defined pattern.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>unroll(top, bottom, prop, max_depth, bottom_padding_value = NA, strict=FALSE)</pre>
+
+
+<h3>Arguments</h3>
+
+
+<table summary="R argblock">
+<tr valign="top"><td><code>top</code></td>
+<td>
+<p>vector of upper horizon boundaries, must be an integer</p>
+</td></tr>
+<tr valign="top"><td><code>bottom</code></td>
+<td>
+<p>vector of lower horizon boundaries, must be an integer</p>
+</td></tr>
+<tr valign="top"><td><code>prop</code></td>
+<td>
+<p>vector of some property to be &quot;unrolled&quot; over a regular sequence</p>
+</td></tr>
+<tr valign="top"><td><code>max_depth</code></td>
+<td>
+<p>maximum depth to which missing data is padded with NA</p>
+</td></tr>
+<tr valign="top"><td><code>bottom_padding_value</code></td>
+<td>
+<p>value to use when padding missing data</p>
+</td></tr>
+<tr valign="top"><td><code>strict</code></td>
+<td>
+<p>should horizons be strictly checked for self-consistency? defaults to FALSE</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+
+<p>This function is used internally by several higher-level components of the <code>aqp</code> package. Basic error checking is performed to make sure that bottom and top horizon boundaries make sense. Note that the horizons should be sorted according to depth before using this function. The <code>max_depth</code> argument is used to specifiy the maximum depth of profiles within a collection, so that data from any profile shallower than this depth is padded with NA.
+</p>
+
+
+<h3>Value</h3>
+
+<p>a vector of &quot;unrolled&quot; property values</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Dylan E. Beaudette</p>
+
+
+<h3>References</h3>
+
+<p>http://casoilresource.lawr.ucdavis.edu/</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="r">
+data(sp1)
+
+# subset a single soil profile:
+sp1.1 &lt;- subset(sp1, subset=id == &#39;P001&#39;)
+
+# demonstrate how this function works
+x &lt;- with(sp1.1, unroll(top, bottom, prop, max_depth=50))
+plot(x, 1:length(x), ylim=c(90,0), type=&#39;b&#39;, cex=0.5)   
+</code></pre>
+
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAArwAAAK8CAMAAAA6ZJxxAAAAYFBMVEX9/v0AAAAAAEYAAHMARpoAdL1GAABGAEZGAHNGm95zAABzAHNzvv2aRgCaRnOadACam96avpqa3/29dAC9dHO9/r29/v3em0be35re/t7e/v39vnP935r9/r39/t79/v2IDWQhAAAAIHRSTlP/////////////////////////////////////////AFxcG+0AAAAJcEhZcwAAD2EAAA9hAag/p2kAABAtSURBVHic7d0NV9vYeobh4wRIodCPuI1bDOb//8tjYyCkHTFb0pZ5H3xda50zrFmZLRNub15JBv/jCUL947MfAEwlXmKJl1jiJZZ4iSVeYomXWOIllniJJV5iiZdY4iWWeIklXmKJl1jiJZZ4iSVeYomXWOIllniJJV5iiZdY4iWWeIklXmKJl1jiJZZ4iSVeYomXWOIllniJJV5iiZdY4iWWeIklXmKJl1jiJZZ4iSVeYomXWOIllniJJV5iiZdY4iWWeIklXmKJl1jiJZZ4iSVeYomXWOIllniJJV5iiZdY4iWWeIklXmKJl1jiJZZ4iSVeYomXWOIllniJJV5iiZdY4iWWeIklXmKJl1jiJZZ4idU53hXM9lnx9l2OcyReYomXWOIllniJJV5iiZdY4iWWeIklXmKJl1jiJZZ4iSVeYomXWOIl1kLx7u6Orxb+/mvucWHIMvFuV9fHDx6urmceF4YsEu/u7i3ZzcX9vOPCkIXivX39cPvn4DD+x49giJ2XWEvNvC9br5mX5bjawDJOMBm6zssiVif4GouXRYiXXMYGGCZelmHnJZWZl1LG/OZG8dLB6X+j6MthF/p83h2i9Q+K97Q+Kbko4u1LcidUKt5P+5J1S05zp1Qp3rEzvuTOXNF4JcffqxTv540NRCoVL4xRKl47L2NUivcUN2X4QsRLrErxGhsYpVS8MIZ4iVUqXmMDY1SK1wkbo4iXWJXiNTYwSql4YYxS8dp5GaNSvGZeRhEvsSrFa2xglFLxwhil4rXzMkaleM28jCJeYlWK19jAKKXihTHES6xS8RobGKNSvE7YGEW8xKoUr7GBUUrFC2OUitfOyxiV4jXzMop4iVUpXmMDo5SKF8YoFa+dlzEqxWvmZRTxEqtSvMYGRikVL4whXmKVitfYwBiV4nXC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" alt="plot of chunk unnamed-chunk-1"/> </p>
+
+<pre><code class="r">
+</code></pre>
+
+
+<hr><div align="center">[Package <em>aqp</em> version 1.4-6 <a href="00Index.html">Index</a>]</div>
+</body></html>
