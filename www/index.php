@@ -62,6 +62,7 @@ echo $contents; } ?>
 <ol>
 <li><a href="aqp-html-manual/index.html">aqp manual pages with figures</a></li>
 <li><a href="soilDB-html-manual/index.html">soilDB manual pages with figures</a></li>
+<li><a href="sharpshootR-html-manual/index.html">sharpshootR manual pages with figures</a></li>
 </ol>
 </p>
 

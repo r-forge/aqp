@@ -130,12 +130,12 @@ a &lt;- slab(sp3, fm= ~ clay + cec + ph + h + s + v, slab.structure=10)
 str(a)
 </code></pre>
 
-<pre><code>## &#39;data.frame&#39;:    107 obs. of  12 variables:
+<pre><code>## &#39;data.frame&#39;:    117 obs. of  12 variables:
 ##  $ variable             : Factor w/ 1 level &quot;name&quot;: 1 1 1 1 1 1 1 1 1 1 ...
 ##  $ all.profiles         : num  1 1 1 1 1 1 1 1 1 1 ...
-##  $ H1                   : num  1 1 1 0.96 0.56 0.28 0.04 0 0 0 ...
-##  $ H2                   : num  0 0 0 0.04 0.44 0.72 0.96 1 1 0.96 ...
-##  $ H3                   : num  0 0 0 0 0 0 0 0 0 0.04 ...
+##  $ H1                   : num  1 1 1 1 0.6 0.28 0.08 0.04 0 0 ...
+##  $ H2                   : num  0 0 0 0 0.4 0.72 0.92 0.96 0.96 0.96 ...
+##  $ H3                   : num  0 0 0 0 0 0 0 0 0.04 0.04 ...
 ##  $ H4                   : num  0 0 0 0 0 0 0 0 0 0 ...
 ##  $ H5                   : num  0 0 0 0 0 0 0 0 0 0 ...
 ##  $ H6                   : num  0 0 0 0 0 0 0 0 0 0 ...
@@ -151,19 +151,19 @@ library(reshape)
 a.wide.q25 &lt;- cast(a, top + bottom ~ variable, value=c(&#39;p.q25&#39;))
 </code></pre>
 
-<pre><code>## Error: arguments imply differing number of rows: 107, 0
+<pre><code>## Error: arguments imply differing number of rows: 117, 0
 </code></pre>
 
 <pre><code class="r">a.wide.q50 &lt;- cast(a, top + bottom ~ variable, value=c(&#39;p.q50&#39;))
 </code></pre>
 
-<pre><code>## Error: arguments imply differing number of rows: 107, 0
+<pre><code>## Error: arguments imply differing number of rows: 117, 0
 </code></pre>
 
 <pre><code class="r">a.wide.q75 &lt;- cast(a, top + bottom ~ variable, value=c(&#39;p.q75&#39;))
 </code></pre>
 
-<pre><code>## Error: arguments imply differing number of rows: 107, 0
+<pre><code>## Error: arguments imply differing number of rows: 117, 0
 </code></pre>
 
 <pre><code class="r">
