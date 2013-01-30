@@ -1,0 +1,91 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Plot Aspect Data</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+
+<link rel="stylesheet" href="highlight.css">
+<script src="highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</head><body>
+
+<table width="100%" summary="page for aspect.plot {sharpshootR}"><tr><td>aspect.plot {sharpshootR}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Plot Aspect Data</h2>
+
+<h3>Description</h3>
+
+<p>Plot a graphical summary of multiple aspect measurements on a circular diagram.</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+aspect.plot(p, p.bins = 60, p.bw = 30, p.axis = seq(0, 350, by = 10), plot.title = NULL)
+</pre>
+
+
+<h3>Arguments</h3>
+
+
+<table summary="R argblock">
+<tr valign="top"><td><code>p</code></td>
+<td>
+<p>a vector of aspect angles in degrees, measured clock-wise from North</p>
+</td></tr>
+<tr valign="top"><td><code>p.bins</code></td>
+<td>
+<p>number of bins to use for circular histogram</p>
+</td></tr>
+<tr valign="top"><td><code>p.bw</code></td>
+<td>
+<p>bandwidth used for circular density estimation</p>
+</td></tr>
+<tr valign="top"><td><code>p.axis</code></td>
+<td>
+<p>a sequence of integers (degrees) describing the circular axis</p>
+</td></tr>
+<tr valign="top"><td><code>plot.title</code></td>
+<td>
+<p>an informative title</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>Spread and central tendency are depicted with a combination of circular histogram and kernel density estimate. The circular mean, and relative confidence in that mean are depicted with an arrow: longer arrow lengths correspond to greater confidence in the mean.</p>
+
+
+<h3>Note</h3>
+
+<p>Manual adjustment of <code>p.bw</code> may be required in order to get an optimal circular density plot.</p>
+
+
+<h3>Author(s)</h3>
+
+<p>D.E. Beaudette</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="r">
+# simulate some data
+p.narrow &lt;- runif(n=25, min=215, max=280)
+p.wide &lt;- runif(n=25, min=0, max=270)
+
+# set figure margins to 0, 2-column plot
+par(mar=c(0,0,0,0), mfcol=c(1,2))
+
+# plot 
+aspect.plot(p.narrow, p.bw=10, plot.title=&#39;Soil A&#39;)
+aspect.plot(p.wide, p.bw=10, plot.title=&#39;Soil B&#39;)
+</code></pre>
+
+<p><img src="data:image/png;base64,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" alt="plot of chunk unnamed-chunk-1"/> </p>
+
+<pre><code class="r">
+</code></pre>
+
+
+<hr><div align="center">[Package <em>sharpshootR</em> version 0.1 <a href="00Index.html">Index</a>]</div>
+</body></html>
