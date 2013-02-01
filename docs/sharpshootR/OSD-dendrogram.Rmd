@@ -1,0 +1,35 @@
+<!--
+when knitting, fetchOSD() fails on soils with spaces in their name!
+-->
+
+## STUFF
+
+```{r setup, echo=FALSE, results='hide'}
+opts_chunk$set(message=FALSE, warning=FALSE, background='#F7F7F7', dpi=100, fig.align='center', dev='CairoPNG')
+options(width=100, stringsAsFactors=FALSE)
+```
+
+```{r get-data}
+# need these
+library(soilDB)
+library(sharpshootR)
+
+# soils of interest
+# s.list <- c('musick', 'cecil', 'drummer', 'amador', 'pentz', 'reiff', 'montpellier','grangeville','pollasky','ramona')
+s.list <- c('hornitos', 'perkins', 'argonaut', 'inks', 'mokelumne', 'dunstone', 'auburn', 'pentz', 'pardee', 'peters', 'amador', 'laniger')
+
+# fetch and convert data into an SPC
+s <- fetchOSD(s.list)
+```
+
+
+```{r check-via-plotting, fig.width=10, fig.height=5}
+# plot profiles
+par(mar=c(0,0,0,0))
+plot(s, name='hzname', cex.names=0.85, axis.line.offset=-4)
+```
+
+```{r plot-dendrogram, fig.width=10, fig.height=5}
+# plot dendrogram + profiles
+SoilTaxonomyDendrogram(s, cex.taxon.labels=0.8)
+```
