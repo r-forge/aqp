@@ -20,7 +20,7 @@
 <h3>Usage</h3>
 
 <pre>
-test_hz_logic(i, topcol, bottomcol, test.NA = TRUE, strict = FALSE)
+test_hz_logic(i, topcol, bottomcol, strict = FALSE)
 </pre>
 
 
@@ -40,10 +40,6 @@ test_hz_logic(i, topcol, bottomcol, test.NA = TRUE, strict = FALSE)
 <td>
 <p>character, giving the name of the column in <code>i</code> that describes horizon bottom depth</p>
 </td></tr>
-<tr valign="top"><td><code>test.NA</code></td>
-<td>
-<p>logicial, should tests for missing (NA) horizon top OR bottom boundaries be performed?</p>
-</td></tr>
 <tr valign="top"><td><code>strict</code></td>
 <td>
 <p>logical, should continuity tests be performed&ndash; i.e. for non-contiguous horizon boundaries</p>
@@ -53,7 +49,7 @@ test_hz_logic(i, topcol, bottomcol, test.NA = TRUE, strict = FALSE)
 
 <h3>Details</h3>
 
-<p>This function is used as part of the validity-methods for SoilProfileCollection objects.</p>
+<p>By default, this function tests for NA and overlapping horizons. If any either are encountered, FALSE is returned.</p>
 
 
 <h3>Value</h3>
@@ -63,7 +59,7 @@ test_hz_logic(i, topcol, bottomcol, test.NA = TRUE, strict = FALSE)
 
 <h3>Author(s)</h3>
 
-<p>Dylan E. Beaudette</p>
+<p>D.E. Beaudette</p>
 
 
 <h3>References</h3>
@@ -79,44 +75,15 @@ test_hz_logic(i, topcol, bottomcol, test.NA = TRUE, strict = FALSE)
 <h3>Examples</h3>
 
 <pre><code class="r">
-# simple example: just one profile
+## simple example: just one profile
 data(sp1)
 depths(sp1) &lt;- id ~ top + bottom
 s &lt;- horizons(sp1[1, ])
 
-# apply tests
-# passes:
-test_hz_logic(s, &#39;top&#39;, &#39;bottom&#39;, test.NA=TRUE, strict=FALSE)
-</code></pre>
-
-<pre><code>## hz_logic_pass 
-##          TRUE
-</code></pre>
-
-<pre><code class="r"># passes:
-test_hz_logic(s, &#39;top&#39;, &#39;bottom&#39;, test.NA=TRUE, strict=TRUE)
-</code></pre>
-
-<pre><code>## hz_logic_pass 
-##          TRUE
-</code></pre>
-
-<pre><code class="r">
-# add-in some bad data
-s$bottom[6] &lt;- NA # missing horizon boundary, common on bottom-most hz
-s$bottom[3] &lt;- 30 # inconsistent hz boundary
-
-# apply tests
+## check
 # fails due to missing hz boundary
-test_hz_logic(s, &#39;top&#39;, &#39;bottom&#39;, test.NA=TRUE, strict=FALSE)
-</code></pre>
-
-<pre><code>## hz_logic_pass 
-##         FALSE
-</code></pre>
-
-<pre><code class="r"># fails due to inconsistent hz boundary
-test_hz_logic(s, &#39;top&#39;, &#39;bottom&#39;, test.NA=FALSE, strict=TRUE)
+s$bottom[6] &lt;- NA # missing horizon boundary, common on bottom-most hz
+test_hz_logic(s, &#39;top&#39;, &#39;bottom&#39;, strict=FALSE)
 </code></pre>
 
 <pre><code>## hz_logic_pass 
@@ -124,8 +91,66 @@ test_hz_logic(s, &#39;top&#39;, &#39;bottom&#39;, test.NA=FALSE, strict=TRUE)
 </code></pre>
 
 <pre><code class="r">
+# fails due to inconsistent hz boundary
+s$bottom[3] &lt;- 30 # inconsistent hz boundary
+test_hz_logic(s, &#39;top&#39;, &#39;bottom&#39;, strict=TRUE)
+</code></pre>
+
+<pre><code>## hz_logic_pass 
+##         FALSE
+</code></pre>
+
+<pre><code class="r">
+
+## filtering bad data 
+## Not run: 
+##D # missing bottom horizons
+##D x$hzn_bot[!is.na(x$hzn_top) &amp; is.na(x$hzn_bot)] &lt;- x$hzn_top[!is.na(x$hzn_top) &amp; is.na(x$hzn_bot)]
+##D 
+##D # remove O horizons where top &gt; bottom
+##D bad.O.hz.idx &lt;- which(x$hzn_top &gt; x$hzn_bot)
+##D if(length(bad.O.hz.idx) &gt; 0)
+##D     x &lt;- x[-bad.O.hz.idx, ]
+## End(Not run)
+
+## checking for bad data: do this before promoting to SoilProfileCollection object
+library(plyr)
+data(sp1)
+
+# horizon logic can be tested via data.frame, at 2 levels of scrutiny:
+ddply(sp1, &#39;id&#39;, test_hz_logic, topcol=&#39;top&#39;, bottomcol=&#39;bottom&#39;, strict=FALSE)
+</code></pre>
+
+<pre><code>##     id hz_logic_pass
+## 1 P001          TRUE
+## 2 P002          TRUE
+## 3 P003          TRUE
+## 4 P004          TRUE
+## 5 P005          TRUE
+## 6 P006          TRUE
+## 7 P007          TRUE
+## 8 P008          TRUE
+## 9 P009          TRUE
+</code></pre>
+
+<pre><code class="r">ddply(sp1, &#39;id&#39;, test_hz_logic, topcol=&#39;top&#39;, bottomcol=&#39;bottom&#39;, strict=TRUE)
+</code></pre>
+
+<pre><code>##     id hz_logic_pass
+## 1 P001          TRUE
+## 2 P002          TRUE
+## 3 P003          TRUE
+## 4 P004          TRUE
+## 5 P005          TRUE
+## 6 P006          TRUE
+## 7 P007          TRUE
+## 8 P008          TRUE
+## 9 P009          TRUE
+</code></pre>
+
+<pre><code class="r">
 </code></pre>
 
 
-<hr><div align="center">[Package <em>aqp</em> version 1.5 <a href="00Index.html">Index</a>]</div>
+<hr><div align="center">[Package <em>aqp</em> version 1.5-1 <a href="00Index.html">Index</a>]</div>
 </body></html>

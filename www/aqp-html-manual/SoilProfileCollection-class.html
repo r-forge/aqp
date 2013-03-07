@@ -114,16 +114,7 @@
 <h3>Examples</h3>
 
 <pre><code class="r">
-## 1. test validity methods
-
-# this should work fine
-data(sp1)
-depths(sp1) &lt;- id ~ top + bottom
-
-# horizon logic can be tested via data.frame and 
-# test_hz_logic(i, topcol, bottomcol, test.NA=TRUE, strict=FALSE)
-
-## 2. use the digest library to detect duplicate data
+## use the digest library to detect duplicate data
 data(sp1)
 
 # make a copy, make new IDs, and stack
@@ -182,16 +173,10 @@ plot(d.new)
 ##D data(sp1)
 ##D sp1$top[1] &lt;- NA
 ##D depths(sp1) &lt;- id ~ top + bottom
-##D 
-##D # insert a bogus horizon boundary
-##D ## NOTE: this is currently valid, as this check breaks slice(SPC, ...)
-##D data(sp1)
-##D sp1$top[2] &lt;- 30
-##D depths(sp1) &lt;- id ~ top + bottom
 ## End(Not run)
 
 </code></pre>
 
 
-<hr><div align="center">[Package <em>aqp</em> version 1.5 <a href="00Index.html">Index</a>]</div>
+<hr><div align="center">[Package <em>aqp</em> version 1.5-1 <a href="00Index.html">Index</a>]</div>
 </body></html>
