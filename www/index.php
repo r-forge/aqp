@@ -51,7 +51,8 @@ echo $contents; } ?>
 <p> Vignettes:
 <ol>
 <li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/aqp/aqp-intro.html?root=aqp">SoilProfileCollection object introduction</a></li>
-<li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/aqp/dealing-with-bad-data.html?revision=670&root=aqp">dealing with bad data</a></li>
+<li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/aqp/dealing-with-bad-data.html?root=aqp">dealing with bad data</a></li>
+<li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/aqp/properties-by-bedrock.html?root=aqp">aggregate properties by bedrock kind</a></li>
 <li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/aqp/aqp-profile-dissimilarity.html?root=aqp">soil profile dissimilarity</a></li>
 <li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/aqp/vertical_vs_perpendicular.html?root=aqp">vertical vs. perpendicular horizon measurements</a></li>
 <li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/soilDB-Intro.html?root=aqp">getting soils data from USDA-NCSS databases</a></li>
