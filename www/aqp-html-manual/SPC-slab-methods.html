@@ -35,7 +35,7 @@ slab(object, fm, slab.structure=1, strict=FALSE, slab.fun=.slab.fun.numeric.defa
 </td></tr>
 <tr valign="top"><td><code>fm</code></td>
 <td>
-<p>A formula: either &lsquo;groups ~ var1 + var2 + var3&rsquo; where named variables are aggregated within &lsquo;groups&rsquo; OR where named variables are aggregated across the entire collection &lsquo; ~ var1 + var2 + var3&rsquo;</p>
+<p>A formula: either &lsquo;groups ~ var1 + var2 + var3&rsquo; where named variables are aggregated within &lsquo;groups&rsquo; OR where named variables are aggregated across the entire collection &lsquo; ~ var1 + var2 + var3&rsquo;. If 'groups' is a factor it must not contain NA.</p>
 </td></tr>
 <tr valign="top"><td><code>slab.structure</code></td>
 <td>
@@ -67,9 +67,9 @@ slab(object, fm, slab.structure=1, strict=FALSE, slab.fun=.slab.fun.numeric.defa
 <h3>Details</h3>
 
 
-<p>Multiple continuous variables OR a single categorical (factor) variable can be aggregated within a call to <code>slab</code>. Basic error checking is performed to make sure that top and bottom horizon boundaries make sense. User-defined aggregate functions (<code>slab.fun</code>) should return a named vector of results. A new, named column will appear in the results of <code>slab</code> for every named element of a vector returned by <code>slab.fun</code>. See examples below for a simple example of a slab function that computes mean, mean-1SD and mean+1SD. The default slab function wraps <code><a href="../../Hmisc/html/hdquantile.html">hdquantile</a></code> from the Hmisc package.
+<p>Multiple continuous variables OR a single categorical (factor) variable can be aggregated within a call to <code>slab</code>. Basic error checking is performed to make sure that top and bottom horizon boundaries make sense. User-defined aggregate functions (<code>slab.fun</code>) should return a named vector of results. A new, named column will appear in the results of <code>slab</code> for every named element of a vector returned by <code>slab.fun</code>. See examples below for a simple example of a slab function that computes mean, mean-1SD and mean+1SD. The default slab function wraps <code><a href="../../Hmisc/html/hdquantile.html">hdquantile</a></code> from the Hmisc package. Note that if 'group' is a factor it must not contain NAs.
 </p>
-<p>Execution time scales linearly (slower) with the total number of profiles in <code>object</code>, and exponentially (faster) as the number of profiles / group is increased.
+<p>Execution time scales linearly (slower) with the total number of profiles in <code>object</code>, and exponentially (faster) as the number of profiles / group is increased. <code>slab()</code> and <code>slice()</code> are much faster and require less memory if input data are either numeric or character.
 </p>
 <p>There are several possible ways to define slabs, using <code>slab.structure</code>:
 </p>
@@ -159,7 +159,7 @@ slab(object, fm, slab.structure=1, strict=FALSE, slab.fun=.slab.fun.numeric.defa
 
 <h3>Author(s)</h3>
 
-<p>Dylan E Beaudette</p>
+<p>D.E. Beaudette</p>
 
 
 <h3>References</h3>
