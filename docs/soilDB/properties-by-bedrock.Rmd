@@ -6,7 +6,10 @@ options(width=100, stringsAsFactors=FALSE)
 
 ## Aggregate Soil Properties by Bedrock Kind
 2013-03-08
+
 Dylan Beaudette
+
+
 
 ### Installation
 With a recent version of R, it should be possible to get all of the packages that this tutorial depends on via:
@@ -26,7 +29,7 @@ Setting up this connection is simple, and outlined in this [guide](https://r-for
 
 ### Loading data from NASIS
 
-Before running this code, be sure to read the instructions above on setting up and ODBC connection and selected set. This approach could also be used to load equivalent data from a PedonPC database using `fetchPedonPC('path.to.your.data.base.accdb')`.
+Before running this code, be sure to read the instructions above on setting up and ODBC connection and selected set. This approach could also be used to load equivalent data from a PedonPC database using `fetchPedonPC('path.to.your.data.base.accdb')`. Note that the filtering step described below should be adjusted to fit *your* data. In this case, we are keeping pedons from the "CA630" survey area, and filtering based on the occurrence of this pattern within the user site ID.
 ```{r prep-environment, results='hide'}
 # load required libraries
 library(soilDB)
@@ -46,6 +49,7 @@ f <- f[idx, ]
 
 ### Tabulate occurrence of various bedrock kinds
 
+The `table()` function is a great way to count the number of cases of each level of a category, or, cross-tabulation among several categories. Objects returned by `table()` can be readily visualized using the `dotplot()` function.
 ```{r inspect-raw-data, fig.height=4, fig.width=8}
 # tabulate all bedrock kinds
 bt <- table(f$bedrock_kind)
@@ -54,10 +58,12 @@ bt <- table(f$bedrock_kind)
 dotplot(sort(bt, decreasing=TRUE)[1:20], col='black')
 ```
 
-There are several bedrock kinds that are functionally similar within CA630, so we can group them into a several "generalized bedrock kinds". 
+There are several bedrock kinds that are functionally similar within CA630, so we can group them into a several "generalized bedrock kinds". Note that we are matching bedorock kind with several possible options using the `%in%` operator.
 ```{r re-group}
-# there are many in there that are functionally identical, lets group them
+# make a new column to store generalized geology, and fill with NA
 f$generalized_bedrock <- rep(NA, times=length(f))
+
+# generate new labels for bedrock kinds that are functionally similar
 f$generalized_bedrock[f$bedrock_kind %in% c('Metavolcanics', 'Greenstone')] <- 'Metavolcanics'
 f$generalized_bedrock[f$bedrock_kind %in% c('Diorite', 'Granite', 'Granodiorite', 'Granitoid')] <- 'Granite'
 f$generalized_bedrock[f$bedrock_kind %in% c('Mica schist', 'Schist', 'Phyllite', 'Metasedimentary rock')] <- 'Metasedimentary'
@@ -70,7 +76,7 @@ f$generalized_bedrock[f$bedrock_kind %in% c('Latite')] <- 'Latite'
 ```
 
 
-For now, lets only aggregate those pedons that we have included within the generalized bedrock classes.
+For now, lets only aggregate those pedons that we have included within the new generalized bedrock classes. For more information on how this process works, see `?subsetProfiles`.
 ```{r subset}
 # subset only those pedons with generalized bedrock
 f.sub <- subsetProfiles(f, s="!is.na(generalized_bedrock)")
@@ -97,7 +103,7 @@ a$generalized_bedrock <- factor(a$generalized_bedrock, levels=names(bedrock.tab)
 
 ### Plot aggregate data
 
-Lattice graphics are used to plot the median property bounded by the 25th and 75th percentiles, with data split into panels according to generalized bedrock type.
+Lattice graphics are used to plot the median property bounded by the 25th and 75th percentiles, with data split into panels according to generalized bedrock type. Percentages printed on the right-hand side of each panel describe the fraction of pedons contributing data at each depth. See `?panel.depth_function` for details on how to plot aggregate soils data.
 ```{r make-plots}
 p.clay <- xyplot(mid ~ p.q50 | generalized_bedrock, upper=a$p.q75, lower=a$p.q25, data=a, ylim=c(180,-5), ylab='Depth (cm)', xlab='% Clay', strip=strip.custom(bg='yellow'), as.table=TRUE, panel=panel.depth_function, prepanel=prepanel.depth_function, scales=list(y=list(tick.number=7, alternating=3), x=list(alternating=1)), subset=variable == 'clay', layout=c(9,1), cf=a$contributing_fraction, sync.colors=TRUE, alpha=0.33)
 
