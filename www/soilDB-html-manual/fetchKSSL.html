@@ -1,0 +1,101 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Fetch KSSL Data (EXPERIMENTAL)</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+
+<link rel="stylesheet" href="highlight.css">
+<script src="highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</head><body>
+
+<table width="100%" summary="page for fetchKSSL {soilDB}"><tr><td>fetchKSSL {soilDB}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Fetch KSSL Data (EXPERIMENTAL)</h2>
+
+<h3>Description</h3>
+
+<p>Get KSSL data via BBOX or series query, from the SoilWeb system.</p>
+
+
+<h3>Usage</h3>
+
+<pre>fetchKSSL(series = NULL, bbox = NULL)</pre>
+
+
+<h3>Arguments</h3>
+
+
+<table summary="R argblock">
+<tr valign="top"><td><code>series</code></td>
+<td>
+<p>a soil series name</p>
+</td></tr>
+<tr valign="top"><td><code>bbox</code></td>
+<td>
+<p>a bounding box in WGS84 geographic coordinates e.g. <code>c(-120, 37, -122, 38)</code></p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>This is an experimental interface to most of the KSSL data as of June 2012. Series-queries are case insensitive.</p>
+
+
+<h3>Value</h3>
+
+<p>a <code>SoilProfileCollection</code> object</p>
+
+
+<h3>Note</h3>
+
+<p>SoilWeb maintains a snapshot of the KSSL data. Please use the link above for the live data.</p>
+
+
+<h3>Author(s)</h3>
+
+<p>D.E. Beaudette</p>
+
+
+<h3>References</h3>
+
+
+<p><a href="http://ncsslabdatamart.sc.egov.usda.gov/">http://ncsslabdatamart.sc.egov.usda.gov/</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="fetchOSD.html">fetchOSD</a></code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="r">
+# search by series name
+s &lt;- fetchKSSL(series=&#39;auburn&#39;)
+
+# search by bounding-box
+# s &lt;- fetchKSSL(bbox=c(-120, 37, -122, 38))
+
+# how many pedons
+length(s)
+</code></pre>
+
+<pre><code>## [1] 20
+</code></pre>
+
+<pre><code class="r">
+# plot 
+par(mar=c(0,0,0,0))
+plot(s, name=&#39;hzn_desgn&#39;, max.depth=150)
+</code></pre>
+
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAfgAAAH4CAMAAACR9g9NAAAA6lBMVEX9/v0AAAAAAEYAAHMARpoAdL0riN5GAABGAHNGNV5GRkZGRppGdJpGdL1Gm95zAABzAEZzAHNzRppzVitzZQBzdABzdEZzdHNzdL1zm5pzvr1zvt5zvv1z3/2HiEaH372aRjWaRkaaRnOadACadHOadJqam0aam5qam72am96ap3Oavr2a372a396a3/29dAC9dEa9dHO9m0a9m3O9m5q9vpq9vr2935q9/r29/t69/v3edCvem0bem3Pem5revnPevprevr3e373e/r3e/t7e/v39vnP9vpr935r93739/r39/t79/v3///8PIEsyAAAATnRSTlP/////////////////////////////////////////////////////////////////////////////////////////////////////AP8Sa+kxAAAACXBIWXMAAAsSAAALEgHS3X78AAASa0lEQVR4nO2dDXfkNhWGcTehSz+yBNrSbZdCyYZuoSSkBNoMaQp0Z7KbuP//7+CPGY8tX8tXsuSx/b7PKYezsuZe2U8sybI984uUQPKLQzeAHAaKB4XiQaF4UCgeFIoHheJBoXhQKB4UigeF4kGheFAoHhSKB4XiQaF4UCgeFIoHheJBoXhQKB4UigeF4kGheFAoHhSKB4XiQaF4UCgelC7xyQ6xsKf08U+rvrrhknmXLi5ZR9Lb5GjdrtQS/3D6/bPkOE1+LtlFvjy5TI53hT9XIZPkJDVKH55lpU9W9rpV2OQ9IVlR1wxQtECZ7PKdT4S64p6VEVphXxRHcMD+NptQJXshhNW01noUTPHNf16v71a5/bOi9d3inz1//6fTldni05vzn05bbVtdfX/a2uWHZ5/nZ3yrbv6/VtjvfyMly+O2AuQtaCfL4rYO5cPpd++368p7VkZoBfg4P0vs++DShKpqHtentfaj0Cv+8XydXt2cv37VLT77u37ycfsk3IgnYXJ8K/35XT5pie8447OPX0r9QBbXDLCRTrfdrpoNk86hjj2TAmQu37zb12u5NGH/N5LF9Wmt5ihUTWn+c5MFz8/4l33iG/vRtXOZrscvL8rRXHUg0kbdJO+0pFI5wOVJd1jfUq8A8v72H4VyH7Ijlh+0cPugEi/T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" alt="plot of chunk unnamed-chunk-1"/> </p>
+
+<pre><code class="r">
+</code></pre>
+
+
+<hr><div align="center">[Package <em>soilDB</em> version 1.0 <a href="00Index.html">Index</a>]</div>
+</body></html>

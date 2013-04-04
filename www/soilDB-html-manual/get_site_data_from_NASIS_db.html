@@ -2,6 +2,10 @@
 <html><head><title>R: Extract Site Data from a local NASIS Database</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link rel="stylesheet" type="text/css" href="R.css">
+
+<link rel="stylesheet" href="highlight.css">
+<script src="highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
 </head><body>
 
 <table width="100%" summary="page for get_site_data_from_NASIS_db {soilDB}"><tr><td>get_site_data_from_NASIS_db {soilDB}</td><td align="right">R Documentation</td></tr></table>
@@ -15,9 +19,7 @@
 
 <h3>Usage</h3>
 
-<pre>
-get_site_data_from_NASIS_db()
-</pre>
+<pre>get_site_data_from_NASIS_db()</pre>
 
 
 <h3>Value</h3>
@@ -41,5 +43,68 @@ get_site_data_from_NASIS_db()
 <p><code><a href="get_hz_data_from_NASIS_db.html">get_hz_data_from_NASIS_db</a></code>, 
 </p>
 
-<hr><div align="center">[Package <em>soilDB</em> version 0.9-7 <a href="00Index.html">Index</a>]</div>
+
+<h3>Examples</h3>
+
+<pre><code class="r">
+
+## Not run: 
+##D 
+##D ## Example: export / convert DMS coordinates from NASIS and save to DD import file
+##D 
+##D # load required libraries
+##D library(soilDB)
+##D library(rgdal)
+##D library(plyr)
+##D 
+##D # get site data from NASIS
+##D s &lt;- get_site_data_from_NASIS_db()
+##D 
+##D # keep only those pedons with real coordinates
+##D good.idx &lt;- which(!is.na(s$x))
+##D s &lt;- s[good.idx, ]
+##D 
+##D # investigate multiple datums:
+##D table(s$datum, useNA=&#39;always&#39;)
+##D 
+##D ## this is not universally appropriate!
+##D # assume missing is NAD83 
+##D s$datum[is.na(s$datum)] &lt;- &#39;NAD83&#39;
+##D 
+##D # check: OK
+##D table(s$datum, useNA=&#39;always&#39;)
+##D 
+##D # convert to NAD83
+##D old.coords &lt;- cbind(s$x, s$y)
+##D 
+##D # add temp colum for projection information, and fill with proj4 style info
+##D s$proj4 &lt;- rep(NA, times=nrow(s))
+##D s$proj4 &lt;- paste(&#39;+proj=longlat +datum=&#39;, s$datum, sep=&#39;&#39;)
+##D 
+##D # iterate over pedons, and convert to WGS84
+##D new.coords &lt;- ddply(s, &#39;peiid&#39;, 
+##D                                         .progress=&#39;text&#39;, .fun=function(i) {
+##D                                             coordinates(i) &lt;- ~ x + y
+##D                                             proj4string(i) &lt;- CRS(i$proj4)
+##D                                             i.t &lt;- spTransform(i, CRS(&#39;+proj=longlat +datum=WGS84&#39;))
+##D                                             i.c &lt;- as.matrix(coordinates(i.t))
+##D                                             return(data.frame(x.new=i.c[, 1], y.new=i.c[, 2]))
+##D                                         })
+##D 
+##D # merge in new coordinates
+##D s &lt;- join(s, new.coords)
+##D 
+##D # any changes?
+##D summary(sqrt(apply((s[, c(&#39;x&#39;, &#39;y&#39;)] - s[, c(&#39;x.new&#39;, &#39;y.new&#39;)])^2, 1, sum)))
+##D 
+##D # save to update file for use with &quot;Import of Standard WGS84 Georeference&quot; calculation in NASIS
+##D # note that this defines the coordinate source as &quot;GPS&quot;, hence the last column of &#39;1&#39;s.
+##D std.coordinates.update.data &lt;- unique(cbind(s[, c(&#39;siteiid&#39;, &#39;y.new&#39;, &#39;x.new&#39;)], 1))
+##D write.table(std.coordinates.update.data, file=&#39;c:/data/sgeoref.txt&#39;, col.names=FALSE, row.names=FALSE, sep=&#39;|&#39;)
+## End(Not run)
+
+</code></pre>
+
+
+<hr><div align="center">[Package <em>soilDB</em> version 1.0 <a href="00Index.html">Index</a>]</div>
 </body></html>

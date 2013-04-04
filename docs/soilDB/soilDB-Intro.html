@@ -255,7 +255,7 @@ mean(x, na.rm=TRUE) # mean computed after removal of missing data
 
 <h2>Design</h2>
 
-<p>The <code>soilDB</code> package provides two layers of functionality for extracting data from file-based databases (PedonPC), relational databases (local NASIS), and online data sources (Soil Data Access). High-level functions <code>fetchPedonPC()</code> and <code>fetchNASIS()</code> query, combine, verify horizon logic, and return <code>SoilProfileCollection</code> class objects containing the most commonly used site/pedon/horizon data. Low-level functions such as <code>get_site_data_from_pedon_db()</code> and <code>get_hz_data_from_pedon_db()</code> extract specific data from a designated source, and return the results as a <code>data.frame</code> class object.</p>
+<p>The <code>soilDB</code> package provides two layers of functionality for extracting data from file-based databases (PedonPC), relational databases (local NASIS), and online data sources (Soil Data Access, OSD information). High-level functions <code>fetchPedonPC()</code> and <code>fetchNASIS()</code> query, combine, verify horizon logic, and return <code>SoilProfileCollection</code> class objects containing the most commonly used site/pedon/horizon data. Low-level functions such as <code>get_site_data_from_pedon_db()</code> and <code>get_hz_data_from_pedon_db()</code> extract specific data from a designated source, and return the results as a <code>data.frame</code> class object.</p>
 
 <h3>High-Level Functions</h3>
 
@@ -268,8 +268,9 @@ mean(x, na.rm=TRUE) # mean computed after removal of missing data
 <li>sites missing pedon records</li>
 </ul>
 
-<p><strong>Fetch Pedons or DMU data from Local NASIS</strong>
-The <code>fetchNASIS()</code> function will load all pedons from the local NASIS database. Pedon records are returned for <em>all</em> pedons/DMU in the local database, regardless of the selected set. An ODBC connection named &#39;nasis_local&#39; must <strong>first</strong> be <a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/setup_local_nasis.html?root=aqp">established</a>.</p>
+<p><strong>Fetch Pedons or DMU data from Local NASIS</strong></p>
+
+<p>The <code>fetchNASIS()</code> function will load all pedons from the local NASIS database. Pedon records are returned for <em>all</em> pedons/DMU in the local database, regardless of the selected set. An ODBC connection named &#39;nasis_local&#39; must <strong>first</strong> be <a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/setup_local_nasis.html?root=aqp">established</a>.</p>
 
 <pre><code class="r">library(soilDB)
 # pedons
@@ -279,8 +280,9 @@ f &lt;- fetchNASIS()
 fc &lt;- fetchNASIS_component_data()
 </code></pre>
 
-<p><strong>Fetch Pedons from PedonPC 5.x Database</strong>
-The <code>fetchPedonPC(dsn)</code> function will load all pedon records into the current R session, based on the value of <code>dsn</code>&ndash; a path to a PedonPC version 5.x database.</p>
+<p><strong>Fetch Pedons from PedonPC 5.x Database</strong></p>
+
+<p>The <code>fetchPedonPC(dsn)</code> function will load all pedon records into the current R session, based on the value of <code>dsn</code>&ndash; a path to a PedonPC version 5.x database.</p>
 
 <pre><code class="r">library(soilDB)
 # this will only work if you have a PedonPC Database and Windows :(
@@ -288,8 +290,9 @@ dsn &lt;- &quot;S:/Service_Center/NRCS/pedon/pedon.accdb&quot;
 f &lt;- fetchPedonPC(dsn)
 </code></pre>
 
-<p><strong>Fetch data from Soil Data Access (SDA) Web-Service</strong>
-The <code>SDA_query()</code> function submits a query (ANSI SQL) to the SDA web-service using the <code>SSOAP</code> package, parses the result, and returns a <code>data.frame</code> (rectangular table) object.</p>
+<p><strong>Fetch data from Soil Data Access (SDA) Web-Service</strong></p>
+
+<p>The <code>SDA_query()</code> function submits a query (ANSI SQL) to the SDA web-service using the <code>SSOAP</code> package, parses the result, and returns a <code>data.frame</code> (rectangular table) object.</p>
 
 <pre><code class="r"># setup a query
 q &lt;- &quot;select cokey, compname, comppct_r 
@@ -300,8 +303,9 @@ where compname = &#39;yolo&#39; and majcompflag = &#39;Yes&#39; &quot;
 res &lt;- SDA_query(q)
 </code></pre>
 
-<p><strong>Get map unit keys for a geographic area</strong>
-The <code>MUKEYS_by_ll_bbox()</code> function accepts a bounding box defined in GCS (longitude, latitude) NAD83 coordinates, and returns a vector of map unit keys. This vector can be used to generate a filtering criteria for queries submitted via <code>SDA_query()</code>.</p>
+<p><strong>Get map unit keys for a geographic area</strong></p>
+
+<p>The <code>MUKEYS_by_ll_bbox()</code> function accepts a bounding box defined in GCS (longitude, latitude) NAD83 coordinates, and returns a vector of map unit keys. This vector can be used to generate a filtering criteria for queries submitted via <code>SDA_query()</code>.</p>
 
 <pre><code class="r"># define bounding box
 b &lt;- c(-120.9, 37.7, -120.8, 37.8)
@@ -310,14 +314,30 @@ b &lt;- c(-120.9, 37.7, -120.8, 37.8)
 m &lt;- MUKEYS_by_ll_bbox(b)
 </code></pre>
 
-<p><strong>Get map unit geometry for a geographic area</strong>
-The <code>mapunit_geom_by_ll_bbox()</code> function accepts a bounding box defined in GCS (longitude, latitude) NAD83 coordinates, and returns a <code>SpatialPolygonsDataFrame</code> class object of map unit polygons. Note that map unit polygons that <em>overlap</em> with the bounding box are returned, rather than the <em>intersection</em> of bounding box and polygons.</p>
+<p><strong>Get map unit geometry for a geographic area</strong></p>
+
+<p>The <code>mapunit_geom_by_ll_bbox()</code> function accepts a bounding box defined in GCS (longitude, latitude) NAD83 coordinates, and returns a <code>SpatialPolygonsDataFrame</code> class object of map unit polygons. Note that map unit polygons that <em>overlap</em> with the bounding box are returned, rather than the <em>intersection</em> of bounding box and polygons.</p>
 
 <pre><code class="r"># define bounding box
 b &lt;- c(-120.54,38.61,-120.41,38.70)
 
 # fetch the results, may take about 10 seconds
 x &lt;- mapunit_geom_by_ll_bbox(b)
+</code></pre>
+
+<p><strong>Get basic horizon morphology and taxonomic data from Official Series Descriptions</strong></p>
+
+<p>The <code>fetchOSD()</code> function character vector of soil series names, and returns a <code>SpatialPolygonsDataFrame</code> class object of basic data from those series. Note that this service is provided by the <a href="http://casoilresource.lawr.ucdavis.edu/drupal/">CA Soil Resource Lab</a> as an experimental prototype. The <strong>official</strong> <a href="http://soils.usda.gov/technical/classification/osd/index.html">series descriptions</a> should still be used to verify series information.</p>
+
+<pre><code class="r"># soils of interest
+s.list &lt;- c(&#39;musick&#39;, &#39;cecil&#39;, &#39;drummer&#39;, &#39;amador&#39;, &#39;pentz&#39;, &#39;reiff&#39;)
+
+# fetch and convert data into an SPC
+s &lt;- fetchOSD(s.list)
+
+# plot profiles
+par(mar=c(0,0,0,0))
+plot(s, name=&#39;hzname&#39;, cex.names=0.85, axis.line.offset=-4)
 </code></pre>
 
 <h3>Low-Level Functions</h3>
@@ -596,7 +616,7 @@ lines(x.pos, gopheridge$paralithic.contact.depth[new.order], lty=2, lwd=2, col=&
 
 <hr/>
 
-<p>This document is based on <code>aqp</code> version 1.5-1 and <code>soilDB</code> version 0.9-7.</p>
+<p>This document is based on <code>aqp</code> version 1.5-1 and <code>soilDB</code> version 1.0.</p>
 
 </body>
 
