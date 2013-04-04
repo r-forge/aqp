@@ -1,0 +1,96 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Dueling Dendrograms</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+
+<link rel="stylesheet" href="highlight.css">
+<script src="highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</head><body>
+
+<table width="100%" summary="page for dueling.dendrograms {sharpshootR}"><tr><td>dueling.dendrograms {sharpshootR}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Dueling Dendrograms</h2>
+
+<h3>Description</h3>
+
+<p>Graphically compare two related dendrograms</p>
+
+
+<h3>Usage</h3>
+
+<pre>dueling.dendrograms(d.1, d.2, lab.1 = "D1", lab.2 = "D2", cex.nodelabels=0.75, arrow.length=0.05)</pre>
+
+
+<h3>Arguments</h3>
+
+
+<table summary="R argblock">
+<tr valign="top"><td><code>d.1</code></td>
+<td>
+<p>left-hand dissimilarity matrix, re-scaled to [0,1]</p>
+</td></tr>
+<tr valign="top"><td><code>d.2</code></td>
+<td>
+<p>right-hand dissimilarity matrix, re-scaled to [0,1]</p>
+</td></tr>
+<tr valign="top"><td><code>lab.1</code></td>
+<td>
+<p>left-hand title</p>
+</td></tr>
+<tr valign="top"><td><code>lab.2</code></td>
+<td>
+<p>right-hand title</p>
+</td></tr>
+<tr valign="top"><td><code>cex.nodelabels</code></td>
+<td>
+<p>character expansion size for node labels</p>
+</td></tr>
+<tr valign="top"><td><code>arrow.length</code></td>
+<td>
+<p>arrow head size</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>Dissimilarity matrices are converted into dendrograms via divisive hierarchical clustering via <code>diana()</code>. Connector arrows are used to link nodes from the left-hand dendrogram to the right-hand dendrogram.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>D. E. Beaudette</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="r">
+library(aqp)
+library(cluster)
+library(ape)
+
+# load sample dataset from aqp package
+data(sp3)
+
+# promote to SoilProfileCollection
+depths(sp3) &lt;- id ~ top + bottom
+
+# compute dissimilarity using different sets of variables
+# note that these are rescaled to the interval [0,1]
+d.1 &lt;- profile_compare(sp3, vars=c(&#39;clay&#39;, &#39;cec&#39;), k=0, max_d=100, rescale.result=TRUE)
+d.2 &lt;- profile_compare(sp3, vars=c(&#39;clay&#39;, &#39;L&#39;), k=0, max_d=100, rescale.result=TRUE)
+
+# graphically compare
+dueling.dendrograms(d.1, d.2, lab.1=&#39;clay and CEC&#39;, lab.2=&#39;clay and L&#39;)
+</code></pre>
+
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAlgAAAJYCAMAAACJuGjuAAAAdVBMVEX9/v0AAAAAAEYAAHMARkYARpoAdL1GAABGRgBGdL1Gm95zAABzAHNzRppzdABzdEZzdL1zvv2aRgCaRkaaRnOadACadHOadJqam0aa3/29dAC9dEa9dHO935q9/v3em0be397e/v39vnP935r9/r39/t79/v1AWaMBAAAAJ3RSTlP//////////////////////////////////////////////////wCDVpfZAAAACXBIWXMAAA9hAAAPYQGoP6dpAAAOPUlEQVR4nO3dDXcTR5qG4chs7B3YD5xkNmuTxYO//v9PXAvZlgNqd7urH/lV6brOnBPSmLerSjeSYAL65R4CfnnvBdAnYREhLCKERYSwiBAWEc1h3f324evUr708udh843q1Wj38sJuzh3+u1hcfL7CcGQ/M7adfvy11+3cJ62p1/vDjTi5uzk7v/3ahdTFsHWFYt59ON//+FNbzBZZzuGHdflqtTjfrX7+mnVx8/+b1w5PP2ubSeq3/XK0+fv/qX/+5Wf/TlzyH9XyBJcx+YGqEdffbr9+uVx/Xi14/46wXtX5Fe/GstL50+2mzr82Xbb7vahvW+j3W5sexlPkPTI2wbs4+rv+xeca9+2395vvhGWi7ts2l7/9++fh26vKnsE7v/3aBBcx/YGqEdb16Xv/Ds+nH20/f6/+/za7uny5t1/9w/cpL4R7Mf2BqhPVYxXr96zC+L+r65L8ff2n3dGn3T4zTv43w5n1RLQ9MhbDWC3/IfbP+04eXs4dn3vUbwc3Sni49rf/lS7nfboia/8DUCOvlLz4uH161/3e9uMvN0/D9/dOlp/Wvv/rDf+38DdL166DfIF3Q7Adm/QNXq+evbLLw/6Vz6d1STXt/YJYNa/2ucNGBLGP/D8yiYV2vPGGV9A4PzCH+1w0Pb80WeRtwEB42e5A/WQ8xrKvzuz8X+9VLddcHmVX9sFY/+H7x8oh+Y+Jq9bjZH0+iqsd1lw9rx7XL87s/jujXCLef33sFb3HIYX25uPv9aJ6yvlwIK2FXWEf25v2wXvcPOSwKExYRwiJCWEQIiwhhESEsIoRFhLCIEBYRwiJCWEQIiwhhESEsIoRFhLCIEBYRwiJCWEQIiwhhESEsIoRFhLCIEBYRwiKiZljD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" alt="plot of chunk unnamed-chunk-1"/> </p>
+
+<pre><code class="r">
+</code></pre>
+
+
+<hr><div align="center">[Package <em>sharpshootR</em> version 0.3 <a href="00Index.html">Index</a>]</div>
+</body></html>
