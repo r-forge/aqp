@@ -79,7 +79,7 @@ mean(x, na.rm=TRUE) # mean computed after removal of missing data
 
 ## Design
 
-The `soilDB` package provides two layers of functionality for extracting data from file-based databases (PedonPC), relational databases (local NASIS), and online data sources (Soil Data Access). High-level functions `fetchPedonPC()` and `fetchNASIS()` query, combine, verify horizon logic, and return `SoilProfileCollection` class objects containing the most commonly used site/pedon/horizon data. Low-level functions such as `get_site_data_from_pedon_db()` and `get_hz_data_from_pedon_db()` extract specific data from a designated source, and return the results as a `data.frame` class object.
+The `soilDB` package provides two layers of functionality for extracting data from file-based databases (PedonPC), relational databases (local NASIS), and online data sources (Soil Data Access, OSD information). High-level functions `fetchPedonPC()` and `fetchNASIS()` query, combine, verify horizon logic, and return `SoilProfileCollection` class objects containing the most commonly used site/pedon/horizon data. Low-level functions such as `get_site_data_from_pedon_db()` and `get_hz_data_from_pedon_db()` extract specific data from a designated source, and return the results as a `data.frame` class object.
 
 ### High-Level Functions
 When loading pedons with the `fetchNASIS()` or `fetchPedonPC()` functions, checks are performed for:
@@ -90,6 +90,7 @@ When loading pedons with the `fetchNASIS()` or `fetchPedonPC()` functions, check
 
 
 **Fetch Pedons or DMU data from Local NASIS**
+
 The `fetchNASIS()` function will load all pedons from the local NASIS database. Pedon records are returned for *all* pedons/DMU in the local database, regardless of the selected set. An ODBC connection named 'nasis_local' must **first** be [established](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/setup_local_nasis.html?root=aqp).
 
 ```{r local-nasis-demo, eval=FALSE}
@@ -102,6 +103,7 @@ fc <- fetchNASIS_component_data()
 ```
 
 **Fetch Pedons from PedonPC 5.x Database**
+
 The `fetchPedonPC(dsn)` function will load all pedon records into the current R session, based on the value of `dsn`-- a path to a PedonPC version 5.x database.
 
 ```{r pedonPC-demo, eval=FALSE}
@@ -113,6 +115,7 @@ f <- fetchPedonPC(dsn)
 
 
 **Fetch data from Soil Data Access (SDA) Web-Service**
+
 The `SDA_query()` function submits a query (ANSI SQL) to the SDA web-service using the `SSOAP` package, parses the result, and returns a `data.frame` (rectangular table) object.
 ```{r sda-example-1, eval=FALSE}
 # setup a query
@@ -126,6 +129,7 @@ res <- SDA_query(q)
 
 
 **Get map unit keys for a geographic area**
+
 The `MUKEYS_by_ll_bbox()` function accepts a bounding box defined in GCS (longitude, latitude) NAD83 coordinates, and returns a vector of map unit keys. This vector can be used to generate a filtering criteria for queries submitted via `SDA_query()`.
 ```{r sda-example-2, eval=FALSE}
 # define bounding box
@@ -137,6 +141,7 @@ m <- MUKEYS_by_ll_bbox(b)
 
 
 **Get map unit geometry for a geographic area**
+
 The `mapunit_geom_by_ll_bbox()` function accepts a bounding box defined in GCS (longitude, latitude) NAD83 coordinates, and returns a `SpatialPolygonsDataFrame` class object of map unit polygons. Note that map unit polygons that *overlap* with the bounding box are returned, rather than the *intersection* of bounding box and polygons.
 ```{r sda-example-3, eval=FALSE}
 # define bounding box
@@ -146,6 +151,22 @@ b <- c(-120.54,38.61,-120.41,38.70)
 x <- mapunit_geom_by_ll_bbox(b)
 ```
 
+
+
+**Get basic horizon morphology and taxonomic data from Official Series Descriptions**
+
+The `fetchOSD()` function character vector of soil series names, and returns a `SpatialPolygonsDataFrame` class object of basic data from those series. Note that this service is provided by the [CA Soil Resource Lab](http://casoilresource.lawr.ucdavis.edu/drupal/) as an experimental prototype. The **official** [series descriptions](http://soils.usda.gov/technical/classification/osd/index.html) should still be used to verify series information.
+```{r OSD-example, eval=FALSE}
+# soils of interest
+s.list <- c('musick', 'cecil', 'drummer', 'amador', 'pentz', 'reiff')
+
+# fetch and convert data into an SPC
+s <- fetchOSD(s.list)
+
+# plot profiles
+par(mar=c(0,0,0,0))
+plot(s, name='hzname', cex.names=0.85, axis.line.offset=-4)
+```
 
 ### Low-Level Functions
 
