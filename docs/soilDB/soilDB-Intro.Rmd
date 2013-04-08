@@ -79,7 +79,7 @@ mean(x, na.rm=TRUE) # mean computed after removal of missing data
 
 ## Design
 
-The `soilDB` package provides two layers of functionality for extracting data from file-based databases (PedonPC), relational databases (local NASIS), and online data sources (Soil Data Access, OSD information). High-level functions `fetchPedonPC()` and `fetchNASIS()` query, combine, verify horizon logic, and return `SoilProfileCollection` class objects containing the most commonly used site/pedon/horizon data. Low-level functions such as `get_site_data_from_pedon_db()` and `get_hz_data_from_pedon_db()` extract specific data from a designated source, and return the results as a `data.frame` class object.
+The `soilDB` package provides two layers of functionality for extracting data from file-based databases (PedonPC), relational databases (local NASIS), and online data sources (Soil Data Access, OSD information, KSSL data). High-level functions `fetchPedonPC()` and `fetchNASIS()` query, combine, verify horizon logic, and return `SoilProfileCollection` class objects containing the most commonly used site/pedon/horizon data. Low-level functions such as `get_site_data_from_pedon_db()` and `get_hz_data_from_pedon_db()` extract specific data from a designated source, and return the results as a `data.frame` class object.
 
 ### High-Level Functions
 When loading pedons with the `fetchNASIS()` or `fetchPedonPC()` functions, checks are performed for:
@@ -155,7 +155,7 @@ x <- mapunit_geom_by_ll_bbox(b)
 
 **Get basic horizon morphology and taxonomic data from Official Series Descriptions**
 
-The `fetchOSD()` function character vector of soil series names, and returns a `SpatialPolygonsDataFrame` class object of basic data from those series. Note that this service is provided by the [CA Soil Resource Lab](http://casoilresource.lawr.ucdavis.edu/drupal/) as an experimental prototype. The **official** [series descriptions](http://soils.usda.gov/technical/classification/osd/index.html) should still be used to verify series information.
+The `fetchOSD()` function accepts a character vector of soil series names, and returns a `SpatialPolygonsDataFrame` class object of basic data from those series. Note that this service is provided by the [CA Soil Resource Lab](http://casoilresource.lawr.ucdavis.edu/drupal/) as an experimental prototype. The **official** [series descriptions](http://soils.usda.gov/technical/classification/osd/index.html) should still be used to verify series information.
 ```{r OSD-example, eval=FALSE}
 # soils of interest
 s.list <- c('musick', 'cecil', 'drummer', 'amador', 'pentz', 'reiff')
@@ -167,6 +167,20 @@ s <- fetchOSD(s.list)
 par(mar=c(0,0,0,0))
 plot(s, name='hzname', cex.names=0.85, axis.line.offset=-4)
 ```
+
+
+**Get the most commonly used data from the Kellog Soil Science Lab database** (formerly NSSL database)
+
+The `fetchKSSL()` function accepts either a soil series name or bounding box in WGS84 geographic coordinates, and returns a `SpatialPolygonsDataFrame` class object containing the matching records. Note that this service is provided by the [CA Soil Resource Lab](http://casoilresource.lawr.ucdavis.edu/drupal/) as an experimental prototype, based on the June 2012 KSSL snapshot. If newer data are needed, it is best to consult the **official** [KSSL data](http://ncsslabdatamart.sc.egov.usda.gov/).
+```{r KSSL-example, eval=FALSE}
+# fetch and convert data into an SPC
+s <- fetchKSSL(series='Pardee')
+
+# plot profiles
+par(mar=c(0,0,0,0))
+plot(s, name='hzn_desgn', cex.names=0.85, axis.line.offset=-4)
+```
+
 
 ### Low-Level Functions
 
