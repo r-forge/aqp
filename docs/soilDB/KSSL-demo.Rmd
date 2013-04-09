@@ -1,0 +1,97 @@
+```{r setup, echo=FALSE, results='hide'}
+# setup
+opts_chunk$set(message=FALSE, warning=FALSE, background='#F7F7F7', dpi=100, fig.align='center', dev='CairoPNG', tidy=FALSE, verbose=FALSE)
+options(width=100, stringsAsFactors=FALSE)
+```
+
+Getting and Comparing KSSL Data
+===============================
+2013-04-09
+Dylan Beaudette
+
+### Introduction
+This document demonstrates how to use the [soilDB](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/soilDB-Intro.html?root=aqp) package to download [KSSL](http://ncsslabdatamart.sc.egov.usda.gov/) data from SoilWeb. These data are from the June 2012 snapshot, and will be updated as future snapshots are released. Comparisons are made via graphical summaries of key soil properties with depth, using data structures and functions from the [aqp](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/aqp/aqp-intro.html?root=aqp) package.
+
+### Installation
+With a recent version of R, it is possible to get all of the packages that this tutorial depends on via:
+```{r install-deps, eval=FALSE}
+# run these commands in the R console
+install.packages('soilDB', dep=TRUE) # stable version from CRAN + dependencies
+install.packages('soilDB', repos="http://R-Forge.R-project.org") # most recent copy from r-forge
+```
+
+### Getting KSSL Data
+
+Data can be queried by fuzzy-matching of series name or using a geographic bounding-box in WGS84 referenced coordinates. See `?fetchKSSL()` for details. In this example, we are downloading KSSL data for the [Auburn](https://soilseriessc.egov.usda.gov/OSD_Docs/A/AUBURN.html), [Argonaut](https://soilseries.sc.egov.usda.gov/OSD_Docs/A/ARGONAUT.html), and [Sobrante](https://soilseries.sc.egov.usda.gov/OSD_Docs/S/SOBRANTE.html) soils; commonly found on metavolcanic rocks within the Sierra Nevada Foothill region of California.
+```{r get-data}
+# load libraries
+library(soilDB)
+library(lattice)
+library(cluster)
+
+# define plotting style
+tps <- list(superpose.line=list(col=c('RoyalBlue', 'DarkRed', 'DarkGreen'), lwd=2))
+
+# fetch KSSL data for selected series
+auburn <- fetchKSSL('auburn')
+argonaut <- fetchKSSL('argonaut')
+sobrante <- fetchKSSL('sobrante')
+```
+
+
+### Aggregation
+The `slab()` function is used to aggregate selected variables within collections of soil profiles along depth-slices. In this case, we aggregate clay, pH, and base saturation at pH 8.2 along 1-cm thick slices. The results of `slab()` are always in the same format, so we can safely stack the results from each series via `make.groups()`. See `?slab()` for details on how this function can be used.
+```{r aggregate}
+auburn.slab <- slab(auburn, ~ clay + ph_h2o + bs82)
+argonaut.slab <- slab(argonaut, ~ clay + ph_h2o + bs82)
+sobrante.slab <- slab(sobrante, ~ clay + ph_h2o + bs82)
+
+# stack aggregate data
+g <- make.groups(auburn=auburn.slab, sobrante=sobrante.slab, argonaut=argonaut.slab)
+
+# inspect stacked data structure
+str(g)
+```
+
+
+### Refine Labels
+The 'which' column is used to label data that have been stacked with `make.groups()`. These labels are stored as factors, and can be renamed using the `levels()` function. In this case, it is convenient to know how many pedons there are within each collection-- therefore, we append this value to the series name. Using the same approach, we can rename the soil properties with more useful descriptions and units of measure.
+```{r rename}
+# re-name soils with series name + number of pedons-- order is critical !
+levels(g$which) <- paste(levels(g$which), ' [', c(length(auburn), length(sobrante), length(argonaut)), ' pedons]', sep='')
+
+# re-name soil property labels-- order is critical !
+levels(g$variable) <- c('Clay (%)', 'pH 1:1 H2O', 'Base Saturation at pH 8.2 (%)')
+```
+
+
+### Graphically Compare
+The slice-wise median and 25th/75th percentiles are reasonable estimations of central tendency and spread. "Contributing fraction" values (% of pedons with data at a given depth) are printed along the right-hand side of each panel. These values provide both an indication of how deep the soils are, and, how much confidence can be placed in data at any given depth.
+```{r plot, fig.width=9, fig.height=6}
+# plot grouped, aggregate data
+xyplot(top ~ p.q50 | variable, groups=which, data=g, ylab='Depth',
+			 xlab='median bounded by 25th and 75th percentiles',
+			 lower=g$p.q25, upper=g$p.q75, ylim=c(155,-5),
+			 panel=panel.depth_function, alpha=0.25, sync.colors=TRUE,
+			 prepanel=prepanel.depth_function,
+			 cf=g$contributing_fraction,
+			 strip=strip.custom(bg=grey(0.85)),
+			 layout=c(3,1), scales=list(x=list(alternating=1, relation='free'), y=list(alternating=3)),
+			 par.settings=tps,
+			 auto.key=list(columns=3, lines=TRUE, points=FALSE)
+)
+
+
+# plot contributing fraction values
+xyplot(top ~ contributing_fraction | variable, groups=which, data=g, ylab='Depth',
+			 xlab='Fraction of Non-Missing Data',
+			 panel=panel.depth_function, ylim=c(155,-5),
+			 strip=strip.custom(bg=grey(0.85)),
+			 layout=c(3,1), scales=list(x=list(alternating=1), y=list(alternating=3)),
+			 par.settings=tps,
+			 auto.key=list(columns=3, lines=TRUE, points=FALSE)
+)
+```
+
+----------------------------
+This document is based on `aqp` version `r utils::packageDescription("aqp", field="Version")` and `soilDB` version `r utils::packageDescription("soilDB", field="Version")`.
