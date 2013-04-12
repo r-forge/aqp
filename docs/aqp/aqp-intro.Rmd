@@ -266,6 +266,8 @@ The `profileApply()` function is an extension of the familiar *apply()* family o
 ```{r profileApply-1}
 # max() returns the depth of a soil profile
 sp4$soil.depth <- profileApply(sp4, FUN=max)
+# max() with additional argument give max depth to non-missing 'clay'
+sp4$soil.depth.clay <- profileApply(sp4, FUN=max, v='clay')
 # nrow() returns the number of horizons
 sp4$n.hz <- profileApply(sp4, FUN=nrow)
 # compute the mean clay content by profile using an inline function
