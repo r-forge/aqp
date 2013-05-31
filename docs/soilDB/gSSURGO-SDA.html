@@ -190,12 +190,12 @@ Dylan Beaudette</p>
 <p>With a recent version of R, it should be possible to get all of the packages need for this tutorial via:</p>
 
 <pre><code class="r"># run these commands in the R console
-install.packages(&quot;raster&quot;, dep = TRUE)
-install.packages(&quot;plyr&quot;, dep = TRUE)
-install.packages(&quot;Hmisc&quot;, dep = TRUE)
-install.packages(&quot;soilDB&quot;, dep = TRUE)  # stable version from CRAN + dependencies
-install.packages(&quot;soilDB&quot;, repos = &quot;http://R-Forge.R-project.org&quot;)  # most recent copy from r-forge
-install.packages(&quot;SSOAP&quot;, repos = &quot;http://www.omegahat.org/R&quot;, type = &quot;source&quot;)  # SSOAP and XMLSchema
+install.packages(&#39;raster&#39;, dep=TRUE)
+install.packages(&#39;plyr&#39;, dep=TRUE)
+install.packages(&#39;Hmisc&#39;, dep=TRUE)
+install.packages(&#39;soilDB&#39;, dep=TRUE) # stable version from CRAN + dependencies
+install.packages(&quot;soilDB&quot;, repos=&quot;http://R-Forge.R-project.org&quot;) # most recent copy from r-forge
+install.packages(&quot;SSOAP&quot;, repos = &quot;http://www.omegahat.org/R&quot;, type=&quot;source&quot;) # SSOAP and XMLSchema
 </code></pre>
 
 <h3>Define custom functions</h3>
@@ -204,17 +204,17 @@ install.packages(&quot;SSOAP&quot;, repos = &quot;http://www.omegahat.org/R&quot
 
 <pre><code class="r"># function for computing profile-total water storage
 co.sum.whc &lt;- function(i) {
-    wt &lt;- i$comppct_r[1]  # keep the first component pct (they are all the same)
-    thick &lt;- with(i, hzdepb_r - hzdept_r)  # compute horizon thickness
-    whc &lt;- thick * i$awc_r  # compute water storage by horizon
-    whc.total &lt;- sum(whc, na.rm = TRUE)  # sum to get profile water storage
-    data.frame(whc = whc.total, wt = wt)  # return profile water storage and component pct
+    wt &lt;- i$comppct_r[1] # keep the first component pct (they are all the same)
+    thick &lt;- with(i, hzdepb_r - hzdept_r) # compute horizon thickness
+    whc &lt;- thick * i$awc_r # compute water storage by horizon
+    whc.total &lt;- sum(whc, na.rm=TRUE) # sum to get profile water storage
+    data.frame(whc=whc.total, wt=wt) # return profile water storage and component pct
 }
 
 # function for copmuting weighted-mean whc within a map unit
 mu.mean.whc &lt;- function(i) {
-    whc &lt;- wtd.mean(i$whc, weights = i$wt)  # safely compute wt. mean water storage
-    data.frame(whc = whc)  # return wt. mean water storage
+    whc &lt;- wtd.mean(i$whc, weights=i$wt) # safely compute wt. mean water storage
+    data.frame(whc=whc) # return wt. mean water storage
 }
 </code></pre>
 
@@ -229,10 +229,10 @@ library(plyr)
 library(raster)
 
 # load chunk of gSSURGO
-data(gSSURGO.chunk, package = &quot;soilDB&quot;)
+data(gSSURGO.chunk, package=&#39;soilDB&#39;)
 
 # convert into a raster + RAT
-gSSURGO.chunk &lt;- ratify(gSSURGO.chunk, count = TRUE)
+gSSURGO.chunk &lt;- ratify(gSSURGO.chunk, count=TRUE)
 
 # save RAT to new object, will use later
 rat &lt;- levels(gSSURGO.chunk)[[1]]
@@ -246,8 +246,9 @@ in.statement &lt;- format_SQL_in_statement(rat$ID)
 <p>Now that we have a list of map unit keys, formatted into an <a href="http://www.techonthenet.com/sql/in.php">IN-statement</a>, we can submit a query to SDA requesting horizon-level available water data. Note that we could do some or all of the aggregation from horizon to map unit within SQL. Queries to SDA can sometimes take 20&ndash;30 seconds to complete.</p>
 
 <pre><code class="r"># format query in SQL- raw data are returned
-q &lt;- paste(&quot;SELECT component.mukey, component.cokey, compname, comppct_r, hzdept_r, hzdepb_r, hzname, awc_r\nFROM component JOIN chorizon ON component.cokey = chorizon.cokey\nAND mukey IN &quot;, 
-    in.statement, &quot;ORDER BY mukey, comppct_r DESC, hzdept_r ASC&quot;, sep = &quot;&quot;)
+q &lt;- paste(&quot;SELECT component.mukey, component.cokey, compname, comppct_r, hzdept_r, hzdepb_r, hzname, awc_r
+FROM component JOIN chorizon ON component.cokey = chorizon.cokey
+AND mukey IN &quot;, in.statement, &quot;ORDER BY mukey, comppct_r DESC, hzdept_r ASC&quot;, sep=&quot;&quot;)
 
 # now get component and horizon-level data for these map unit keys
 res &lt;- SDA_query(q)
@@ -261,10 +262,10 @@ head(res, 6)
 <p>The <code>ddply()</code> function applies a named function (<code>co.sum.whc</code>) to chunks of data from <code>res</code>, with chunks defined by combinations of map unit and component keys, and returns a rectangular table of data (e.g. a <code>data.frame</code> object). This approach works well for aggregating SSURGO data, or any other case where a <a href="http://www.jstatsoft.org/v40/i01/paper">split-apply-combine</a> workflow is needed.</p>
 
 <pre><code class="r"># aggregate by component, retaining map unit keys
-co.whc &lt;- ddply(res, c(&quot;mukey&quot;, &quot;cokey&quot;), co.sum.whc)
+co.whc &lt;- ddply(res, c(&#39;mukey&#39;, &#39;cokey&#39;), co.sum.whc)
 
 # aggregate by map unit
-mu.whc &lt;- ddply(co.whc, &quot;mukey&quot;, mu.mean.whc)
+mu.whc &lt;- ddply(co.whc, &#39;mukey&#39;, mu.mean.whc)
 
 # check: there should be a single water storage value per map unit key
 head(mu.whc)
@@ -284,16 +285,16 @@ head(mu.whc)
 <p>Aggregate water storage values can now be joined with the raster attribute table (RAT) via map unit key (mukey). After joining, the new RAT is packed-into our original raster object, and converted into a standard raster object with cell values containing water storage estimates. Plotting the final raster object yields a simple thematic map. See manual pages for <code>ratify()</code> and <code>deratify()</code> for details on how RATs are managed in <strong>R</strong>.</p>
 
 <pre><code class="r"># change first colum name from &#39;mukey&#39; to &#39;ID&#39;, so that it matches our RAT
-names(mu.whc)[1] &lt;- &quot;ID&quot;
+names(mu.whc)[1] &lt;- &#39;ID&#39;
 
-# combine RAT with aggregate data via &#39;left&#39; join
-rat.new &lt;- join(rat, mu.whc, type = &quot;left&quot;)
+# combine RAT with aggregate data via &quot;left&quot; join
+rat.new &lt;- join(rat, mu.whc, type=&#39;left&#39;)
 
 # put modified RAT back into our raster object
 levels(gSSURGO.chunk) &lt;- rat.new
 
 # convert into standard raster based on new column
-r.new &lt;- deratify(gSSURGO.chunk, att = &quot;whc&quot;)
+r.new &lt;- deratify(gSSURGO.chunk, att=&#39;whc&#39;)
 
 # check: OK
 plot(r.new)
