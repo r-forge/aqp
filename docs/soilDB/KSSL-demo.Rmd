@@ -23,19 +23,27 @@ install.packages('soilDB', repos="http://R-Forge.R-project.org") # most recent c
 ### Getting KSSL Data
 
 Data can be queried by fuzzy-matching of series name or using a geographic bounding-box in WGS84 referenced coordinates. See `?fetchKSSL()` for details. In this example, we are downloading KSSL data for the [Auburn](https://soilseriessc.egov.usda.gov/OSD_Docs/A/AUBURN.html), [Argonaut](https://soilseries.sc.egov.usda.gov/OSD_Docs/A/ARGONAUT.html), and [Sobrante](https://soilseries.sc.egov.usda.gov/OSD_Docs/S/SOBRANTE.html) soils; commonly found on metavolcanic rocks within the Sierra Nevada Foothill region of California.
-```{r get-data}
+```{r get-data, fig.width=5, fig.height=5}
 # load libraries
 library(soilDB)
 library(lattice)
-library(cluster)
+library(maps)
 
 # define plotting style
 tps <- list(superpose.line=list(col=c('RoyalBlue', 'DarkRed', 'DarkGreen'), lwd=2))
 
 # fetch KSSL data for selected series
 auburn <- fetchKSSL('auburn')
-argonaut <- fetchKSSL('argonaut')
 sobrante <- fetchKSSL('sobrante')
+argonaut <- fetchKSSL('argonaut')
+
+# map the data
+map('county', 'California', xlim=c(-123.25, -119), ylim=c(37.5, 41))
+map.axes()
+points(y ~ x, data=site(auburn), pch=21, bg='RoyalBlue')
+points(y ~ x, data=site(sobrante), pch=21, bg='DarkRed')
+points(y ~ x, data=site(argonaut), pch=21, bg='DarkGreen')
+legend('topright', pch=21, pt.bg=c('RoyalBlue', 'DarkRed', 'DarkGreen'), legend=c('Auburn', 'Sobrante', 'Argonaut'), bty='n')
 ```
 
 
@@ -80,7 +88,6 @@ xyplot(top ~ p.q50 | variable, groups=which, data=g, ylab='Depth',
 			 par.settings=tps,
 			 auto.key=list(columns=3, lines=TRUE, points=FALSE)
 )
-
 
 # plot contributing fraction values
 xyplot(top ~ contributing_fraction | variable, groups=which, data=g, ylab='Depth',
