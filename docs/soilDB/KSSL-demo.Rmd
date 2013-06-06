@@ -26,6 +26,7 @@ Data can be queried by fuzzy-matching of series name or using a geographic bound
 ```{r get-data, fig.width=5, fig.height=5}
 # load libraries
 library(soilDB)
+library(plyr)
 library(lattice)
 library(maps)
 
@@ -47,29 +48,39 @@ legend('topright', pch=21, pt.bg=c('RoyalBlue', 'DarkRed', 'DarkGreen'), legend=
 ```
 
 
-### Aggregation
-The `slab()` function is used to aggregate selected variables within collections of soil profiles along depth-slices. In this case, we aggregate clay, pH, and base saturation at pH 8.2 along 1-cm thick slices. The results of `slab()` are always in the same format, so we can safely stack the results from each series via `make.groups()`. See `?slab()` for details on how this function can be used.
-```{r aggregate}
-auburn.slab <- slab(auburn, ~ clay + ph_h2o + bs82)
-argonaut.slab <- slab(argonaut, ~ clay + ph_h2o + bs82)
-sobrante.slab <- slab(sobrante, ~ clay + ph_h2o + bs82)
+### Combining Data
+Since the results from `fetchKSSL()` function always returns data in the same format, it is possible to stack the results of several KSSL queries using `rbind()`.
+```{r combine-data}
+# normalize soil series names
+auburn$correlated_as <- 'Auburn'
+sobrante$correlated_as <- 'Sobrante'
+argonaut$correlated_as <- 'Argonaut'
 
-# stack aggregate data
-g <- make.groups(auburn=auburn.slab, sobrante=sobrante.slab, argonaut=argonaut.slab)
+# stack datasets into a new SoilProfileCollection
+g <- rbind(auburn, sobrante, argonaut)
+```
+
+
+### Aggregation
+The `slab()` function is used to aggregate selected variables within collections of soil profiles along depth-slices. In this case, we aggregate clay, pH, and base saturation at pH 8.2 along 1-cm thick slices and within groups defined by the variable 'correlated_as'. See `?slab()` for details on how this function can be used.
+```{r aggregate}
+g.slab <- slab(g, correlated_as ~ clay + ph_h2o + bs82)
 
 # inspect stacked data structure
-str(g)
+str(g.slab)
 ```
 
 
 ### Refine Labels
-The 'which' column is used to label data that have been stacked with `make.groups()`. These labels are stored as factors, and can be renamed using the `levels()` function. In this case, it is convenient to know how many pedons there are within each collection-- therefore, we append this value to the series name. Using the same approach, we can rename the soil properties with more useful descriptions and units of measure.
+It is convenient to know how many pedons there are within each collection-- therefore, we append this value to the series name. Using the same approach, we can rename the soil properties with more useful descriptions and units of measure.
 ```{r rename}
 # re-name soils with series name + number of pedons-- order is critical !
-levels(g$which) <- paste(levels(g$which), ' [', c(length(auburn), length(sobrante), length(argonaut)), ' pedons]', sep='')
+new.levels <- c('Auburn', 'Sobrante', 'Argonaut')
+new.labels <- paste(new.levels, ' [', c(length(auburn), length(sobrante), length(argonaut)), ' pedons]', sep='')
+g.slab$correlated_as <- factor(g.slab$correlated_as, levels=new.levels, labels=new.labels)
 
 # re-name soil property labels-- order is critical !
-levels(g$variable) <- c('Clay (%)', 'pH 1:1 H2O', 'Base Saturation at pH 8.2 (%)')
+levels(g.slab$variable) <- c('Clay (%)', 'pH 1:1 H2O', 'Base Saturation at pH 8.2 (%)')
 ```
 
 
@@ -77,12 +88,12 @@ levels(g$variable) <- c('Clay (%)', 'pH 1:1 H2O', 'Base Saturation at pH 8.2 (%)
 The slice-wise median and 25th/75th percentiles are reasonable estimations of central tendency and spread. "Contributing fraction" values (% of pedons with data at a given depth) are printed along the right-hand side of each panel. These values provide both an indication of how deep the soils are, and, how much confidence can be placed in data at any given depth.
 ```{r plot, fig.width=9, fig.height=6}
 # plot grouped, aggregate data
-xyplot(top ~ p.q50 | variable, groups=which, data=g, ylab='Depth',
+xyplot(top ~ p.q50 | variable, groups=correlated_as, data=g.slab, ylab='Depth',
 			 xlab='median bounded by 25th and 75th percentiles',
-			 lower=g$p.q25, upper=g$p.q75, ylim=c(155,-5),
+			 lower=g.slab$p.q25, upper=g.slab$p.q75, ylim=c(155,-5),
 			 panel=panel.depth_function, alpha=0.25, sync.colors=TRUE,
 			 prepanel=prepanel.depth_function,
-			 cf=g$contributing_fraction,
+			 cf=g.slab$contributing_fraction,
 			 strip=strip.custom(bg=grey(0.85)),
 			 layout=c(3,1), scales=list(x=list(alternating=1, relation='free'), y=list(alternating=3)),
 			 par.settings=tps,
@@ -90,15 +101,16 @@ xyplot(top ~ p.q50 | variable, groups=which, data=g, ylab='Depth',
 )
 
 # plot contributing fraction values
-xyplot(top ~ contributing_fraction | variable, groups=which, data=g, ylab='Depth',
-			 xlab='Fraction of Non-Missing Data',
-			 panel=panel.depth_function, ylim=c(155,-5),
-			 strip=strip.custom(bg=grey(0.85)),
-			 layout=c(3,1), scales=list(x=list(alternating=1), y=list(alternating=3)),
-			 par.settings=tps,
-			 auto.key=list(columns=3, lines=TRUE, points=FALSE)
+xyplot(top ~ contributing_fraction | variable, groups=correlated_as, data=g.slab, ylab='Depth',
+             xlab='Fraction of Non-Missing Data',
+             panel=panel.depth_function, ylim=c(155,-5),
+             strip=strip.custom(bg=grey(0.85)),
+             layout=c(3,1), scales=list(x=list(alternating=1), y=list(alternating=3)),
+             par.settings=tps,
+             auto.key=list(columns=3, lines=TRUE, points=FALSE)
 )
 ```
+
 
 ----------------------------
 This document is based on `aqp` version `r utils::packageDescription("aqp", field="Version")` and `soilDB` version `r utils::packageDescription("soilDB", field="Version")`.
