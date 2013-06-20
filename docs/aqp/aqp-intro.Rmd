@@ -106,7 +106,7 @@ sp4$thickness <- sp4$bottom - sp4$top # horizon-level
 
 # extraction of specific attributes by name
 sp4$clay # vector of clay content (horizon data)
-sp4$elevation # vector of group membership (site data)
+sp4$elevation # vector of simulated elevation (site data)
 
 # assign a single single value into horizon-level attributes
 sp4$constant <- rep(1, times=nrow(sp4))

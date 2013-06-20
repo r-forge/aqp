@@ -10,14 +10,14 @@ Getting and Comparing KSSL Data
 Dylan Beaudette
 
 ### Introduction
-This document demonstrates how to use the [soilDB](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/soilDB-Intro.html?root=aqp) package to download [KSSL](http://ncsslabdatamart.sc.egov.usda.gov/) data from SoilWeb. These data are from the June 2012 snapshot, and will be updated as future snapshots are released. Comparisons are made via graphical summaries of key soil properties with depth, using data structures and functions from the [aqp](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/aqp/aqp-intro.html?root=aqp) package.
+This document demonstrates how to use the [soilDB](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/soilDB-Intro.html?root=aqp) package to download [KSSL](http://ncsslabdatamart.sc.egov.usda.gov/) data from SoilWeb. These data are from the June 2012 snapshot, and will be updated as future snapshots are released. Comparisons are made via graphical summaries of key soil properties with depth, using [data structures and functions](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/aqp/aqp-intro.html?root=aqp) from the [aqp](http://aqp.r-forge.r-project.org/) package.
 
 ### Installation
-With a recent version of R, it is possible to get all of the packages that this tutorial depends on via:
+With a recent version of R (>= 2.15), it is possible to get all of the packages that this tutorial depends on via:
 ```{r install-deps, eval=FALSE}
 # run these commands in the R console
 install.packages('soilDB', dep=TRUE) # stable version from CRAN + dependencies
-install.packages('soilDB', repos="http://R-Forge.R-project.org") # most recent copy from r-forge
+install.packages('soilDB', repos="http://R-Forge.R-project.org", type='source') # most recent copy from r-forge
 ```
 
 ### Getting KSSL Data
@@ -38,12 +38,17 @@ auburn <- fetchKSSL('auburn')
 sobrante <- fetchKSSL('sobrante')
 argonaut <- fetchKSSL('argonaut')
 
-# map the data
+# generate a basemap of northern California, with county boundaries
 map('county', 'California', xlim=c(-123.25, -119), ylim=c(37.5, 41))
+# add long/lat axes
 map.axes()
+# add locations of Auburn
 points(y ~ x, data=site(auburn), pch=21, bg='RoyalBlue')
+# add locations of Sobrante
 points(y ~ x, data=site(sobrante), pch=21, bg='DarkRed')
+# add locations of Argonaut
 points(y ~ x, data=site(argonaut), pch=21, bg='DarkGreen')
+# add a simple legend
 legend('topright', pch=21, pt.bg=c('RoyalBlue', 'DarkRed', 'DarkGreen'), legend=c('Auburn', 'Sobrante', 'Argonaut'), bty='n')
 ```
 
