@@ -359,4 +359,4 @@ lines(x.pos, gopheridge$paralithic.contact.depth[new.order], lty=2, lwd=2, col='
 ```
 
 ----------------------------
-This document is based on `aqp` version `r utils::packageDescription("aqp", field="Version")` and `soilDB` version `r utils::packageDescription("soilDB", field="Version")`.
+This document is based on `aqp` version `r utils::packageDescription("aqp", field="Version")` and `soilDB` version `r utils::packageDescription("soilDB", field="Version")`. [`r format(Sys.time(), "%Y-%m-%d")`]

@@ -1,6 +1,6 @@
 ## Setup an ODBC Connection to the Local NASIS Database
 NASIS 6.2
-2012-09-05
+`r format(Sys.time(), "%Y-%m-%d")`
 DEB
 
 ### Introduction
