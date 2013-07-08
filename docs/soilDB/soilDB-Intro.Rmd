@@ -103,7 +103,7 @@ fc <- fetchNASIS_component_data()
 
 **Fetch Pedons from PedonPC 5.x Database**
 
-The `fetchPedonPC(dsn)` function will load all pedon records into the current R session, based on the value of `dsn`-- a path to a PedonPC version 5.x database.
+The `fetchPedonPC(dsn)` function will load all pedon records into the current R session, based on the value of `dsn`-- a path to a PedonPC version 5.x database. Note that this function requires that both R and Access are either 32bit or 64bit. R (64bit) cannot communicate with Acccess (32bit) and vice versa.
 
 ```{r pedonPC-demo, eval=FALSE}
 library(soilDB)
