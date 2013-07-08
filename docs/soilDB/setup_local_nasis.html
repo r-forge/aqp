@@ -190,14 +190,18 @@ DEB</p>
 
 <h3>Open the ODBC Data Source Administrator</h3>
 
-<p>Access via control panels, or click: Start-&gt;Run, then paste in <code>odbccp32.cpl</code> and hit enter. This will open a small panel of ODBC connections in Windows XP. For Windows 7 see <a href="http://msdn.microsoft.com/en-us/library/ms188691.aspx">this page</a>. With the &ldquo;User DSN&rdquo; tab selected, create a new data source by clicking on the &ldquo;Add&hellip;&rdquo; button. </p>
+<ol>
+<li><p>Windows 7: Start-&gt;search for &#39;OBCC&#39;. See <a href="http://msdn.microsoft.com/en-us/library/ms188691.aspx">this page</a> for details. </p></li>
+<li><p>Windows XP: Start-&gt;Run, then paste in <code>odbccp32.cpl</code> and hit enter. This will open a small panel of ODBC connections. </p></li>
+<li><p>With the &ldquo;User DSN&rdquo; tab selected, create a new data source by clicking on the &ldquo;Add&hellip;&rdquo; button. </p></li>
+</ol>
 
 <p><strong>Step by Step:</strong></p>
 
 <ul>
 <li>Select the &ldquo;SQL Server Native Client&rdquo; driver.</li>
 <li>Name the data source <code>nasis_local</code>, the data source description is optional.</li>
-<li>The server location is <code>XXXXXX\NASISSQLEXPRESS</code>, where <code>XXXXXX</code> is the full name of your local machine. It is usually on the outside of your computer somewhere, or can be accessed by right-clicking on the &ldquo;My Computer&rdquo; icon and then clicking on the &ldquo;Properties&rdquo; tab. It will look something like: <code>CASONORA00L354</code>. When finished click &ldquo;Next&rdquo;.</li>
+<li>The server location is <code>XXXXXX\NASISSQLEXPRESS</code>, where <code>XXXXXX</code> is the <a href="http://windows.microsoft.com/en-us/windows7/find-your-computer-name">full name of your local machine</a>. It is usually on the outside of your computer somewhere, or can be accessed by right-clicking on the &ldquo;My Computer&rdquo; icon and then clicking on the &ldquo;Properties&rdquo; tab. It will look something like: <code>CASONORA00L354</code>. When finished click &ldquo;Next&rdquo;.</li>
 <li>Choose the second option: &ldquo;SQL Server authentication&hellip;&rdquo;:
 
 <ul>

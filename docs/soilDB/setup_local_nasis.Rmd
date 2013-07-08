@@ -8,13 +8,17 @@ This document describes how setup an ODBC link between a local NASIS database an
 
 
 ### Open the ODBC Data Source Administrator
-Access via control panels, or click: Start->Run, then paste in `odbccp32.cpl` and hit enter. This will open a small panel of ODBC connections in Windows XP. For Windows 7 see [this page](http://msdn.microsoft.com/en-us/library/ms188691.aspx). With the "User DSN" tab selected, create a new data source by clicking on the "Add..." button. 
+ 1. Windows 7: Start->search for 'OBCC'. See [this page](http://msdn.microsoft.com/en-us/library/ms188691.aspx) for details. 
+ 
+ 2. Windows XP: Start->Run, then paste in `odbccp32.cpl` and hit enter. This will open a small panel of ODBC connections. 
+ 
+ 3. With the "User DSN" tab selected, create a new data source by clicking on the "Add..." button. 
 
 
 **Step by Step:**
  * Select the "SQL Server Native Client" driver.
  * Name the data source `nasis_local`, the data source description is optional.
- * The server location is `XXXXXX\NASISSQLEXPRESS`, where `XXXXXX` is the full name of your local machine. It is usually on the outside of your computer somewhere, or can be accessed by right-clicking on the "My Computer" icon and then clicking on the "Properties" tab. It will look something like: `CASONORA00L354`. When finished click "Next".
+ * The server location is `XXXXXX\NASISSQLEXPRESS`, where `XXXXXX` is the [full name of your local machine](http://windows.microsoft.com/en-us/windows7/find-your-computer-name). It is usually on the outside of your computer somewhere, or can be accessed by right-clicking on the "My Computer" icon and then clicking on the "Properties" tab. It will look something like: `CASONORA00L354`. When finished click "Next".
  * Choose the second option: "SQL Server authentication...":
   * login: `NASISSQLRO`
   * password: `nasisRe@d0n1y`
