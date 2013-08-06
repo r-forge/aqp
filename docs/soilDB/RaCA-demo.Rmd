@@ -81,7 +81,7 @@ r.state <- fetchRaCA(state='ca')
 par(mar=c(0,0,0,0))
 map('county', 'california')
 points(y ~ x, data=site(r.state$pedons), col='RoyalBlue', cex=0.5, pch=1)
-points(y ~ x, data=site(r.bbox$pedons), col='DarkGreen', cex=0.5, pch=15)
+points(y ~ x, data=site(r.bbox$pedons), col='DarkGreen', cex=0.8, pch=15)
 points(y ~ x, data=site(r.series$pedons), col='DarkRed', cex=0.8, pch=16)
 # add bounding box
 rect(bbox[1], bbox[2], bbox[3], bbox[4])
