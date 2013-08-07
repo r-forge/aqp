@@ -15,9 +15,11 @@ This document demonstrates how to use the [soilDB](https://r-forge.r-project.org
 
 ### The SoilWeb RaCA Query API
 
-RaCA data are queried via HTTP request to the SoilWeb server, with query parameters encoded as [URL parameters](http://en.wikipedia.org/wiki/Query_string). By appending parameters to the base URL [`http://casoilresource.lawr.ucdavis.edu/soil_web/rca/rca_query.php`] it is possible to query "site-level" data associated with soils correlated to the Auburn series like this:
+RaCA data are queried via HTTP request to the SoilWeb server, with query parameters encoded as [URL parameters](http://en.wikipedia.org/wiki/Query_string). For example, by appending several parameters to the base URL it is possible to query "site-level" data associated with soils correlated to the Auburn series like this:
 
-`http://casoilresource.lawr.ucdavis.edu/soil_web/rca/rca_query.php?what=site&series=auburn`
+```
+http://casoilresource.lawr.ucdavis.edu/soil_web/rca/rca_query.php?what=site&series=auburn
+```
 
 There are 5 URL parameters that can be used to refine RaCA data queries:
 

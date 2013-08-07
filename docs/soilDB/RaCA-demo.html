@@ -180,7 +180,7 @@ hljs.initHighlightingOnLoad();
 <body>
 <h1>Getting Data from the Rapid Carbon Assessment Project</h1>
 
-<p>2013-08-06
+<p>2013-08-07
 Dylan Beaudette</p>
 
 <h2>Introduction</h2>
@@ -189,9 +189,10 @@ Dylan Beaudette</p>
 
 <h3>The SoilWeb RaCA Query API</h3>
 
-<p>RaCA data are queried via HTTP request to the SoilWeb server, with query parameters encoded as <a href="http://en.wikipedia.org/wiki/Query_string">URL parameters</a>. By appending parameters to the base URL [<code>http://casoilresource.lawr.ucdavis.edu/soil_web/rca/rca_query.php</code>] it is possible to query &ldquo;site-level&rdquo; data associated with soils correlated to the Auburn series like this:</p>
+<p>RaCA data are queried via HTTP request to the SoilWeb server, with query parameters encoded as <a href="http://en.wikipedia.org/wiki/Query_string">URL parameters</a>. For example, by appending several parameters to the base URL it is possible to query &ldquo;site-level&rdquo; data associated with soils correlated to the Auburn series like this:</p>
 
-<p><code>http://casoilresource.lawr.ucdavis.edu/soil_web/rca/rca_query.php?what=site&amp;series=auburn</code></p>
+<pre><code>http://casoilresource.lawr.ucdavis.edu/soil_web/rca/rca_query.php?what=site&amp;series=auburn
+</code></pre>
 
 <p>There are 5 URL parameters that can be used to refine RaCA data queries:</p>
 
