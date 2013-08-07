@@ -37,10 +37,10 @@ There are 5 URL parameters that can be used to refine RaCA data queries:
 The **what** parameter determines which chunk of data will be returned:
   * **site**: site and pedon level data
   * **horizon**: horizon level data
-  * **veg**: vegetation data
-  * **trees**: tree height and [DBH](http://en.wikipedia.org/wiki/Diameter_at_breast_height)
-  * **conc**: soil organic carbon concentrations at standardized depths
-  * **stock**: soil organic carbon stocks at standardized depths
+  * **veg**: vegetation information recorded at each site (relative abundence of 6 most common species)
+  * **trees**: tree height(feet) and [DBH](http://en.wikipedia.org/wiki/Diameter_at_breast_height)(inches) measured on the first for trees [in](ftp://ftp-fc.sc.egov.usda.gov/NSSC/raca/RaCA_Field_Collection_Protocols.pdf) using RaCA procdures
+  * **conc**: cumulative soil organic carbon concentrations (% or wt/wt) for standardized depths
+  * **stock**: cumulative soil organic carbon stocks (Mg per ha) to standardized depths
   * **vnir**: VNIR spectra
 
 
@@ -157,7 +157,7 @@ new.levels <- levels(s$taxonname)[stock.asc.order]
 s$taxonname <- factor(s$taxonname, levels=new.levels)
 
 # visualize
-bwplot(taxonname ~ value_100cm, data=site(s))
+bwplot(taxonname ~ value_100cm, data=site(s), xlab='Carbon Stock to 100cm (Mg per ha)')
 ```
 
 
@@ -192,7 +192,7 @@ a <- slab(m, ~ c.stock)
 
 # plot aggregate data
 xyplot(
-  top ~ p.q50, data=a, main='Auburn', ylab='Depth (cm)',
+  top ~ p.q50, data=a, main='Auburn', ylab='Depth (cm)', xlab='Cumulative Carbon Stock (Mg per ha)',
   lower=a$p.q5, upper=a$p.q95, sync.colors=TRUE, alpha=0.3,
   ylim=c(105,-5), asp=1.5,
   par.settings=list(superpose.line=list(lwd=2, col=c('RoyalBlue'))),
