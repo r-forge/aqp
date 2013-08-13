@@ -39,13 +39,13 @@ The **what** parameter determines which chunk of data will be returned:
   * **horizon**: horizon level data
   * **veg**: vegetation information recorded at each site (relative abundence of 6 most common species)
   * **trees**: tree height(feet) and [DBH](http://en.wikipedia.org/wiki/Diameter_at_breast_height)(inches) measured on the first for trees [in](ftp://ftp-fc.sc.egov.usda.gov/NSSC/raca/RaCA_Field_Collection_Protocols.pdf) using RaCA procdures
-  * **conc**: cumulative soil organic carbon concentrations (% or wt/wt) for standardized depths
   * **stock**: cumulative soil organic carbon stocks (Mg per ha) to standardized depths
+  * **lab**: measured/modeled bulk density and carbon concentration at the sample-level
   * **vnir**: VNIR spectra
 
 
 ## Getting RaCA Data in R
-The [soilDB](http://cran.at.r-project.org/package=soilDB) package abstracts URL-based queries for RaCA data into a single function, `fetchRaCA()`. Calling this function with user-defined query paramters, e.g. `fetchRaCA(series='auburn')`, will download all data (site, horizon, veg, trees, conc, stock) associated with the Auburn series and return the results as a `list`. VNIR spectra can be very large and are therefore not downloaded by default.
+The [soilDB](http://cran.at.r-project.org/package=soilDB) package abstracts URL-based queries for RaCA data into a single function, `fetchRaCA()`. Calling this function with user-defined query paramters, e.g. `fetchRaCA(series='auburn')`, will download all data (site, horizon, veg, trees, stock) associated with the Auburn series and return the results as a `list`. VNIR spectra can be very large and are therefore not downloaded by default.
 
 
 ### Installation
@@ -135,8 +135,32 @@ ddply(r.bbox$trees, 'siteiid', summarize, mean.dbh=mean(dbh), mean.height=mean(h
 ```
 
 
-### Soil Organic Carbon Concentration / Stock Data
-```{r conc-stock, fig.width=8, fig.height=5, eval=TRUE}
+### Soil Organic Carbon Concentrations
+```{r carbon-conc-raw-data, fig.width=8, fig.height=5, eval=TRUE}
+# extract lab data horizon-level carbon and bulk density
+lab <- r.series$lab
+
+# init SoilProfileCollection
+depths(lab) <- rcapid ~ sample_top + sample_bottom
+
+# slice-wise aggregation over entire collection
+a <- slab(lab, ~ soc)
+
+# plot
+xyplot(
+  top ~ p.q50, data=a, main='Auburn', ylab='Depth (cm)', xlab='Soil Organic Carbon Concentration (%)',
+  lower=a$p.q5, upper=a$p.q95, sync.colors=TRUE, alpha=0.3,
+  ylim=c(60,-5), asp=1.5,
+  par.settings=list(superpose.line=list(lwd=2, col=c('RoyalBlue'))),
+  panel=panel.depth_function, 
+  prepanel=prepanel.depth_function,
+  auto.key=list(columns=2, lines=TRUE, points=FALSE)
+)
+```
+
+
+### Soil Organic Carbon Stock Data
+```{r carbon-stock, fig.width=8, fig.height=5, eval=TRUE}
 # join carbon stock estimates to SPC object
 # these are site-level data
 s <- r.bbox$pedons
