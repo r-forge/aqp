@@ -27,7 +27,7 @@ There are 5 URL parameters that can be used to refine RaCA data queries:
   
   * series=**auburn** ------*return only those data correlated to the Auburn series*
   
-  * bbox=**-120,37,-122,38** ------*return only those data within the specified bounding box*
+  * bbox=**-120,37,-122,38** ------*return only those data within the specified bounding box, constrained to a 5-degree block*
   
   * state=**ca** ------*return only those data within California*
   
@@ -40,8 +40,8 @@ The **what** parameter determines which chunk of data will be returned:
   * **veg**: vegetation information recorded at each site (relative abundence of 6 most common species)
   * **trees**: tree height(feet) and [DBH](http://en.wikipedia.org/wiki/Diameter_at_breast_height)(inches) measured on the first for trees [in](ftp://ftp-fc.sc.egov.usda.gov/NSSC/raca/RaCA_Field_Collection_Protocols.pdf) using RaCA procdures
   * **stock**: cumulative soil organic carbon stocks (Mg per ha) to standardized depths
-  * **lab**: measured/modeled bulk density and carbon concentration at the sample-level
-  * **vnir**: VNIR spectra
+  * **sample**: measured/modeled bulk density and carbon concentration at the sample-level
+  * **vnir**: VNIR spectra [queries by soil series or BBOX only]
 
 
 ## Getting RaCA Data in R
@@ -137,14 +137,14 @@ ddply(r.bbox$trees, 'siteiid', summarize, mean.dbh=mean(dbh), mean.height=mean(h
 
 ### Soil Organic Carbon Concentrations
 ```{r carbon-conc-raw-data, fig.width=8, fig.height=5, eval=TRUE}
-# extract lab data horizon-level carbon and bulk density
-lab <- r.series$lab
+# extract sample data horizon-level carbon and bulk density
+s <- r.series$sample
 
 # init SoilProfileCollection
-depths(lab) <- rcapid ~ sample_top + sample_bottom
+depths(s) <- rcapid ~ sample_top + sample_bottom
 
 # slice-wise aggregation over entire collection
-a <- slab(lab, ~ soc)
+a <- slab(s, ~ soc)
 
 # plot
 xyplot(
