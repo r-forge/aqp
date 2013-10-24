@@ -90,7 +90,7 @@ When loading pedons with the `fetchNASIS()` or `fetchPedonPC()` functions, check
 
 **Fetch Pedons or DMU data from Local NASIS**
 
-The `fetchNASIS()` function will load all pedons from the local NASIS database. Pedon records are returned for *all* pedons/DMU in the local database, regardless of the selected set. An ODBC connection named 'nasis_local' must **first** be [established](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/setup_local_nasis.html?root=aqp).
+The `fetchNASIS()` function will load pedons from the "selected set" in your local NASIS database. An ODBC connection named 'nasis_local' must **first** be [established](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/setup_local_nasis.html?root=aqp).
 
 ```{r local-nasis-demo, eval=FALSE}
 library(soilDB)
@@ -103,7 +103,7 @@ fc <- fetchNASIS_component_data()
 
 **Fetch Pedons from PedonPC 5.x Database**
 
-The `fetchPedonPC(dsn)` function will load all pedon records into the current R session, based on the value of `dsn`-- a path to a PedonPC version 5.x database. Note that this function requires that both R and Access are either 32bit or 64bit. R (64bit) cannot communicate with Acccess (32bit) and vice versa.
+The `fetchPedonPC(dsn)` function will load all pedon records into the current R session, based on the value of `dsn`-- a path to a PedonPC version 5.x database. Note that it is not currently possible to use 64bit R to connect with 32bit Acccess. Therefore, if you plan on using this function, please remember to use the 32bit R executable.
 
 ```{r pedonPC-demo, eval=FALSE}
 library(soilDB)
