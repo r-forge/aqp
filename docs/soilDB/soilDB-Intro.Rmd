@@ -82,10 +82,10 @@ The `soilDB` package provides two layers of functionality for extracting data fr
 
 ### High-Level Functions
 When loading pedons with the `fetchNASIS()` or `fetchPedonPC()` functions, checks are performed for:
- * multiple map datums
- * inconsistent horizon boundaries
- * missing lower horizon depths
- * sites missing pedon records
+ * multiple map datums: results reported to the user, data are not modified
+ * inconsistent horizon boundaries: pedons with inconsistent horizon boundaries are not loaded
+ * missing lower horizon depths: offending horizons are **fixed** by replacing the missing bottom depth with the top depth
+ * sites missing pedon records: these data are not loaded
 
 
 **Fetch Pedons or DMU data from Local NASIS**
@@ -298,7 +298,7 @@ rect(b[1], b[2], b[3], b[4], border='red', lwd=2)
 title(sub='SSURGO Map Unit Delineations', line=-2, font=2)
 
 # follow-up by retrieving corresponding map unit data from SDA
-in.statement <- format_SQL_in_statement(unique(x$MUKEY))
+in.statement <- format_SQL_in_statement(unique(x$mukey))
 q <- paste("SELECT mukey, muname FROM mapunit WHERE mukey IN ", in.statement, sep="")
 res <- SDA_query(q)
 ```
@@ -317,10 +317,6 @@ data(gopheridge)
 
 # what kind of object is this?
 class(gopheridge)
-
-# print method of SoilProfileCollection objects
-# lots in there!
-gopheridge
 ```
 
 
@@ -331,7 +327,8 @@ f.diag.top <- function(x, d.hz) {
 	# extract diagnostic horizon data
 	d <- diagnostic_hz(x)
 	# subset to the requested diagnostic hz
-	d <- d[d$diag_kind == d.hz, ]
+	d <- subset(d, diag_kind == d.hz)
+  
 	# if missing return NA
 	if(nrow(d) == 0)
 		return(NA)
