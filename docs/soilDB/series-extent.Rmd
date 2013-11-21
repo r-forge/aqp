@@ -5,11 +5,11 @@ options(width=100, stringsAsFactors=FALSE)
 ```
 
 ## Getting, Plotting, and Saving Soil Series Extent Data from SoilWeb
-2012-12-19
+2013-11-21
 Dylan Beaudette
 
 ### Introduction
-This document demonstrates how to use the [soilDB](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/soilDB-Intro.html?root=aqp) package to access detailed soil series extent maps via SoilWeb. These maps can be directly displayed in **R**, overlayed on Google Maps, or saved as local files (e.g. shapefiles). Data returned from SoilWeb represent bounding-boxes that enclose SSURGO polygons associated with map units containing the search criteria. Bounding-boxes are snapped to 0.05 degree precision in order to reduce processing time and file size.
+This document demonstrates how to use the [soilDB](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/soilDB-Intro.html?root=aqp) package to access detailed soil series extent maps via SoilWeb. These maps can be directly displayed in **R**, overlayed on Google Maps, or saved as local files (e.g. shapefiles). Data returned from SoilWeb represent bounding-boxes that enclose SSURGO polygons associated with map units containing the search criteria. Bounding-boxes are snapped to 0.01 degree precision in order to reduce processing time and file size. Note that these files are cached server-side after the first request, and the cache is purged when SoilWeb is periodically synced to the official data.
 
 ### Installation
 With a recent version of R, it should be possible to get all of the packages that this tutorial depends on via:
