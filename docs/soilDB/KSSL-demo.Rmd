@@ -16,13 +16,14 @@ This document demonstrates how to use the [soilDB](https://r-forge.r-project.org
 With a recent version of R (>= 2.15), it is possible to get all of the packages that this tutorial depends on via:
 ```{r install-deps, eval=FALSE}
 # run these commands in the R console
+install.packages('maps', dep=TRUE) # stable version from CRAN + dependencies
 install.packages('soilDB', dep=TRUE) # stable version from CRAN + dependencies
 install.packages('soilDB', repos="http://R-Forge.R-project.org", type='source') # most recent copy from r-forge
 ```
 
 ### Getting KSSL Data
 
-Data can be queried by fuzzy-matching of series name or using a geographic bounding-box in WGS84 referenced coordinates. See `?fetchKSSL()` for details. In this example, we are downloading KSSL data for the [Auburn](https://soilseriessc.egov.usda.gov/OSD_Docs/A/AUBURN.html), [Argonaut](https://soilseries.sc.egov.usda.gov/OSD_Docs/A/ARGONAUT.html), and [Sobrante](https://soilseries.sc.egov.usda.gov/OSD_Docs/S/SOBRANTE.html) soils; commonly found on metavolcanic rocks within the Sierra Nevada Foothill region of California.
+Data can be queried by fuzzy-matching of *correlated* series name or using a geographic bounding-box in WGS84 referenced coordinates. Series name matching is case-insensitive and will return results based on partial matches. For example, querying for "adco" will also return the soil named "adco taxadjunct". See `?fetchKSSL()` for details. In this example, we are downloading KSSL data for the [Auburn](https://soilseriessc.egov.usda.gov/OSD_Docs/A/AUBURN.html), [Argonaut](https://soilseries.sc.egov.usda.gov/OSD_Docs/A/ARGONAUT.html), and [Sobrante](https://soilseries.sc.egov.usda.gov/OSD_Docs/S/SOBRANTE.html) soils; commonly found on metavolcanic rocks within the Sierra Nevada Foothill region of California.
 ```{r get-data, fig.width=5, fig.height=5}
 # load libraries
 library(soilDB)
@@ -33,7 +34,7 @@ library(maps)
 # define plotting style
 tps <- list(superpose.line=list(col=c('RoyalBlue', 'DarkRed', 'DarkGreen'), lwd=2))
 
-# fetch KSSL data for selected series
+# fetch KSSL data by fuzzy-matching of series name
 auburn <- fetchKSSL('auburn')
 sobrante <- fetchKSSL('sobrante')
 argonaut <- fetchKSSL('argonaut')
@@ -56,13 +57,21 @@ legend('topright', pch=21, pt.bg=c('RoyalBlue', 'DarkRed', 'DarkGreen'), legend=
 ### Combining Data
 Since the results from `fetchKSSL()` function always returns data in the same format, it is possible to stack the results of several KSSL queries using `rbind()`.
 ```{r combine-data}
-# normalize soil series names
+# check "correlated as" names from each object
+table(auburn$correlated_as)
+table(sobrante$correlated_as)
+table(argonaut$correlated_as)
+
+# since there are multiple permuations of each, normalize soil series name by replacement
 auburn$correlated_as <- 'Auburn'
 sobrante$correlated_as <- 'Sobrante'
 argonaut$correlated_as <- 'Argonaut'
 
 # stack datasets into a new SoilProfileCollection
 g <- rbind(auburn, sobrante, argonaut)
+
+# tabulate number of pedons by normalized series name
+table(g$correlated_as)
 ```
 
 
@@ -84,13 +93,16 @@ new.levels <- c('Auburn', 'Sobrante', 'Argonaut')
 new.labels <- paste(new.levels, ' [', c(length(auburn), length(sobrante), length(argonaut)), ' pedons]', sep='')
 g.slab$correlated_as <- factor(g.slab$correlated_as, levels=new.levels, labels=new.labels)
 
+# new names should match the order in:
+levels(g.slab$variable)
+
 # re-name soil property labels-- order is critical !
 levels(g.slab$variable) <- c('Clay (%)', 'pH 1:1 H2O', 'Base Saturation at pH 8.2 (%)')
 ```
 
 
 ### Graphically Compare
-The slice-wise median and 25th/75th percentiles are reasonable estimations of central tendency and spread. "Contributing fraction" values (% of pedons with data at a given depth) are printed along the right-hand side of each panel. These values provide both an indication of how deep the soils are, and, how much confidence can be placed in data at any given depth.
+The slice-wise median and 25th/75th percentiles are reasonable estimations of central tendency and spread. "Contributing fraction" values (% of pedons with data at a given depth) are printed along the right-hand side of each panel. These values provide both an indication of how deep the soils are, and, how much confidence can be placed in the aggregate data at any given depth.
 ```{r plot, fig.width=9, fig.height=6}
 # plot grouped, aggregate data
 xyplot(top ~ p.q50 | variable, groups=correlated_as, data=g.slab, ylab='Depth',
