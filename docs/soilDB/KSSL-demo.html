@@ -180,7 +180,7 @@ hljs.initHighlightingOnLoad();
 <body>
 <h1>Getting and Comparing KSSL Data</h1>
 
-<p>2013-11-21
+<p>2013-11-22
 Dylan Beaudette</p>
 
 <h3>Introduction</h3>
@@ -199,7 +199,7 @@ install.packages(&#39;soilDB&#39;, repos=&quot;http://R-Forge.R-project.org&quot
 
 <h3>Getting KSSL Data</h3>
 
-<p>Data can be queried by fuzzy-matching of <em>correlated</em> series name or using a geographic bounding-box in WGS84 referenced coordinates. Series name matching is case-insensitive and will return results based on partial matches. For example, querying for &ldquo;adco&rdquo; will also return the soil named &ldquo;adco taxadjunct&rdquo;. See <code>?fetchKSSL()</code> for details. In this example, we are downloading KSSL data for the <a href="https://soilseriessc.egov.usda.gov/OSD_Docs/A/AUBURN.html">Auburn</a>, <a href="https://soilseries.sc.egov.usda.gov/OSD_Docs/A/ARGONAUT.html">Argonaut</a>, and <a href="https://soilseries.sc.egov.usda.gov/OSD_Docs/S/SOBRANTE.html">Sobrante</a> soils; commonly found on metavolcanic rocks within the Sierra Nevada Foothill region of California.</p>
+<p>Data can be queried by fuzzy-matching of <em>correlated</em> series name or using a geographic bounding-box in WGS84 referenced coordinates. Series name matching is case-insensitive and will return results based on partial matches. For example, querying for &ldquo;adco&rdquo; will also return the soil named &ldquo;adco taxadjunct&rdquo;. Note that series name is based on the &ldquo;correlated as&rdquo; field (from KSSL snapshot) when present.  The &ldquo;sampled as&rdquo; classification was promoted to &ldquo;correlated as&rdquo; if the &ldquo;correlated as&rdquo; classification was missing. See <code>?fetchKSSL()</code> for details. In this example, we are downloading KSSL data for the <a href="https://soilseriessc.egov.usda.gov/OSD_Docs/A/AUBURN.html">Auburn</a>, <a href="https://soilseries.sc.egov.usda.gov/OSD_Docs/A/ARGONAUT.html">Argonaut</a>, and <a href="https://soilseries.sc.egov.usda.gov/OSD_Docs/S/SOBRANTE.html">Sobrante</a> soils; commonly found on metavolcanic rocks within the Sierra Nevada Foothill region of California.</p>
 
 <pre><code class="r"># load libraries
 library(soilDB)
