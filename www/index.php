@@ -86,6 +86,8 @@ R-Forge (http://aqp.r-forge.r-project.org).
 </p>
 
 
+<img src="brackets.png" border="0">
+
 <img src="properties_by_mlra.png" border="0">
 
 <img src="profile_compare-explanation.png" border="0">
