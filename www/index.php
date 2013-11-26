@@ -42,13 +42,10 @@ fclose($handle);
 echo $contents; } ?>
 
 <!-- end of project description -->
-<p>You can find the <strong>project summary page</strong> <a href="http://<?php echo $domain; ?>/projects/<?php echo $group_name; ?>/"><strong>here</strong></a>.</p>
+<p>Algorithms for Quantitative Pedology (AQP) is a collection of code, ideas, documentation, and examples wrapped-up into several <b>R</b> packages. The theory behind much of the code can be found in <a href="http://dx.doi.org/10.1016/j.cageo.2012.10.020">this Computers & Geosciences paper</a>. Links to project member contacts, code, and other information hosted by R-Forge can be found <a href="http://<?php echo $domain; ?>/projects/<?php echo $group_name; ?>/">here</a>. Worked examples along with discussion and application to soil survey work can be found on the <a href="http://casoilresource.lawr.ucdavis.edu/drupal/taxonomy/term/56">CA Soil Resource Lab website</a>. AQP is very much a work in progress! If you are interested in contributing code, documentation, bug reports, or even scathing criticism, feel free to contact Dylan at debeaudette [at] ucdavis [dot] edu.</p>
 
-<p>You can find <strong>extended examples + discussion</strong> <a href="http://casoilresource.lawr.ucdavis.edu/drupal/taxonomy/term/56"><strong>here</strong></a>.</p>
 
-<p><strong>Technical details</strong> <a href="http://dx.doi.org/10.1016/j.cageo.2012.10.020"><strong>here</strong></a>.</p>
-
-<p> Vignettes:
+<p><b>Tutorials</b>:
 <ol>
 <li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/aqp/aqp-intro.html?root=aqp">SoilProfileCollection object introduction</a></li>
 <li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/aqp/dealing-with-bad-data.html?root=aqp">dealing with bad data</a></li>
@@ -63,7 +60,7 @@ echo $contents; } ?>
 </ol>
 </p>
 
-<p> Manual Pages c/o <a href="http://yihui.name/knitr/">knitr</a>:
+<p><b>Manual Pages</b> c/o <a href="http://yihui.name/knitr/">knitr</a>:
 <ol>
 <li><a href="aqp-html-manual/index.html">aqp manual pages with figures</a></li>
 <li><a href="soilDB-html-manual/index.html">soilDB manual pages with figures</a></li>
@@ -72,19 +69,7 @@ echo $contents; } ?>
 </p>
 
 
-<p>
-Soils are routinely sampled and characterized according to genetic horizons,
-resulting in data that are associated with principle dimensions: location (x,y), 
-depth (z), and property space (p). The high dimensionality and grouped
-nature of this type of data can complicate standard analysis, summarization, and visualization. The <tt>aqp</tt> (algorithms for quantitative pedology)
-package was designed to support data-driven approaches to common soils-related tasks such as visualization, aggregation, and classification of soil
-profile collections. In addition, we sought to advance the study of numerical soil classification by building on previously published methods within an
-extensible and open source framework. Functions in the aqp package have
-been successfully applied to studies involving several thousand soil profiles.
-The stable version of the aqp package is hosted by CRAN (http://cran.r-project.org/web/packages/aqp), and the development version is hosted by
-R-Forge (http://aqp.r-forge.r-project.org).
-</p>
-
+<p><b>Sample Figures</b></p>
 
 <img src="brackets.png" border="0">
 
