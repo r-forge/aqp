@@ -180,7 +180,7 @@ hljs.initHighlightingOnLoad();
 <body>
 <h1>Getting and Comparing KSSL Data</h1>
 
-<p>2013-11-22
+<p>2013-12-11
 Dylan Beaudette</p>
 
 <h3>Introduction</h3>
@@ -267,7 +267,7 @@ sobrante$correlated_as &lt;- &#39;Sobrante&#39;
 argonaut$correlated_as &lt;- &#39;Argonaut&#39;
 
 # stack datasets into a new SoilProfileCollection
-g &lt;- rbind(auburn, sobrante, argonaut)
+g &lt;- rbind(argonaut, auburn, sobrante)
 
 # tabulate number of pedons by normalized series name
 table(g$correlated_as)
@@ -358,7 +358,7 @@ xyplot(top ~ contributing_fraction | variable, groups=correlated_as, data=g.slab
 
 <hr/>
 
-<p>This document is based on <code>aqp</code> version 1.5-6 and <code>soilDB</code> version 1.2-4.</p>
+<p>This document is based on <code>aqp</code> version 1.6 and <code>soilDB</code> version 1.2-6.</p>
 
 </body>
 
