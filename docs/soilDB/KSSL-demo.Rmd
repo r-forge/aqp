@@ -68,7 +68,7 @@ sobrante$correlated_as <- 'Sobrante'
 argonaut$correlated_as <- 'Argonaut'
 
 # stack datasets into a new SoilProfileCollection
-g <- rbind(auburn, sobrante, argonaut)
+g <- rbind(argonaut, auburn, sobrante)
 
 # tabulate number of pedons by normalized series name
 table(g$correlated_as)
