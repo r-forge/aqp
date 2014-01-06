@@ -1,0 +1,101 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Fetch SCAN Data</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+
+<link rel="stylesheet" href="http://yandex.st/highlightjs/7.3/styles/github.min.css">
+<script src="http://yandex.st/highlightjs/7.3/highlight.min.js"></script>
+<script src="http://yandex.st/highlightjs/7.3/languages/r.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</head><body>
+
+<table width="100%" summary="page for fetchSCAN {soilDB}"><tr><td>fetchSCAN {soilDB}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Fetch SCAN Data</h2>
+
+<h3>Description</h3>
+
+<p>Query soil/climate data from USDA-NRCS SCAN Stations (experimental)</p>
+
+
+<h3>Usage</h3>
+
+<pre>fetchSCAN(req)</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>req</code></td>
+<td>
+<p>a vector of named characters, e.g. 
+c(intervalType=' View Historic ', report='STO', timeseries='Daily', 
+format='copy', sitenum='2072', interval='YEAR', year='2011', month='CY')</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>An attempt is made to parse the column names from the data returned from the SCAN webservice. The data returned will depend on the report submitted. Column names contain the code (I, D, H): 
+</p>
+<p>Daily sensors (e.g. TAVG.D-1) report a summary value for the previous day.  Hourly sensors (e.g. TAVG.H-1) report a summary value for the previous hour.  Instantaneous sensors (e.g. TOBS.I-1) report a single observation on the hour.
+</p>
+<p>Some of the available reports include: SCAN, ALL, SOIL, SMS, STO, PREC, WEATHER, WIND, SOLAR.
+</p>
+<p>See examples, details pending.</p>
+
+
+<h3>Value</h3>
+
+<p>a <code>data.frame</code> object</p>
+
+
+<h3>Note</h3>
+
+<p>This is still an experimental function.</p>
+
+
+<h3>Author(s)</h3>
+
+<p>D.E. Beaudette</p>
+
+
+<h3>References</h3>
+
+<p>http://www.wcc.nrcs.usda.gov/scan/</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="r">
+## Not run: 
+##D # all sensors
+##D req &lt;- c(intervalType=&#39; View Historic &#39;, report=&#39;ALL&#39;, timeseries=&#39;Daily&#39;, 
+##D format=&#39;copy&#39;, sitenum=&#39;2072&#39;, interval=&#39;YEAR&#39;, year=&#39;2011&#39;, month=&#39;CY&#39;)
+##D 
+##D # standard SCAN report
+##D req &lt;- c(intervalType=&#39; View Historic &#39;, report=&#39;SCAN&#39;, timeseries=&#39;Daily&#39;, 
+##D format=&#39;copy&#39;, sitenum=&#39;2072&#39;, interval=&#39;YEAR&#39;, year=&#39;2011&#39;, month=&#39;CY&#39;)
+##D 
+##D # soil / air temps
+##D req &lt;- c(intervalType=&#39; View Historic &#39;, report=&#39;STO&#39;, timeseries=&#39;Daily&#39;, 
+##D format=&#39;copy&#39;, sitenum=&#39;2072&#39;, interval=&#39;YEAR&#39;, year=&#39;2011&#39;, month=&#39;CY&#39;)
+##D 
+##D # soil moisture + precip
+##D req &lt;- c(intervalType=&#39; View Historic &#39;, report=&#39;SMS&#39;, timeseries=&#39;Daily&#39;, 
+##D format=&#39;copy&#39;, sitenum=&#39;2072&#39;, interval=&#39;YEAR&#39;, year=&#39;2011&#39;, month=&#39;CY&#39;)
+##D 
+##D # soil moisture, hourly: careful, lots of data!
+##D req &lt;- c(intervalType=&#39; View Historic &#39;, report=&#39;SMS&#39;, timeseries=&#39;Hourly&#39;, 
+##D format=&#39;copy&#39;, sitenum=&#39;2072&#39;, interval=&#39;YEAR&#39;, year=&#39;2011&#39;, month=&#39;CY&#39;)
+##D 
+##D # get data, format into DF
+##D x &lt;- fetchSCAN(req)
+## End(Not run)
+
+</code></pre>
+
+
+<hr><div align="center">[Package <em>soilDB</em> version 1.2-8 <a href="00Index.html">Index</a>]</div>
+</body></html>

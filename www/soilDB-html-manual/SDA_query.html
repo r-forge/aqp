@@ -3,8 +3,9 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link rel="stylesheet" type="text/css" href="R.css">
 
-<link rel="stylesheet" href="highlight.css">
-<script src="highlight.pack.js"></script>
+<link rel="stylesheet" href="http://yandex.st/highlightjs/7.3/styles/github.min.css">
+<script src="http://yandex.st/highlightjs/7.3/highlight.min.js"></script>
+<script src="http://yandex.st/highlightjs/7.3/languages/r.min.js"></script>
 <script>hljs.initHighlightingOnLoad();</script>
 </head><body>
 
@@ -23,7 +24,6 @@
 
 
 <h3>Arguments</h3>
-
 
 <table summary="R argblock">
 <tr valign="top"><td><code>q</code></td>
@@ -74,11 +74,12 @@
 ##D install.packages(&quot;XMLSchema&quot;, repos = &quot;http://www.omegahat.org/R&quot;, type=&quot;source&quot;)
 ## End(Not run)
 
-# NASIS export metadata:
+# SSURGO export metadata:
 ## Not run: 
-##D res &lt;- SDA_query(&#39;select areasymbol, exportcertdate from distlegendmd order by areasymbol&#39;)
-##D res$exportcertdate &lt;- as.Date(as.POSIXct(res$exportcertdate, format=&quot;%m/%d/%Y %H:%M:%S&quot;))
-##D recently_updated &lt;- res$areasymbol[res$exportcertdate &gt; as.Date(&#39;2011-01-01&#39;)]
+##D q &lt;- &quot;SELECT areasymbol, saverest FROM sacatalog WHERE areasymbol LIKE &#39;CA##D 
+##D x &lt;- SDA_query(q)
+##D x$saverest &lt;- as.Date(x$saverest, format=&quot;##D 
+##D head(x)
 ## End(Not run)
 
 # basic query:
@@ -97,9 +98,12 @@
 ##D # make an SQL-compliant &quot;in&quot; statment
 ##D in.statement &lt;- format_SQL_in_statement(m)
 ##D # format query:
-##D q &lt;- paste(&quot;SELECT component.cokey, compname, comppct_r, hzdept_r, hzdepb_r, hzname, sandtotal_r, silttotal_r, claytotal_r
+##D q &lt;- paste(&quot;
+##D SELECT component.cokey, compname, comppct_r, hzdept_r, hzdepb_r, 
+##D hzname, sandtotal_r, silttotal_r, claytotal_r
 ##D FROM component JOIN chorizon ON component.cokey = chorizon.cokey
-##D WHERE majcompflag = &#39;Yes&#39; AND mukey IN &quot;, in.statement, &quot;ORDER BY cokey, comppct_r DESC, hzdept_r ASC&quot;, sep=&quot;&quot;)
+##D WHERE majcompflag = &#39;Yes&#39; AND mukey IN &quot;, in.statement, 
+##D &quot;ORDER BY cokey, comppct_r DESC, hzdept_r ASC&quot;, sep=&quot;&quot;)
 ##D # now get component and horizon-level data for these map unit keys
 ##D res &lt;- SDA_query(q)
 ## End(Not run)
@@ -107,7 +111,8 @@
 # get component-level data for a specific soil survey area (Yolo county, CA)
 ## Not run: 
 ##D q &lt;- &quot;SELECT 
-##D component.mukey, cokey, comppct_r, compname, taxclname, taxorder, taxsuborder, taxgrtgroup, taxsubgrp
+##D component.mukey, cokey, comppct_r, compname, taxclname, 
+##D taxorder, taxsuborder, taxgrtgroup, taxsubgrp
 ##D FROM legend
 ##D INNER JOIN mapunit ON mapunit.lkey = legend.lkey
 ##D LEFT OUTER JOIN component ON component.mukey = mapunit.mukey
@@ -119,5 +124,5 @@
 </code></pre>
 
 
-<hr><div align="center">[Package <em>soilDB</em> version 1.0 <a href="00Index.html">Index</a>]</div>
+<hr><div align="center">[Package <em>soilDB</em> version 1.2-8 <a href="00Index.html">Index</a>]</div>
 </body></html>

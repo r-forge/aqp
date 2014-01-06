@@ -3,8 +3,9 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link rel="stylesheet" type="text/css" href="R.css">
 
-<link rel="stylesheet" href="highlight.css">
-<script src="highlight.pack.js"></script>
+<link rel="stylesheet" href="http://yandex.st/highlightjs/7.3/styles/github.min.css">
+<script src="http://yandex.st/highlightjs/7.3/highlight.min.js"></script>
+<script src="http://yandex.st/highlightjs/7.3/languages/r.min.js"></script>
 <script>hljs.initHighlightingOnLoad();</script>
 </head><body>
 
@@ -23,7 +24,6 @@
 
 
 <h3>Arguments</h3>
-
 
 <table summary="R argblock">
 <tr valign="top"><td><code>s</code></td>
@@ -56,61 +56,18 @@
 <h3>Examples</h3>
 
 <pre><code class="r">
-require(soilDB)
-require(reshape)
+## Not run: 
+##D library(soilDB)
+##D 
+##D # soil series of interest
+##D s &lt;- c(&#39;auburn&#39;, &#39;pardee&#39;, &#39;amador&#39;, &#39;pentz&#39;)
+##D 
+##D # generate hillslope probability table
+##D hillslope.probability(s)
+## End(Not run)
 
-# soil series of interest
-s &lt;- c(&#39;auburn&#39;, &#39;pardee&#39;, &#39;amador&#39;, &#39;pentz&#39;)
-
-# generate hillslope probability table
-hillslope.probability(s)
-</code></pre>
-
-<pre><code>## sending SOAP request...
-## processing results...
-## 
-  |                                                                       
-  |                                                                 |   0%
-  |                                                                       
-  |=====                                                            |   7%
-  |                                                                       
-  |=========                                                        |  14%
-  |                                                                       
-  |==============                                                   |  21%
-  |                                                                       
-  |===================                                              |  29%
-  |                                                                       
-  |=======================                                          |  36%
-  |                                                                       
-  |============================                                     |  43%
-  |                                                                       
-  |================================                                 |  50%
-  |                                                                       
-  |=====================================                            |  57%
-  |                                                                       
-  |==========================================                       |  64%
-  |                                                                       
-  |==============================================                   |  71%
-  |                                                                       
-  |===================================================              |  79%
-  |                                                                       
-  |========================================================         |  86%
-  |                                                                       
-  |============================================================     |  93%
-  |                                                                       
-  |=================================================================| 100%
-</code></pre>
-
-<pre><code>##   compname Toeslope Footslope Backslope Shoulder Summit
-## 1   amador       NA      0.03      0.45       NA   0.21
-## 2   auburn       NA      0.03      0.70     0.04   0.17
-## 3   pardee     0.18        NA      0.27     0.09   0.36
-## 4    pentz     0.02        NA      0.58       NA   0.39
-</code></pre>
-
-<pre><code class="r">
 </code></pre>
 
 
-<hr><div align="center">[Package <em>sharpshootR</em> version 0.4 <a href="00Index.html">Index</a>]</div>
+<hr><div align="center">[Package <em>sharpshootR</em> version 0.4-1 <a href="00Index.html">Index</a>]</div>
 </body></html>

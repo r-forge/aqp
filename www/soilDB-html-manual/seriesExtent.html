@@ -3,8 +3,9 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link rel="stylesheet" type="text/css" href="R.css">
 
-<link rel="stylesheet" href="highlight.css">
-<script src="highlight.pack.js"></script>
+<link rel="stylesheet" href="http://yandex.st/highlightjs/7.3/styles/github.min.css">
+<script src="http://yandex.st/highlightjs/7.3/highlight.min.js"></script>
+<script src="http://yandex.st/highlightjs/7.3/languages/r.min.js"></script>
 <script>hljs.initHighlightingOnLoad();</script>
 </head><body>
 
@@ -27,7 +28,6 @@ seriesExtentAsGmap(s, timeout=60, exp=1.25)
 
 <h3>Arguments</h3>
 
-
 <table summary="R argblock">
 <tr valign="top"><td><code>s</code></td>
 <td>
@@ -46,7 +46,7 @@ seriesExtentAsGmap(s, timeout=60, exp=1.25)
 
 <h3>Details</h3>
 
-<p>These functions are only useful for querying the </p>
+<p>Soil series extent data are generated as KMZ files, and cached on the SoilWeb server. Initial creation of the KMZ extent may require 1-10+ seconds depending on the spatial extent of the series and server load. All subsequent requests for the same series will return cached data. The cache is purged whenever soil survey data are synced with the official repository.</p>
 
 
 <h3>Value</h3>
@@ -61,7 +61,7 @@ seriesExtentAsGmap(s, timeout=60, exp=1.25)
 
 <h3>Author(s)</h3>
 
-<p>D. E. Beaudette</p>
+<p>D.E. Beaudette</p>
 
 
 <h3>References</h3>
@@ -85,5 +85,5 @@ seriesExtentAsGmap(s, timeout=60, exp=1.25)
 </code></pre>
 
 
-<hr><div align="center">[Package <em>soilDB</em> version 1.0 <a href="00Index.html">Index</a>]</div>
+<hr><div align="center">[Package <em>soilDB</em> version 1.2-8 <a href="00Index.html">Index</a>]</div>
 </body></html>
