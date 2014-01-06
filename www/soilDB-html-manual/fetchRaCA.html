@@ -1,0 +1,118 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Fetch KSSL Data (EXPERIMENTAL)</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+
+<link rel="stylesheet" href="http://yandex.st/highlightjs/7.3/styles/github.min.css">
+<script src="http://yandex.st/highlightjs/7.3/highlight.min.js"></script>
+<script src="http://yandex.st/highlightjs/7.3/languages/r.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</head><body>
+
+<table width="100%" summary="page for fetchRaCA {soilDB}"><tr><td>fetchRaCA {soilDB}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Fetch KSSL Data (EXPERIMENTAL)</h2>
+
+<h3>Description</h3>
+
+<p>Get Rapid Carbon Assessment (RaCA) data via state, geographic bounding-box, or series query from the SoilWeb system.</p>
+
+
+<h3>Usage</h3>
+
+<pre>fetchRaCA(series = NULL, bbox = NULL, state = NULL, get.vnir = FALSE)</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>series</code></td>
+<td>
+<p>a soil series name, case insensitive</p>
+</td></tr>
+<tr valign="top"><td><code>bbox</code></td>
+<td>
+<p>a bounding box in WGS84 geographic coordinates e.g. <code>c(-120, 37, -122, 38)</code>, constrained to a 5-degree block</p>
+</td></tr>
+<tr valign="top"><td><code>state</code></td>
+<td>
+<p>a two-letter US state abbreviation, case insensitive</p>
+</td></tr>
+<tr valign="top"><td><code>get.vnir</code></td>
+<td>
+<p>boolean, should associated VNIR spectra be downloaded? (see details)</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>The VNIR spectra associated with RaCA data are quite large [each gzip-compressed VNIR spectra record is about 6.6kb], so requests for these data are disabled by default. Note that VNIR spectra can only be queried by soil series or geographic BBOX.</p>
+
+
+<h3>Value</h3>
+
+
+<dl>
+<dt><code>pedons</code>:</dt><dd><p>a <code>SoilProfileCollection</code> object containing site/pedon/horizon data</p>
+</dd>
+<dt><code>trees</code>:</dt><dd><p>a <code>data.frame</code> object containing tree DBH and height</p>
+</dd>
+<dt><code>veg</code>:</dt><dd><p>a <code>data.frame</code> object containing plant species</p>
+</dd>
+<dt><code>stock</code>:</dt><dd><p>a <code>data.frame</code> object containing carbon quantities (stocks) at standardized depths</p>
+</dd>
+<dt><code>sample</code>:</dt><dd><p>a <code>data.frame</code> object containing sample-level bulk density and soil organic carbon values</p>
+</dd>
+<dt><code>spectra</code>:</dt><dd><p>a numeric <code>matrix</code> containing VNIR reflectance spectra from 350&ndash;2500 nm</p>
+</dd>
+</dl>
+
+
+
+<h3>Author(s)</h3>
+
+<p>D.E. Beaudette, USDA-NRCS staff</p>
+
+
+<h3>References</h3>
+
+<p><a href="http://soils.usda.gov/survey/raca/index.html">http://soils.usda.gov/survey/raca/index.html</a>
+<a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/RaCA-demo.html?root=aqp">fetchRaCA() Tutorial</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="fetchOSD.html">fetchOSD</a></code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="r">
+## Not run: 
+##D   # search by series name
+##D   s &lt;- fetchRaCA(series=&#39;auburn&#39;)
+##D   
+##D   # search by bounding-box
+##D   # s &lt;- fetchRaCA(bbox=c(-120, 37, -122, 38))
+##D   
+##D   # check structure
+##D   str(s, 1)
+##D   
+##D   # extract pedons
+##D   p &lt;- s$pedons
+##D   
+##D   # how many pedons
+##D   length(p)
+##D   
+##D   # plot 
+##D   par(mar=c(0,0,0,0))
+##D   plot(p, name=&#39;hzn_desgn&#39;, max.depth=150)
+## End(Not run)
+
+</code></pre>
+
+
+<hr><div align="center">[Package <em>soilDB</em> version 1.2-8 <a href="00Index.html">Index</a>]</div>
+</body></html>

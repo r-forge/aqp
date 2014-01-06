@@ -3,8 +3,9 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link rel="stylesheet" type="text/css" href="R.css">
 
-<link rel="stylesheet" href="highlight.css">
-<script src="highlight.pack.js"></script>
+<link rel="stylesheet" href="http://yandex.st/highlightjs/7.3/styles/github.min.css">
+<script src="http://yandex.st/highlightjs/7.3/highlight.min.js"></script>
+<script src="http://yandex.st/highlightjs/7.3/languages/r.min.js"></script>
 <script>hljs.initHighlightingOnLoad();</script>
 </head><body>
 
@@ -20,6 +21,11 @@
 <h3>Usage</h3>
 
 <pre>get_site_data_from_NASIS_db()</pre>
+
+
+<h3>Details</h3>
+
+<p>When multiple &quot;site bedrock&quot; entries are present, only the shallowest is returned by this function.</p>
 
 
 <h3>Value</h3>
@@ -38,7 +44,6 @@
 
 
 <h3>See Also</h3>
-
 
 <p><code><a href="get_hz_data_from_NASIS_db.html">get_hz_data_from_NASIS_db</a></code>, 
 </p>
@@ -83,13 +88,13 @@
 ##D 
 ##D # iterate over pedons, and convert to WGS84
 ##D new.coords &lt;- ddply(s, &#39;peiid&#39;, 
-##D                                         .progress=&#39;text&#39;, .fun=function(i) {
-##D                                             coordinates(i) &lt;- ~ x + y
-##D                                             proj4string(i) &lt;- CRS(i$proj4)
-##D                                             i.t &lt;- spTransform(i, CRS(&#39;+proj=longlat +datum=WGS84&#39;))
-##D                                             i.c &lt;- as.matrix(coordinates(i.t))
-##D                                             return(data.frame(x.new=i.c[, 1], y.new=i.c[, 2]))
-##D                                         })
+##D   .progress=&#39;text&#39;, .fun=function(i) {
+##D     coordinates(i) &lt;- ~ x + y
+##D     proj4string(i) &lt;- CRS(i$proj4)
+##D     i.t &lt;- spTransform(i, CRS(&#39;+proj=longlat +datum=WGS84&#39;))
+##D     i.c &lt;- as.matrix(coordinates(i.t))
+##D     return(data.frame(x.new=i.c[, 1], y.new=i.c[, 2]))
+##D   })
 ##D 
 ##D # merge in new coordinates
 ##D s &lt;- join(s, new.coords)
@@ -100,11 +105,13 @@
 ##D # save to update file for use with &quot;Import of Standard WGS84 Georeference&quot; calculation in NASIS
 ##D # note that this defines the coordinate source as &quot;GPS&quot;, hence the last column of &#39;1&#39;s.
 ##D std.coordinates.update.data &lt;- unique(cbind(s[, c(&#39;siteiid&#39;, &#39;y.new&#39;, &#39;x.new&#39;)], 1))
-##D write.table(std.coordinates.update.data, file=&#39;c:/data/sgeoref.txt&#39;, col.names=FALSE, row.names=FALSE, sep=&#39;|&#39;)
+##D # save to file
+##D write.table(std.coordinates.update.data, 
+##D file=&#39;c:/data/sgeoref.txt&#39;, col.names=FALSE, row.names=FALSE, sep=&#39;|&#39;)
 ## End(Not run)
 
 </code></pre>
 
 
-<hr><div align="center">[Package <em>soilDB</em> version 1.0 <a href="00Index.html">Index</a>]</div>
+<hr><div align="center">[Package <em>soilDB</em> version 1.2-8 <a href="00Index.html">Index</a>]</div>
 </body></html>
