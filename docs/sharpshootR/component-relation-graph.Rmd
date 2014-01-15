@@ -1,0 +1,103 @@
+```{r setup, echo=FALSE, results='hide'}
+opts_chunk$set(message=FALSE, warning=FALSE, background='#F7F7F7', dpi=100, fig.align='center', dev='CairoPNG', tidy=FALSE)
+options(width=100, stringsAsFactors=FALSE)
+```
+
+# Generating Soil Component Relation Diagrams
+
+Component association is a function of how frequently components co-occur, weighted by component percentage. This summary should generate structures that are related to soil-landscape concepts that were used to construct collections of map units associated with one or more soil survey legends. These diagrams are 2D approximations of the multi-dimensional relationship between components-- where each node is a component, lines (edges) connect components that have been mapped together, colors define groups of components that frequently co-occur, node proximity is proportional to co-occurrence, and size is proportional to "connectivity".
+
+Details pending.
+
+## Simple Example
+```{r libraries-and-sample}
+# load libraries
+library(soilDB)
+library(sharpshootR)
+library(plyr)
+library(igraph)
+library(RColorBrewer)
+
+# load sample data associated with the amador soil series
+data(amador)
+
+# map unit keys, component names, component percentages
+head(amador)
+
+# convert into adjacency matrix, based on no. times component co-occur
+m <- component.adj.matrix(amador, method='occurrence')
+print(m)
+
+# convert into adjacency matrix, weighted by component percent
+m <- component.adj.matrix(amador)
+print(round(m, 2))
+
+# tighten margins
+par(mfcol=c(1,2), mar=c(0,0,0,0))
+# plot as network diagram, with Amador soil highlighted
+plotSoilRelationGraph(m, s='amador')
+# plot as dendrogram, with Amador soil highlighted
+plotSoilRelationGraph(m, s='amador', type='dendrogram')
+```
+
+## NASIS via local database
+```{r get-format-nasis-data}
+# get legend/DMU/component data from NASIS
+# in this case, CA630 data
+d <- get_component_data_from_NASIS_db()
+
+# normalize component names
+d$compname <- tolower(d$compname)
+
+# remove misc. areas components
+d <- subset(d, compkind != 'miscellaneous area')
+
+# remove some higher-taxa and non-soil components
+d <- subset(d, ! compname %in% c('lithic haploxeralfs', 'rock outcrop', 'aquic haploxeralfs', 'ultic haploxeralfs', 'riparian'))
+
+# select only those columns that we really need
+d <- d[, c('dmudesc', 'compname', 'comppct_r')]
+
+# check top couple of rows
+head(d)
+
+# convert into adjacency matrix, weighted by component percentage
+m <- component.adj.matrix(d, mu='dmudesc', co='compname', wt='comppct_r')
+```
+
+
+```{r plot-network-graph, fig.width=15, fig.height=15, out.width='100%'}
+# tighten margins
+par(mar=c(0,0,2,0))
+plotSoilRelationGraph(m)
+title('CA630 Components (subject to revision)')
+```
+
+
+## SSURGO via SDA
+```{r get-format-SSURGO-data, results='hide'}
+# select by survey area(s)
+q <- "SELECT 
+component.mukey, comppct_r, lower(compname) as compname
+FROM legend
+INNER JOIN mapunit ON mapunit.lkey = legend.lkey
+LEFT OUTER JOIN component ON component.mukey = mapunit.mukey
+WHERE legend.areasymbol IN ('CA654')
+AND compkind IN ('Series', 'Taxadjunct')"
+
+# run query, process results, and return as data.frame object
+res <- SDA_query(q)
+
+# convert into adj. matrix using component percentage weights
+m <- component.adj.matrix(res)
+```
+
+```{r plot-SSURGO-network-graph, fig.width=15, fig.height=15, out.width='100%'}
+# tighten margins
+par(mar=c(0,0,2,0))
+plotSoilRelationGraph(m)
+title('CA654 Components')
+```
+
+----------------------------
+This document is based on `aqp` version `r utils::packageDescription("aqp", field="Version")`, `soilDB` version `r utils::packageDescription("soilDB", field="Version")`, and `sharpshootR` version `r utils::packageDescription("sharpshootR", field="Version")`.
