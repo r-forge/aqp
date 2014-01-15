@@ -33,3 +33,7 @@ plot(s, name='hzname', cex.names=0.85, axis.line.offset=-4)
 # plot dendrogram + profiles
 SoilTaxonomyDendrogram(s, cex.taxon.labels=0.8)
 ```
+
+
+----------------------------
+This document is based on `aqp` version `r utils::packageDescription("aqp", field="Version")` and `soilDB` version `r utils::packageDescription("soilDB", field="Version")`.
