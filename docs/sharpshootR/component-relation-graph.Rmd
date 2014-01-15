@@ -10,7 +10,7 @@ Component association is a function of how frequently components co-occur, weigh
 Details pending.
 
 ## Simple Example
-```{r libraries-and-sample}
+```{r libraries-and-sample, fig.width=14, fig.height=7, out.width='100%'}
 # load libraries
 library(soilDB)
 library(sharpshootR)
