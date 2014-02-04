@@ -7,15 +7,6 @@ options(width=100, stringsAsFactors=FALSE)
 ```{r prep-environment, results='hide'}
 library(soilDB)
 
-# function for plotting SPC + associated restrictive feautures
-plot.res.features <- function(i) {
-  idx <- 1:length(i)
-  plot(i, name='hzname')
-  points(idx, i$resdept_r, col='red')
-  points(idx, i$resdepb_r, col='red')
-  segments(idx, i$resdept_r, idx, i$resdepb_r, lty=2, col='red')
-}
-
 # filter function to ID components with non-overlapping restrictive features
 f <- function(i) {
   h <- horizons(i) # extract horizons
@@ -84,7 +75,8 @@ site(x) <- y[! y$cokey %in% problem.cokey, ]
 # subset and visually check
 par(mar=c(0,0,0,0))
 s <- x[1:20, ]
-plot.res.features(s)
+plot(s)
+addBracket(top=s$resdept_r, bottom=s$resdepb_r, col='red', offset=0.01, lwd=2, tick.length=0)
 
 
 # apply filter function and save as site-level data
@@ -100,18 +92,27 @@ as.data.frame(table(x$res_check))
 
 # get those components with exact overlap
 s <- x[which(x$res_check == 'perfect overlap'), ]
-plot.res.features(s[1:40, ])
+ss <- s[1:40, ]
+plot(ss)
+addBracket(top=ss$resdept_r, bottom=ss$resdepb_r, col='red', offset=0.01, lwd=2, tick.length=0)
+
 
 # get those components with top errors
 s.bad <- x[which(x$res_check == 'top error'), ]
-plot.res.features(s.bad)
+plot(s.bad)
+addBracket(top=s.bad$resdept_r, bottom=s.bad$resdepb_r, col='red', offset=0.01, lwd=2, tick.length=0)
+
 
 # get those components with bottom errors
 s.bad <- x[which(x$res_check == 'bottom error'), ]
-plot.res.features(s.bad)
+plot(s.bad)
+addBracket(top=s.bad$resdept_r, bottom=s.bad$resdepb_r, col='red', offset=0.01, lwd=2, tick.length=0)
+
 
 # get those components with no overlap
 s.bad <- x[which(x$res_check == 'no overlap'), ]
-plot.res.features(s.bad)
+plot(s.bad)
+addBracket(top=s.bad$resdept_r, bottom=s.bad$resdepb_r, col='red', offset=0.01, lwd=2, tick.length=0)
+
 ```
 
