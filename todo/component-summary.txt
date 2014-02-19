@@ -1,0 +1,22 @@
+JS:
+
+Hillslope Position Summary
+- add an (n= ?) value following the taxonname so that the user knows how many of the comps had this information populated.  SWEET!!! I actually figured out how to add the n-value to the table in the local_functions myself.....small victory!!!
+
+Generalized Horizon Classification
+- Can a total count of horizons column be added to this horizon/genhz matrix?
+- plot of horizons against clay - flip the y axis, so that horizons read from top to bottom.....sort by hzdept
+- fix shift hzname labels in the plot
+
+Maximum-Likelihood Horizonation
+- title of this horizonation plot gets truncated
+- in the summary table for ML.hz, sometimes ML horizons drop out of the summary table....is there some threshold of probability built into this summary that is dropping horizons for this summary table?
+
+Component Profile Plot
+- these plots aren't working right now....not sure why yet.
+
+Surface Fragment Summary Tables
+- would be handy to have an (n=?) for this table to tell the user how much weight to give calls of surface fragments within the  data.
+
+Diagnostic Feature Summary
+- I get some funky l-rv-h numbers for the thickness column..... 20-21-17, etc??
