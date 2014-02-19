@@ -1,22 +1,37 @@
-JS:
+TODO items by report section:
+
+
 
 Hillslope Position Summary
-- add an (n= ?) value following the taxonname so that the user knows how many of the comps had this information populated.  SWEET!!! I actually figured out how to add the n-value to the table in the local_functions myself.....small victory!!!
+- add an (N= ?) value following the taxonname so that the user knows how many of the comps had this information populated. Use addmargin() or nrow()?  
+
+Texture summary - use counts or probability?  Use the calculated texture class field for this aggregation.  This will also include the texture modifier which is good because it is a check against whether the phfrags table was populated.....Can other non-numerical data be summarized in this table such as counts of effervescence class?
+
+
 
 Generalized Horizon Classification
 - Can a total count of horizons column be added to this horizon/genhz matrix?
 - plot of horizons against clay - flip the y axis, so that horizons read from top to bottom.....sort by hzdept
-- fix shift hzname labels in the plot
+- fix shifted hzname labels in the plot
+
+
 
 Maximum-Likelihood Horizonation
 - title of this horizonation plot gets truncated
 - in the summary table for ML.hz, sometimes ML horizons drop out of the summary table....is there some threshold of probability built into this summary that is dropping horizons for this summary table?
 
+  Least probably will drop out where they overlap - user will need to decide whether to include them or not.
+
 Component Profile Plot
-- these plots aren't working right now....not sure why yet.
+- these plots aren't working right now....not sure why.....
+
+
 
 Surface Fragment Summary Tables
-- would be handy to have an (n=?) for this table to tell the user how much weight to give calls of surface fragments within the  data.
+- would be handy to have an (N=?) for this table to tell the user how much weight to give calls of surface fragments within the  data.
+
+
 
 Diagnostic Feature Summary
 - I get some funky l-rv-h numbers for the thickness column..... 20-21-17, etc??
+
