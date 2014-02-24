@@ -3,9 +3,11 @@ TODO items by report section:
 
 
 Hillslope Position Summary
-- add an (N= ?) value following the taxonname so that the user knows how many of the comps had this information populated. Use addmargin() or nrow()?  
+- add an (N= ?) value following the taxonname so that the user knows how many of the comps had this information populated. Use addmargin() or nrow()? 
 
-Geomorphic Description summary - add function to build string to soilDB for get_extended_data() and then build a table with counts.
+Add a slope shape tablulation matrix with counts....
+
+Add a Geomorphic Description summary section- add function to build string to soilDB for get_extended_data() and then build a table with counts.
 
 Texture summary - use counts or probability?  Use the calculated texture class field for this aggregation.  This will also include the texture modifier which is good because it is a check against whether the phfrags table was populated.....Can other non-numerical data be summarized in this table such as counts of effervescence class?
 
