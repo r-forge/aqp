@@ -1,15 +1,19 @@
 TODO items by report section:
 
 
-
+Fixed -- 
 Hillslope Position Summary
 - add an (N= ?) value following the taxonname so that the user knows how many of the comps had this information populated. Use addmargin() or nrow()? 
 
-Add a slope shape tablulation matrix with counts....
+Fixed -- Add a slope shape tabulation matrix with counts....
 
-Add a Geomorphic Description summary section- add function to build string to soilDB for get_extended_data() and then build a table with counts.
+Fixed -- Add drainage class tabulation...
 
-Texture summary - use counts or probability?  Use the calculated texture class field for this aggregation.  This will also include the texture modifier which is good because it is a check against whether the phfrags table was populated.....Can other non-numerical data be summarized in this table such as counts of effervescence class?
+Add a Geomorphic Description summary section - add function to build string to soilDB for get_extended_data() and then build a table with counts.
+
+Fixed -- Texture summary - use counts or probability?  Use the calculated texture class field for this aggregation.  This will also include the texture modifier which is good because it is a check against whether the phfrags table was populated.
+
+Can other non-numerical data be summarized in this table such as counts of effervescence class?
 
 
 
@@ -26,7 +30,7 @@ Maximum-Likelihood Horizonation
 
   Least probably will drop out where they overlap - user will need to decide whether to include them or not.
 
-Component Profile Plot
+Fixed -- Component Profile Plot
 - these plots aren't working right now....not sure why.....
 
 
@@ -35,7 +39,6 @@ Surface Fragment Summary Tables
 - would be handy to have an (N=?) for this table to tell the user how much weight to give calls of surface fragments within the  data.
 
 
-
-Diagnostic Feature Summary
+Fixed -- Diagnostic Feature Summary
 - I get some funky l-rv-h numbers for the thickness column..... 20-21-17, etc??
 
