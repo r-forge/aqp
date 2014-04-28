@@ -58,6 +58,7 @@ echo $contents; } ?>
 <li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/series-extent.html?root=aqp">getting, plotting, saving detailed soil series extent data (US-only)</a></li>
 <li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/gSSURGO-SDA.html?root=aqp">gridded SSURRGO (gSSURGO) and SDA</a></li>
 <li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/sharpshootR/component-relation-graph.html?root=aqp">Component Relation Graphs</a></li>
+<li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/sharpshootR/OSD-dendrogram.html?root=aqp">OSD Dendrogram</a></li>
 </ol>
 </p>
 
@@ -71,6 +72,10 @@ echo $contents; } ?>
 
 
 <p><b>Sample Figures</b></p>
+
+<img src="OSD-dend.png" border="0">
+
+<img src="diagnosticFeatures.png" border="0">
 
 <img src="brackets.png" border="0">
 
