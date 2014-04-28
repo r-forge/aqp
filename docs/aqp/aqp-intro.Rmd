@@ -257,11 +257,30 @@ axis(2, line=-1, at=pretty(1:max(sp4)), cex.axis=0.75, font=4, las=1, col='blue'
 mtext('depth axis', side=2, line=1, font=4, col='blue')
 ```
 
+
 Horizon-level attributes can be symbolized with color, in this case using the horizon-level attribute "clay":
 ```{r plotting-with-color, fig.height=4, fig.width=8}
 # plot again, this time using new colors
 par(mar=c(0,0,3,0)) # tighter figure margins
 plot(sp4, name='name', color='clay')
+```
+
+Horizon-level attributes that represent a volume fraction (e.g. coarse-fragment percentage) can be added to an existing figure:
+```{r plotting-vol-fraction, fig.height=4, fig.width=8}
+par(mar=c(0,0,3,0)) # tighter figure margins
+sp4$frag_pct <- sp4$CF * 100 # convert fraction -> percent
+plot(sp4, name='name', col='frag_pct')
+addVolumeFraction(sp4, 'frag_pct') # symbolize volume fraction data
+```
+
+Annotation of depth-intervals can be accomplished using:
+```{r plotting-depth-interval, fig.height=4, fig.width=8}
+# generate some fake depth brackets:
+fake.tops <- rep(0, times=length(sp4))
+fake.bottoms <- runif(n=length(sp4), min=0, max=20)
+par(mar=c(0,0,3,0)) # tighter figure margins
+plot(sp4, name='name')
+addBracket(fake.tops, fake.bottoms, col='red') # add depth brackets
 ```
 
 
@@ -275,7 +294,9 @@ sp4$soil.depth.clay <- profileApply(sp4, FUN=max, v='clay')
 # nrow() returns the number of horizons
 sp4$n.hz <- profileApply(sp4, FUN=nrow)
 # compute the mean clay content by profile using an inline function
-sp4$mean.clay <- profileApply(sp4, FUN=function(i) mean(i$clay)) 
+sp4$mean.clay <- profileApply(sp4, FUN=function(i) mean(i$clay))
+# estimate soil depth based on horizon designation
+sp4$soil.depth <- profileApply(sp4, estimateSoilDepth, name='name', top='top', bottom='bottom')
 ```
 
 When `FUN` returns a vector of the same length as the number of horizons in a profile, `profileApply()` can be used to create new horizon-level attributes. For example, the change in clay content with depth could be calculated via:

@@ -37,7 +37,7 @@ par(mfcol=c(1,2), mar=c(0,0,0,0))
 # plot as network diagram, with Amador soil highlighted
 plotSoilRelationGraph(m, s='amador')
 # plot as dendrogram, with Amador soil highlighted
-plotSoilRelationGraph(m, s='amador', type='dendrogram')
+plotSoilRelationGraph(m, s='amador', plot.style='dendrogram')
 ```
 
 ## NASIS via local database
