@@ -73,6 +73,8 @@ echo $contents; } ?>
 
 <p><b>Sample Figures</b></p>
 
+<img src="miami-and-related.png" border="0">
+
 <img src="OSD-dend.png" border="0">
 
 <img src="diagnosticFeatures.png" border="0">
