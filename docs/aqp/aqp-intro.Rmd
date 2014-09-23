@@ -1,3 +1,6 @@
+---
+output: word_document
+---
 <!--
 manually process like this:
 library(knitr); library(markdown)
