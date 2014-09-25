@@ -7,7 +7,7 @@ output: html_document
 
 ```{r setup, echo=FALSE, results='hide'}
 library(knitr)
-opts_chunk$set(message=FALSE, warning=FALSE, dpi=120, fig.align='center', dev='CairoPNG', dev.args=list(pointsize=10), tidy=TRUE)
+opts_chunk$set(message=FALSE, warning=FALSE, dpi=120, fig.align='center', dev='CairoPNG', dev.args=list(pointsize=10), tidy=FALSE)
 options(width=100, stringsAsFactors=FALSE)
 ```
 
@@ -16,8 +16,8 @@ Assigning Generalized Horizon Labels
 D.E. Beaudette, J.M. Skovlin [`r format(Sys.time(), "%Y-%m-%d")`]
 
 
-### Setup
-If you have never used the `aqp` or `soildb` packages before, you will likely need to install them. This only needs to be done once.
+# Setup
+If you have never used the [aqp](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/aqp/aqp-intro.html?root=aqp) or [soildb](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/soilDB-Intro.html?root=aqp) packages before, you will likely need to install them. This only needs to be done once. 
 ```{r install-packages, eval=FALSE}
 # stable version from CRAN + dependencies
 install.packages('aqp', dep=TRUE) 
@@ -27,7 +27,19 @@ install.packages('aqp', repos="http://R-Forge.R-project.org", type='source')
 install.packages('soilDB', repos="http://R-Forge.R-project.org", type='source')
 ```
 
-### Introduction
+Now that you have all of the R packages that this document depends on, it would be a good idea to load them. R packages must be ***installed*** anytime you change versions of R (e.g. after an upgrade), and ***loaded*** anytime you want to access functions from within those packages.
+
+```{r load-packages}
+library(aqp)
+library(soilDB)
+library(latticeExtra) # you will need to install this package
+library(plyr) # you will need to install this package
+library(lattice) # these packages come with R and do not need to be installed
+library(cluster)
+library(MASS)
+```
+
+# Introduction
 Variation in horizon designation "style" among different soil scientists, changes in horizon designation standards over time, and variable depths at which genetic horizons occur are some of the possible factors that complicate the process of aggregating pedon data. This document describes an aggregation strategy based on the use of "generalized horizon labels" (GHL); essentially, a new set of labels used to group functionally-similar horizons. 
 
 Here is a basic outline of the process:
@@ -43,17 +55,11 @@ Here is a basic outline of the process:
   5. Estimate a most-likely horizonation (e.g. top and bottom depths) for each generalized horizon label. (next document in this series)
 
 
-### Sample Data
+
+# Sample Data
 While the methods outlined in this document can be applied to any collection of pedons, it is convenient to work with a standardized set of data. You can follow along with the analysis by copying code from the following blocks and running it in your **R** session. The sample data used in this document is based on 15 soil profiles that have been correlated to the [Loafercreek](https://soilseries.sc.egov.usda.gov/OSD_Docs/L/LOAFERCREEK.html) soil series from the Sierra Nevada Foothill Region of California.
 
-```{r load-data, fig.width=12, fig.height=4}
-# load required libraries
-library(aqp)
-library(soilDB)
-library(lattice)
-library(cluster)
-library(MASS)
-
+```{r load-data, fig.width=12, fig.height=5}
 # load sample data from the soilDB package
 data(loafercreek, package = 'soilDB')
 # keep only the first 15 pedons
@@ -64,9 +70,9 @@ plot(loafercreek, name='hzname', print.id=FALSE, cex.names=0.8, axis.line.offset
 ```
 
 
-## Methods
+# Methods
 
-### Selection of Generalized Horizon Labels
+## Selection of Generalized Horizon Labels
 
 Generalized horizon labels represent an expert-guided selection of designations that were consistently observed in the field, and meaningful in terms of theory and management. The very first step in this process is to tabulate the number of times each horizon designation occurs.
 
@@ -123,75 +129,133 @@ bwplot(total_frags_pct ~ factor(hzname, levels=hz.designation.by.median.depths),
 
 
 Sometimes looking at thematic soil profile sketches can be informative.
-```{r thematic-profile-sketch, fig.width=12, fig.height=4}
+```{r thematic-profile-sketch, fig.width=12, fig.height=5}
 # color horizons by clay content
 par(mar=c(0,0,3,3))
 plot(loafercreek, name='hzname', print.id=FALSE, cex.names=0.8, axis.line.offset=-4, color='clay')
 ```
 
+## Assignment of Generalized Horizon Labels
 
+Once a set of generalized horizon labels have been determined a corresponding set of [regular expression](http://en.wikipedia.org/wiki/Regular_expression) (REGEX) rules were developed to convert field-described designations into GHL. Pattern matching with REGEX will typically assign useful GHL, however, there will always be cases where manual intervention is required. More on that later.
 
+From the above analysis and the [OSD](https://soilseries.sc.egov.usda.gov/OSD_Docs/L/LOAFERCREEK.html), it seems like the following sequence of GHL are appropriate: (`r c('A','Bt1','Bt2','Bt3','Cr','R')`)-- an A horizon, followed by 3 Bt horizons, then Cr and finally R. For each GHL we need a corrosponding REGEX rule. For example, `'^A$|Ad|Ap'` will match 'A', 'Ad', and 'Ap'.
 
-
-**Advanced: Multivariate Soil Property Summary**
-A simultanious summary of more than two soil properties can be achieved with [non-metric multidimensional scaling](http://en.wikipedia.org/wiki/Multidimensional_scaling). In this example, clay content, total rock fragment volume, and horizon mid-points are used. Missing data cannot be included therefore it is neccessary to filter them out:
-```{r multivariate-eval-1}
-# generate an index to those horizon that are NOT missing properties of interest
-no.na.idx <- which(complete.cases(horizons(loafercreek)[, c('clay', 'mid', 'total_frags_pct')]))
-```
-
-Next, a dissimilarity matrix is generated after standardization. 
-```{r multivariate-eval-2}
-d <- daisy(horizons(loafercreek)[no.na.idx, c('clay', 'mid', 'total_frags_pct')], stand=TRUE)
-```
-
-Solve MDS and plot original horizon designation on MDS axes. Proximity is proportional to similarity in data-space.
-```{r multivariate-eval-3, fig.width=4, fig.height=4}
-pc <- isoMDS(d+0.001, trace=FALSE)
-
-loafercreek$pc.1 <- rep(NA, times=nrow(horizons(loafercreek)))
-loafercreek$pc.2 <- rep(NA, times=nrow(horizons(loafercreek)))
-loafercreek$pc.1[no.na.idx] <- pc$points[, 1]
-loafercreek$pc.2[no.na.idx] <- pc$points[, 2]
-
-par(mar=c(1,1,1,1))
-plot(loafercreek$pc.1, loafercreek$pc.2, type='n', axes=FALSE, ylab='', xlab='')
-text(loafercreek$pc.1, loafercreek$pc.2, labels=loafercreek$hzname, cex=0.65)
-box()
+```{r generalize-hz-names-1}
+# save our GHL
+n <- c('A','Bt1','Bt2','Bt3','Cr','R')
+# REGEX rules
+p <- c('^A$|Ad|Ap',
+       'Bt1$',
+       '^Bt2$',
+       '^Bt3|^Bt4|CBt$|BCt$|2Bt|2CB$|^C$',
+       'Cr',
+       'R')
 ```
 
 
-
-
-### Assignment of Generalized Horizon Labels
-
-Once a set of generalized horizons have been determined (`r c('A','BA','Bt1','Bt2','Bt3','Cr','R')`), a corresponding set of regular expression (REGEX) rules were developed to convert field-described designations into generalized designations. This process typically requires expert-guided review of: 1) regional patterns in horizonation style, 2) mophologic property differences by groups of field-described designation, and, 3) patterns with depth. The expert's field experience is thus preserved within the vector of REGEX rules. 
-
-```{r generalize-hz-names, fig.width=12, fig.height=5}
-# discreet colors used to plot horizon probability depth-functions
-cols <- c(grey(0.33), 'goldenrod4', 'orange', 'orangered', 'chocolate', 'green', 'blue')
-
-## generalize horizon names using REGEX rules
-n <- c('A','BA','Bt1','Bt2','Bt3','Cr','R')
-p <- c('^A$|Ad|Ap|^ABt$','AB$|BA$|Bw', 'Bt1$','^Bt2$','^Bt3|^Bt4|CBt$|BCt$|2Bt|2CB$|^C$','Cr','R')
+Apply GHL pattern-matching rules and save to a new column called `genhz` and cross-tabulate the occurence of GHL and original designations.
+```{r generalize-hz-names-2}
 loafercreek$genhz <- generalize.hz(loafercreek$hzname, n, p)
-
-# check unclassified names
-table(loafercreek$genhz, loafercreek$hzname)
-
-# remove non-matching generalized horizon names
-loafercreek$genhz[loafercreek$genhz == 'not-used'] <- NA
-loafercreek$genhz <- factor(loafercreek$genhz)
-
-# keep track of generalized horizon names for later
-hz.names <- levels(loafercreek$genhz)
-
-# plot generalized horizons via color
-loafercreek$genhz.soil_color <- cols[match(loafercreek$genhz, hz.names)]
-
-par(mar=c(4,0,0,0))
-plot(loafercreek, name='hzname', print.id=FALSE, cex.names=0.8, axis.line.offset=-4, color='genhz.soil_color', divide.hz=TRUE)
-legend('bottomleft', legend=hz.names, col=cols, pch=15, bty='n', cex=2)
+# cross-tabulate original horizon designations and GHL
+addmargins(table(loafercreek$genhz, loafercreek$hzname))
 ```
+
+From the above cross-tabulation, we can see that a couple of original designations were not macthed (`not-used` in the table) by our REGEX rules: BA, Bw, and Oi horizons. In this example, we are going to make the assumption that those horizons aren't common enough for inclusion in our set of GHL.
+
+## Evaluation of Generalized Horizon Labels
+
+An initial evaluation of our GHL assignment can be accomplished by plotting profile sketches with horizons colored by GHL. That looks about right, but further investigation may be warranted.
+```{r eval-ghl-1, fig.width=12, fig.height=5}
+# make a palette of colors, last color is for not-used class
+cols <- c(grey(0.33), 'orange', 'orangered', 'chocolate', 'green', 'blue', 'yellow')
+# assign a color to each generalized horizon label
+hz.names <- levels(loafercreek$genhz)
+loafercreek$genhz.soil_color <- cols[match(loafercreek$genhz, hz.names)]
+# plot generalized horizons via color and add a legend
+par(mar=c(4,0,0,0))
+plot(loafercreek, name='hzname', print.id=FALSE, cex.names=0.8, axis.line.offset=-4, color='genhz.soil_color')
+legend('bottomleft', legend=hz.names, pt.bg=c(cols), pch=22, bty='n', cex=2)
+```
+
+
+
+### Advanced: Multivariate Soil Property Summary
+A simultanious summary of more than two soil properties can be achieved with [non-metric multidimensional scaling](http://en.wikipedia.org/wiki/Multidimensional_scaling). In this example, clay content, total rock fragment volume, and horizon mid-points are used.
+
+
+```{r evaluate-genhz-assignment}
+# store the column names of our variables of interest
+vars <- c('clay', 'mid', 'total_frags_pct')
+# result is a list of several items
+hz.eval <- evalGenHZ(loafercreek, 'genhz', vars)
+
+# extract MDS coords
+loafercreek$mds.1 <- hz.eval$horizons$mds.1
+loafercreek$mds.2 <- hz.eval$horizons$mds.2
+
+# extract silhouette widths and neighbor
+loafercreek$sil.width <- hz.eval$horizons$sil.width
+loafercreek$neighbor <- hz.eval$horizons$neighbor
+```
+
+
+
+```{r eval-ghl-2, fig.width=10, fig.height=10}
+loafercreek.df <- as(loafercreek, 'data.frame')
+
+mdsplot <- xyplot(mds.2 ~ mds.1, groups=genhz, data=loafercreek.df, 
+                  xlab='', ylab='', aspect=1,
+                  scales=list(draw=FALSE), 
+                  auto.key=list(columns=length(levels(loafercreek.df$genhz))), 
+                  par.settings=list(
+                    superpose.symbol=list(pch=16, cex=3, alpha=0.5)
+                  )
+)
+# annotate with original hzname, pedon_id, and phiid
+mdsplot +
+  layer(panel.abline(h=0, v=0, col='grey', lty=3)) + 
+  layer(panel.text(loafercreek.df$mds.1, loafercreek.df$mds.2, loafercreek.df$hzname, cex=0.85, font=2, pos=3)) +
+  layer(panel.text(loafercreek.df$mds.1, loafercreek.df$mds.2, loafercreek.df$pedon_id, cex=0.55, font=1, pos=1))
+
+```
+
+```{r eval-ghl-3, fig.width=12, fig.height=5}
+par(mar=c(0,0,3,3))
+plot(loafercreek, name='hzname', label='pedon_id', cex.names=0.8, axis.line.offset=-4, color='sil.width')
+
+summary(loafercreek.df$sil.width)
+
+check.idx <- which(loafercreek.df$sil.width < 0)
+
+loafercreek.df[check.idx[order(loafercreek.df$sil.width[check.idx])], c('peiid', 'pedon_id', 'hzname', 'genhz', 'neighbor', 'sil.width', vars)]
+
+hz.eval$stats
+```
+
+
+
+
+## Saving GHL to NASIS
+
+
+```{r save-to-nasis, eval=FALSE}
+# Once further changes to genhz has been made - we could kick out a horizon_agg.txt file which captures those changes for uploading to NASIS
+# then when the comp summary report is run from NASIS data it will reflect all the custom changes to the genhz/comp layer field
+# clear-out any existing files
+rules.file <- 'C:/data/horizon_agg.txt'
+write.table(data.frame(), file=rules.file, row.names=FALSE, quote=FALSE, na='', col.names=FALSE, sep='|')
+
+# strip-out 'not-used' values
+h <- f.i.h[which(h$genhz != 'not-used'), c('phiid', 'genhz')]
+# append to NASIS import file
+if(nrow(h) > 0)
+  write.table(h, file=rules.file, row.names=FALSE, quote=FALSE, na='', col.names=FALSE, sep='|', append=TRUE)
+```
+
+
+
+# Concluding Remarks
+
 
 
