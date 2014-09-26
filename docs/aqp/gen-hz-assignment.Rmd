@@ -32,6 +32,7 @@ Now that you have all of the R packages that this document depends on, it would 
 ```{r load-packages}
 library(aqp)
 library(soilDB)
+library(ape) # you will need to install this package
 library(latticeExtra) # you will need to install this package
 library(plyr) # you will need to install this package
 library(lattice) # these packages come with R and do not need to be installed
@@ -44,7 +45,7 @@ Variation in horizon designation "style" among different soil scientists, change
 
 Here is a basic outline of the process:
 
-  1. Select a set of GHL that best represent a group of pedons to be aggregated. This could be based on series descriptions, expert-knowledge, or even inspection of the most frequently occuring horizon designations.
+  1. Select a set of GHL that best represent a group of pedons to be aggregated. This could be based on series descriptions, expert-knowledge, or even inspection of the most frequently occurring horizon designations.
   
   2. Assign GHL to each horizon using whatever information that is available for grouping horizons. This micro-correlation of horizon designations will likely require slightly different "rules" in each instance. Careful inspection of horizon designation and observed properties is critical.
   
@@ -139,7 +140,7 @@ plot(loafercreek, name='hzname', print.id=FALSE, cex.names=0.8, axis.line.offset
 
 Once a set of generalized horizon labels have been determined a corresponding set of [regular expression](http://en.wikipedia.org/wiki/Regular_expression) (REGEX) rules were developed to convert field-described designations into GHL. Pattern matching with REGEX will typically assign useful GHL, however, there will always be cases where manual intervention is required. More on that later.
 
-From the above analysis and the [OSD](https://soilseries.sc.egov.usda.gov/OSD_Docs/L/LOAFERCREEK.html), it seems like the following sequence of GHL are appropriate: (`r c('A','Bt1','Bt2','Bt3','Cr','R')`)-- an A horizon, followed by 3 Bt horizons, then Cr and finally R. For each GHL we need a corrosponding REGEX rule. For example, `'^A$|Ad|Ap'` will match 'A', 'Ad', and 'Ap'.
+From the above analysis and the [OSD](https://soilseries.sc.egov.usda.gov/OSD_Docs/L/LOAFERCREEK.html), it seems like the following sequence of GHL are appropriate: (`r c('A','Bt1','Bt2','Bt3','Cr','R')`)-- an A horizon, followed by 3 Bt horizons, then Cr and finally R. For each GHL we need a corresponding REGEX rule. For example, `'^A$|Ad|Ap'` will match 'A', 'Ad', and 'Ap'.
 
 ```{r generalize-hz-names-1}
 # save our GHL
@@ -154,19 +155,19 @@ p <- c('^A$|Ad|Ap',
 ```
 
 
-Apply GHL pattern-matching rules and save to a new column called `genhz` and cross-tabulate the occurence of GHL and original designations.
+Apply GHL pattern-matching rules and save to a new column called `genhz` and cross-tabulate the occurrence of GHL and original designations.
 ```{r generalize-hz-names-2}
 loafercreek$genhz <- generalize.hz(loafercreek$hzname, n, p)
 # cross-tabulate original horizon designations and GHL
 addmargins(table(loafercreek$genhz, loafercreek$hzname))
 ```
 
-From the above cross-tabulation, we can see that a couple of original designations were not macthed (`not-used` in the table) by our REGEX rules: BA, Bw, and Oi horizons. In this example, we are going to make the assumption that those horizons aren't common enough for inclusion in our set of GHL.
+From the above cross-tabulation, we can see that a couple of original designations were not matched (`not-used` in the table) by our REGEX rules: BA, Bw, and Oi horizons. In this example, we are going to make the assumption that those horizons aren't common enough for inclusion in our set of GHL.
 
 ## Evaluation of Generalized Horizon Labels
 
 An initial evaluation of our GHL assignment can be accomplished by plotting profile sketches with horizons colored by GHL. That looks about right, but further investigation may be warranted.
-```{r eval-ghl-1, fig.width=12, fig.height=5}
+```{r plot-ghl-1, fig.width=12, fig.height=5}
 # make a palette of colors, last color is for not-used class
 cols <- c(grey(0.33), 'orange', 'orangered', 'chocolate', 'green', 'blue', 'yellow')
 # assign a color to each generalized horizon label
@@ -179,31 +180,49 @@ legend('bottomleft', legend=hz.names, pt.bg=c(cols), pch=22, bty='n', cex=2)
 ```
 
 
+A box and whisker plot of the depth-ranges for each of the generalized horizon labels helps to visualize the degree of overlap. [Slicing](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/aqp/aqp-intro.html?root=aqp) the collection of profiles along 1-cm intervals generates a more precise figure.
+```{r plot-ghl-2, fig.width=6, fig.height=5}
+# slice profile collection from 0-150 cm
+s <- slice(loafercreek, 0:150 ~ genhz)
+# convert horizon name back to factor, using original levels
+s$genhz <- factor(s$genhz, levels = hz.names)
+# plot depth-ranges of generalized horizon slices
+bwplot(hzdept ~ genhz, data=horizons(s), 
+       ylim=c(155, -5), ylab='Generalized Horizon Depth (cm)', 
+       scales=list(y=list(tick.number=10)), asp=1, 
+       panel=function(...) {
+          panel.abline(h=seq(0, 140, by=10), v=1:length(hz.names),col=grey(0.8), lty=3)
+	        panel.bwplot(...)
+          }
+       )
+```
+
+
+
 
 ### Advanced: Multivariate Soil Property Summary
-A simultanious summary of more than two soil properties can be achieved with [non-metric multidimensional scaling](http://en.wikipedia.org/wiki/Multidimensional_scaling). In this example, clay content, total rock fragment volume, and horizon mid-points are used.
 
+The evaluation of generalized horizon labels typically requires a review of more information than field-described horizon labels and depth. For example, clay content, sand content, pH, total rock fragment volume, and horizon mid-points are soil properties that can be used to differentiate horizons-- as long as the data are populated. In this document clay content, total rock fragment volume and horizon mid-points are used. Multivariate comparisons are commonly based on the concept of [pair-wise dissimilarity](http://hymenoptera.tamu.edu/courses/ento601/pdf/Sokal_1966.pdf), and subsequent reduction of the resulting [distance matrix](http://en.wikipedia.org/wiki/Distance_matrix) into a simpler representation. [Non-metric multidimensional scaling](http://en.wikipedia.org/wiki/Multidimensional_scaling) is one method for reducing the distance matrix into a new set of coordinates in two-dimensional space. A [related](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/aqp/aqp-profile-dissimilarity.html?root=aqp) document explores this idea further.
 
 ```{r evaluate-genhz-assignment}
 # store the column names of our variables of interest
 vars <- c('clay', 'mid', 'total_frags_pct')
 # result is a list of several items
 hz.eval <- evalGenHZ(loafercreek, 'genhz', vars)
-
 # extract MDS coords
 loafercreek$mds.1 <- hz.eval$horizons$mds.1
 loafercreek$mds.2 <- hz.eval$horizons$mds.2
-
 # extract silhouette widths and neighbor
 loafercreek$sil.width <- hz.eval$horizons$sil.width
 loafercreek$neighbor <- hz.eval$horizons$neighbor
 ```
 
 
-
-```{r eval-ghl-2, fig.width=10, fig.height=10}
+In the following figure generalized horizon labels are plotted at nMDS coordinates as colored circles, along with original horizon designations and pedon IDs. Ideally, groupings of GHL should form relatively homogeneous clusters in this figure, however, there will always be some overlap at the edges. Heterogeneous regions should probably be inspected for cases where assigned HGL may not make sense. In this case, the original designation of "Bt2" for pedon ID 09CKS036 doesn't seem to fit into the 'Bt2' generalized horizon. According to the soil properties used (clay content, total rock fragments, horizon mid-point) it may fit better into the 'Bt1' generalized horizon. Decisions like this can only be made within the context of field experience or at least some level of expert knowledge about the soils in question.
+```{r mds-plot, fig.width=10, fig.height=10}
+# convert loafercreek to a data.frame
 loafercreek.df <- as(loafercreek, 'data.frame')
-
+# plot generalized horizon labels at MDS coordinates
 mdsplot <- xyplot(mds.2 ~ mds.1, groups=genhz, data=loafercreek.df, 
                   xlab='', ylab='', aspect=1,
                   scales=list(draw=FALSE), 
@@ -212,47 +231,49 @@ mdsplot <- xyplot(mds.2 ~ mds.1, groups=genhz, data=loafercreek.df,
                     superpose.symbol=list(pch=16, cex=3, alpha=0.5)
                   )
 )
-# annotate with original hzname, pedon_id, and phiid
+
+# annotate with original hzname and pedon ID
 mdsplot +
   layer(panel.abline(h=0, v=0, col='grey', lty=3)) + 
   layer(panel.text(loafercreek.df$mds.1, loafercreek.df$mds.2, loafercreek.df$hzname, cex=0.85, font=2, pos=3)) +
   layer(panel.text(loafercreek.df$mds.1, loafercreek.df$mds.2, loafercreek.df$pedon_id, cex=0.55, font=1, pos=1))
-
 ```
 
-```{r eval-ghl-3, fig.width=12, fig.height=5}
+
+The [silhouette width](http://www.sciencedirect.com/science/article/pii/0377042787901257) metric is a useful indicator of how consistently group labels partition observations in a dissimilarity matrix. Silhouette widths closer to 1 indicate excellent partitioning, while values closer to 0 indicate less effective partitioning. Silhouette widths less than 0 are often associated with inappropriate label assignment. A sketch of profiles with horizons colored by silhouette width can shed some light on possible horizons with inappropriate GHL assignment or perhaps a pedon that doesn't fit within the concept of Loafercreek. For example, many of the horizons associated with pedon ID 09CKS036 don't appear to fit within the collection of soil properties associated with generalized horizon labels "Bt1", "Bt2", and "Bt3". Keep in mind that this evaluation is only based on three soil properties-- expert guidance will be required for a final assignment of GHL.
+```{r silhouette-sketch, fig.width=12, fig.height=5}
 par(mar=c(0,0,3,3))
 plot(loafercreek, name='hzname', label='pedon_id', cex.names=0.8, axis.line.offset=-4, color='sil.width')
+```
 
-summary(loafercreek.df$sil.width)
 
+The following table contains information on those horizons with silhouette widths less than 0. The "neighbor" column contains the next closest GHL (in terms of soil properties used in the pair-wise dissimilarity calculation) which may be a more appropriate GHL candidate.
+```{r silhouette-summary}
+# index those horizons with silhouette widths less than 0
 check.idx <- which(loafercreek.df$sil.width < 0)
-
-loafercreek.df[check.idx[order(loafercreek.df$sil.width[check.idx])], c('peiid', 'pedon_id', 'hzname', 'genhz', 'neighbor', 'sil.width', vars)]
-
+# sort this index based on min sil.width
+check.idx.sorted <- check.idx[order(loafercreek.df$sil.width[check.idx])]
+# list those pedons/horizons that may need some further investigation
+loafercreek.df[check.idx.sorted, c('peiid', 'pedon_id', 'hzname', 'genhz', 'neighbor', 'sil.width', vars)]
+# print a table summarizing the mean and standard deviation (in parenthesis) of soil properites considered
 hz.eval$stats
 ```
 
 
-
-
 ## Saving GHL to NASIS
 
-
+Once further changes to genhz has been made, save a "horizon_agg.txt"" file which captures those changes for uploading to NASIS. (details on running calculation here). Comp summary report is run from NASIS data it will reflect all the custom changes to the genhz/comp layer field.
 ```{r save-to-nasis, eval=FALSE}
-# Once further changes to genhz has been made - we could kick out a horizon_agg.txt file which captures those changes for uploading to NASIS
-# then when the comp summary report is run from NASIS data it will reflect all the custom changes to the genhz/comp layer field
 # clear-out any existing files
 rules.file <- 'C:/data/horizon_agg.txt'
 write.table(data.frame(), file=rules.file, row.names=FALSE, quote=FALSE, na='', col.names=FALSE, sep='|')
-
-# strip-out 'not-used' values
-h <- f.i.h[which(h$genhz != 'not-used'), c('phiid', 'genhz')]
+# extract horizon data
+h <- horizons(loafercreek)
+# strip-out 'not-used' genhz labels and retain horizon ID and genhz assignment
+h <- h[which(h$genhz != 'not-used'), c('phiid', 'genhz')]
 # append to NASIS import file
-if(nrow(h) > 0)
-  write.table(h, file=rules.file, row.names=FALSE, quote=FALSE, na='', col.names=FALSE, sep='|', append=TRUE)
+write.table(h, file=rules.file, row.names=FALSE, quote=FALSE, na='', col.names=FALSE, sep='|', append=TRUE)
 ```
-
 
 
 # Concluding Remarks
