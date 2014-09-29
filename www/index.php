@@ -59,6 +59,13 @@ echo $contents; } ?>
 <li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/gSSURGO-SDA.html?root=aqp">gridded SSURRGO (gSSURGO) and SDA</a></li>
 <li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/sharpshootR/component-relation-graph.html?root=aqp">Component Relation Graphs</a></li>
 <li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/sharpshootR/OSD-dendrogram.html?root=aqp">OSD Dendrogram</a></li>
+
+<li>Pedon Data Aggregation<ol>
+<li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/aqp/gen-hz-assignment.html?root=aqp">Assignment of generalized horizon labels</a></li>
+<li>Computing range in characteristics by generalized horizon label</li>
+<li>Estimation of most-likely horizonation</li>
+</ol</li>
+
 </ol>
 </p>
 

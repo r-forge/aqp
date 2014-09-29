@@ -7,7 +7,7 @@ options(width=100, stringsAsFactors=FALSE)
 
 Component association is a function of how frequently components co-occur, weighted by component percentage. This summary should generate structures that are related to soil-landscape concepts that were used to construct collections of map units associated with one or more soil survey legends. These diagrams are 2D approximations of the multi-dimensional relationship between components-- where each node is a component, lines (edges) connect components that have been mapped together, colors define groups of components that frequently co-occur, node proximity is proportional to co-occurrence, and size is proportional to "connectivity".
 
-Details pending.
+Details pending. (A recent discussion on the topic)[http://casoilresource.lawr.ucdavis.edu/wiki/SoilSeriesRelationGraph#Recent_Dialog].
 
 ## Simple Example
 ```{r libraries-and-sample, fig.width=14, fig.height=7, out.width='100%'}
