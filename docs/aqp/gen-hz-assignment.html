@@ -203,7 +203,7 @@ hr {
 <body>
 <h1>Assigning Generalized Horizon Labels</h1>
 
-<p>D.E. Beaudette, J.M. Skovlin [2014-09-26]</p>
+<p>D.E. Beaudette, J.M. Skovlin [2014-09-29]</p>
 
 <h1>Setup</h1>
 
@@ -239,13 +239,13 @@ library(MASS)
 <li><p>Select a set of GHL that best represent a group of pedons to be aggregated. This could be based on series descriptions, expert-knowledge, or even inspection of the most frequently occurring horizon designations.</p></li>
 <li><p>Assign GHL to each horizon using whatever information that is available for grouping horizons. This micro-correlation of horizon designations will likely require slightly different &ldquo;rules&rdquo; in each instance. Careful inspection of horizon designation and observed properties is critical.</p></li>
 <li><p>Evaluate GHL assignments and manually refine as needed. Keep track of final GHL assignments in NASIS or text file. </p></li>
-<li><p>Compute summary statistics (e.g. clay, sand, pH, etc.) over GHL. (next document in this series)</p></li>
+<li><p>Compute range in characteristics, aka <a href="http://casoilresource.lawr.ucdavis.edu/wiki/Low-rv-high">low-rv-high values</a>, (e.g. clay, sand, pH, etc.) over GHL. (next document in this series)</p></li>
 <li><p>Estimate a most-likely horizonation (e.g. top and bottom depths) for each generalized horizon label. (next document in this series)</p></li>
 </ol>
 
 <h1>Sample Data</h1>
 
-<p>While the methods outlined in this document can be applied to any collection of pedons, it is convenient to work with a standardized set of data. You can follow along with the analysis by copying code from the following blocks and running it in your <strong>R</strong> session. The sample data used in this document is based on 15 soil profiles that have been correlated to the <a href="https://soilseries.sc.egov.usda.gov/OSD_Docs/L/LOAFERCREEK.html">Loafercreek</a> soil series from the Sierra Nevada Foothill Region of California.</p>
+<p>While the methods outlined in this document can be applied to any collection of pedons, it is convenient to work with a standardized set of data. You can follow along with the analysis by copying code from the following blocks and running it in your <strong>R</strong> session. The sample data used in this document is based on 15 soil profiles that have been correlated to the <a href="https://soilseries.sc.egov.usda.gov/OSD_Docs/L/LOAFERCREEK.html">Loafercreek</a> soil series from the Sierra Nevada Foothill Region of California. Note that the internal structure of the <code>loafercreek</code> data is identical to the structure returned by <a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/soilDB-Intro.html?root=aqp"><code>fetchNASIS()</code> from the soilDB package</a>.</p>
 
 <pre><code class="r"># load sample data from the soilDB package
 data(loafercreek, package = &#39;soilDB&#39;)
@@ -483,19 +483,21 @@ loafercreek.df[check.idx.sorted, c(&#39;peiid&#39;, &#39;pedon_id&#39;, &#39;hzn
 hz.eval$stats
 </code></pre>
 
-<pre><code>##      genhz         clay           mid total_frags_pct   sil.width
-## 1        A 14.27 (3.15)   3.27 (1.47)     3.33 (3.39) 0.51 (0.25)
-## 2      Bt1    19 (2.36)   15.6 (5.19)   11.87 (14.47)  0.26 (0.2)
-## 3      Bt2 24.13 (4.53)  32.93 (7.03)   25.93 (24.65)  0.04 (0.2)
-## 4      Bt3  28.5 (5.17)  57.8 (14.48)    40.5 (24.71) 0.12 (0.19)
-## 5       Cr     NaN (NA) 76.75 (14.11)           0 (0)    NaN (NA)
-## 6        R     NaN (NA) 142.15 (8.92)           0 (0)    NaN (NA)
-## 7 not-used  15.8 (2.68)   3.79 (5.07)     1.36 (2.41)    NaN (NA)
+<pre><code>##      genhz clay mid total_frags_pct sil.width
+## 1        A   15  15              15        15
+## 2      Bt1   15  15              15        15
+## 3      Bt2   15  15              15        15
+## 4      Bt3   20  20              20        20
+## 5       Cr   14  14              14        14
+## 6        R   10  10              10        10
+## 7 not-used   14  14              14        14
 </code></pre>
 
 <h2>Saving GHL to NASIS</h2>
 
-<p>Once further changes to genhz has been made, save a &ldquo;horizon_agg.txt&rdquo;&ldquo; file which captures those changes for uploading to NASIS. (details on running calculation here). Comp summary report is run from NASIS data it will reflect all the custom changes to the genhz/comp layer field.</p>
+<p>GHL assignment as decried thus far applies only to <strong><em>in-memory</em></strong> objects in the current R session. In order to use these GHL in further analysis or perform manual adjustments, the GHL need to be saved externally. If you are a NASIS user (working with data derived from NASIS) then the following code will create a text file that be read by NASIS and stored in the <code>dspcomplayerid</code> field of the &ldquo;pedon horizon&rdquo; table. The &ldquo;Update horizon group aggregations&rdquo; calculation (&ldquo;Calculations&rdquo; -&gt; &ldquo;Pedon Horizon&rdquo; -&gt; &ldquo;Update horizon group aggregations&rdquo;) expects a text file at <code>C:/data/horizon_agg.txt</code>, containing phiid and generalized horizon labels.</p>
+
+<p>Note that some people prefer to adjust GHL assignments in R while others prefer to make adjustments after loading the data into NASIS.</p>
 
 <pre><code class="r"># clear-out any existing files
 rules.file &lt;- &#39;C:/data/horizon_agg.txt&#39;
@@ -509,6 +511,8 @@ write.table(h, file=rules.file, row.names=FALSE, quote=FALSE, na=&#39;&#39;, col
 </code></pre>
 
 <h1>Concluding Remarks</h1>
+
+<p>In the next document we will work with pedon data from NASIS and use our GHL to generate estimates of &ldquo;low-rv-high&rdquo; style range in characteristics. An alternative approach to assignment of GHL can be performed with the &ldquo;Update comp layer id by hzname (horizon group Aggregation)&rdquo; calculation&ndash; however, this calculation performs only basic pattern matching.</p>
 
 </body>
 
