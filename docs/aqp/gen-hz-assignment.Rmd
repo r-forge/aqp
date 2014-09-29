@@ -51,14 +51,14 @@ Here is a basic outline of the process:
   
   3. Evaluate GHL assignments and manually refine as needed. Keep track of final GHL assignments in NASIS or text file. 
   
-  4. Compute summary statistics (e.g. clay, sand, pH, etc.) over GHL. (next document in this series)
+  4. Compute range in characteristics, aka [low-rv-high values](http://casoilresource.lawr.ucdavis.edu/wiki/Low-rv-high), (e.g. clay, sand, pH, etc.) over GHL. (next document in this series)
   
   5. Estimate a most-likely horizonation (e.g. top and bottom depths) for each generalized horizon label. (next document in this series)
 
 
 
 # Sample Data
-While the methods outlined in this document can be applied to any collection of pedons, it is convenient to work with a standardized set of data. You can follow along with the analysis by copying code from the following blocks and running it in your **R** session. The sample data used in this document is based on 15 soil profiles that have been correlated to the [Loafercreek](https://soilseries.sc.egov.usda.gov/OSD_Docs/L/LOAFERCREEK.html) soil series from the Sierra Nevada Foothill Region of California.
+While the methods outlined in this document can be applied to any collection of pedons, it is convenient to work with a standardized set of data. You can follow along with the analysis by copying code from the following blocks and running it in your **R** session. The sample data used in this document is based on 15 soil profiles that have been correlated to the [Loafercreek](https://soilseries.sc.egov.usda.gov/OSD_Docs/L/LOAFERCREEK.html) soil series from the Sierra Nevada Foothill Region of California. Note that the internal structure of the `loafercreek` data is identical to the structure returned by [`fetchNASIS()` from the soilDB package](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/soilDB-Intro.html?root=aqp).
 
 ```{r load-data, fig.width=12, fig.height=5}
 # load sample data from the soilDB package
@@ -260,9 +260,11 @@ hz.eval$stats
 ```
 
 
-## Saving GHL to NASIS
 
-Once further changes to genhz has been made, save a "horizon_agg.txt"" file which captures those changes for uploading to NASIS. (details on running calculation here). Comp summary report is run from NASIS data it will reflect all the custom changes to the genhz/comp layer field.
+## Saving GHL to NASIS
+GHL assignment as decried thus far applies only to ***in-memory*** objects in the current R session. In order to use these GHL in further analysis or perform manual adjustments, the GHL need to be saved externally. If you are a NASIS user (working with data derived from NASIS) then the following code will create a text file that be read by NASIS and stored in the `dspcomplayerid` field of the "pedon horizon" table. The "Update horizon group aggregations" calculation ("Calculations" -> "Pedon Horizon" -> "Update horizon group aggregations") expects a text file at `C:/data/horizon_agg.txt`, containing phiid and generalized horizon labels.
+
+Note that some people prefer to adjust GHL assignments in R while others prefer to make adjustments after loading the data into NASIS.
 ```{r save-to-nasis, eval=FALSE}
 # clear-out any existing files
 rules.file <- 'C:/data/horizon_agg.txt'
@@ -277,6 +279,6 @@ write.table(h, file=rules.file, row.names=FALSE, quote=FALSE, na='', col.names=F
 
 
 # Concluding Remarks
-
+In the next document we will work with pedon data from NASIS and use our GHL to generate estimates of "low-rv-high" style range in characteristics. An alternative approach to assignment of GHL can be performed with the "Update comp layer id by hzname (horizon group Aggregation)" calculation-- however, this calculation performs only basic pattern matching.
 
 
