@@ -65,8 +65,7 @@
 
 <h3>Examples</h3>
 
-<pre><code class="r">
-# install the required packages
+<pre><code class="r"># install the required packages
 ## Not run: 
 ##D install.packages(&#39;RCurl&#39;, dep=TRUE)
 ##D install.packages(&#39;XML&#39;, dep=TRUE)
@@ -76,9 +75,9 @@
 
 # SSURGO export metadata:
 ## Not run: 
-##D q &lt;- &quot;SELECT areasymbol, saverest FROM sacatalog WHERE areasymbol LIKE &#39;CA##D 
+##D q &lt;- &quot;SELECT areasymbol, saverest FROM sacatalog WHERE areasymbol LIKE &#39;CA%&#39;;&quot;
 ##D x &lt;- SDA_query(q)
-##D x$saverest &lt;- as.Date(x$saverest, format=&quot;##D 
+##D x$saverest &lt;- as.Date(x$saverest, format=&quot;%m/%d/%Y&quot;)
 ##D head(x)
 ## End(Not run)
 
@@ -120,9 +119,8 @@
 ##D 
 ##D res &lt;- SDA_query(q)
 ## End(Not run)
-
 </code></pre>
 
 
-<hr><div align="center">[Package <em>soilDB</em> version 1.2-8 <a href="00Index.html">Index</a>]</div>
+<hr><div align="center">[Package <em>soilDB</em> version 1.3-5 <a href="00Index.html">Index</a>]</div>
 </body></html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: CDEC Snow Course List</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+
+<link rel="stylesheet" href="http://yandex.st/highlightjs/7.3/styles/github.min.css">
+<script src="http://yandex.st/highlightjs/7.3/highlight.min.js"></script>
+<script src="http://yandex.st/highlightjs/7.3/languages/r.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</head><body>
+
+<table width="100%" summary="page for CDEC.snow.courses {sharpshootR}"><tr><td>CDEC.snow.courses {sharpshootR}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>CDEC Snow Course List</h2>
+
+<h3>Description</h3>
+
+<p>The CDEC snow course list, updated 2014</p>
+
+
+<h3>Usage</h3>
+
+<pre>data(CDEC.snow.courses)</pre>
+
+
+<h3>Format</h3>
+
+<p>A data frame with 261 observations on the following 8 variables.
+</p>
+
+<dl>
+<dt><code>course_number</code></dt><dd><p>course number</p>
+</dd>
+<dt><code>name</code></dt><dd><p>connotative course label</p>
+</dd>
+<dt><code>id</code></dt><dd><p>course ID</p>
+</dd>
+<dt><code>elev_feet</code></dt><dd><p>course elevation in feet</p>
+</dd>
+<dt><code>latitude</code></dt><dd><p>latitude</p>
+</dd>
+<dt><code>longitude</code></dt><dd><p>longitude</p>
+</dd>
+<dt><code>april.1.Avg.inches</code></dt><dd><p>average inches of snow as of April 1st</p>
+</dd>
+<dt><code>agency</code></dt><dd><p>responsible agency</p>
+</dd>
+</dl>
+
+
+
+<h3>Source</h3>
+
+<p>Data were scraped from <a href="http://cdec.water.ca.gov/misc/SnowCourses.html">http://cdec.water.ca.gov/misc/SnowCourses.html</a>, 2014.</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="r">data(CDEC.snow.courses)
+head(CDEC.snow.courses)
+</code></pre>
+
+<pre><code>##   course_number             name  id elev_feet latitude longitude
+## 1             1      PARKS CREEK PRK      6700   41.367   122.550
+## 2             2    LITTLE SHASTA LSH      6200   41.808   122.195
+## 3             3       SWEETWATER SWT      5850   41.382   122.535
+## 4             5 MIDDLE BOULDER 1 MBL      6600   41.217   122.807
+## 5           417         BOX CAMP BXC      6450   41.597   123.165
+## 6           311 MIDDLE BOULDER 3 MB3      6200   41.225   122.811
+##   april.1.Avg.inches                             agency
+## 1               37.4       Mount Shasta Ranger District
+## 2               19.0          Goosenest Ranger District
+## 3               13.7       Mount Shasta Ranger District
+## 4               32.4 Salmon/Scott River Ranger District
+## 5               35.9 Salmon/Scott River Ranger District
+## 6               28.3 Salmon/Scott River Ranger District
+</code></pre>
+
+
+<hr><div align="center">[Package <em>sharpshootR</em> version 0.6-6 <a href="00Index.html">Index</a>]</div>
+</body></html>

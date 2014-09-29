@@ -2,6 +2,11 @@
 <html><head><title>R: LoaferCreek Soils</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link rel="stylesheet" type="text/css" href="R.css">
+
+<link rel="stylesheet" href="http://yandex.st/highlightjs/7.3/styles/github.min.css">
+<script src="http://yandex.st/highlightjs/7.3/highlight.min.js"></script>
+<script src="http://yandex.st/highlightjs/7.3/languages/r.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
 </head><body>
 
 <table width="100%" summary="page for loafercreek {soilDB}"><tr><td>loafercreek {soilDB}</td><td align="right">R Documentation</td></tr></table>
@@ -123,5 +128,39 @@
   .. ..$ featdept     : int [1:170] 0 23 64 1 12 68 0 9 97 110 ...
   .. ..$ featdepb     : int [1:170] 23 64 NA 12 68 100 9 97 110 NA ...
 </PRE>
-<hr><div align="center">[Package <em>soilDB</em> version 1.2-8 <a href="00Index.html">Index</a>]</div>
+
+<h3>Examples</h3>
+
+<pre><code class="r">## Not run: 
+##D # load example dataset
+##D data(gopheridge)
+##D 
+##D # what kind of object is this?
+##D class(gopheridge)
+##D 
+##D # tighten figure margins:
+##D par(mar=c(0,0,4,0))
+##D 
+##D # plot soil colors
+##D plot(gopheridge, name=&#39;hzname&#39;, color=&#39;soil_color&#39;)
+##D 
+##D # generate colors based on clay content
+##D plot(gopheridge, name=&#39;hzname&#39;, color=&#39;clay&#39;)
+##D 
+##D # plot soils sorted by depth to contact
+##D plot(gopheridge, name=&#39;hzname&#39;, plot.order=order(gopheridge$bedrckdepth))
+##D 
+##D # plot first 10 profiles
+##D plot(gopheridge[1:10, ], name=&#39;hzname&#39;, color=&#39;soil_color&#39;)
+##D 
+##D # add rock fragment data to plot:
+##D addVolumeFraction(gopheridge[1:10, ], colname=&#39;total_frags_pct&#39;)
+##D 
+##D # add diagnostic horizons
+##D addDiagnosticBracket(gopheridge[1:10, ], kind=&#39;argillic horizon&#39;, col=&#39;red&#39;)
+## End(Not run)
+</code></pre>
+
+
+<hr><div align="center">[Package <em>soilDB</em> version 1.3-5 <a href="00Index.html">Index</a>]</div>
 </body></html>

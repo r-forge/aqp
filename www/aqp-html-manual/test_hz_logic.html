@@ -74,8 +74,7 @@ test_hz_logic(i, topcol, bottomcol, strict = FALSE)
 
 <h3>Examples</h3>
 
-<pre><code class="r">
-## simple example: just one profile
+<pre><code class="r">## simple example: just one profile
 data(sp1)
 depths(sp1) &lt;- id ~ top + bottom
 s &lt;- horizons(sp1[1, ])
@@ -90,8 +89,7 @@ test_hz_logic(s, &#39;top&#39;, &#39;bottom&#39;, strict=FALSE)
 ##         FALSE
 </code></pre>
 
-<pre><code class="r">
-# fails due to inconsistent hz boundary
+<pre><code class="r"># fails due to inconsistent hz boundary
 s$bottom[3] &lt;- 30 # inconsistent hz boundary
 test_hz_logic(s, &#39;top&#39;, &#39;bottom&#39;, strict=TRUE)
 </code></pre>
@@ -100,9 +98,7 @@ test_hz_logic(s, &#39;top&#39;, &#39;bottom&#39;, strict=TRUE)
 ##         FALSE
 </code></pre>
 
-<pre><code class="r">
-
-## filtering bad data 
+<pre><code class="r">## filtering bad data 
 ## Not run: 
 ##D # missing bottom horizons
 ##D x$hzn_bot[!is.na(x$hzn_top) &amp; is.na(x$hzn_bot)] &lt;- x$hzn_top[!is.na(x$hzn_top) &amp; is.na(x$hzn_bot)]
@@ -148,9 +144,6 @@ ddply(sp1, &#39;id&#39;, test_hz_logic, topcol=&#39;top&#39;, bottomcol=&#39;bot
 ## 9 P009          TRUE
 </code></pre>
 
-<pre><code class="r">
-</code></pre>
 
-
-<hr><div align="center">[Package <em>aqp</em> version 1.6-1 <a href="00Index.html">Index</a>]</div>
+<hr><div align="center">[Package <em>aqp</em> version 1.7-6 <a href="00Index.html">Index</a>]</div>
 </body></html>

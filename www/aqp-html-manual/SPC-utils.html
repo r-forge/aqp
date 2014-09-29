@@ -40,8 +40,7 @@
 
 <h3>Examples</h3>
 
-<pre><code class="r">
-data(sp1)
+<pre><code class="r">data(sp1)
 
 ## init SoilProfileCollection objects from data.frame
 depths(sp1) &lt;- id ~ top + bottom
@@ -76,9 +75,7 @@ nrow(sp1)
 <pre><code>## [1] 60
 </code></pre>
 
-<pre><code class="r">
-
-## getting site-level data
+<pre><code class="r">## getting site-level data
 site(sp1)
 </code></pre>
 
@@ -94,8 +91,7 @@ site(sp1)
 ## 9 P009
 </code></pre>
 
-<pre><code class="r">
-## setting site-level data
+<pre><code class="r">## setting site-level data
 # site-level data from horizon-level data (stored in @horizons)
 site(sp1) &lt;- ~ group
 
@@ -105,9 +101,8 @@ site(sp1) &lt;- ~ group
 # note that IDs should all be character class
 d &lt;- data.frame(id=profile_id(sp1), p=runif(n=length(sp1)), stringsAsFactors=FALSE)
 site(sp1) &lt;- d
-
 </code></pre>
 
 
-<hr><div align="center">[Package <em>aqp</em> version 1.6-1 <a href="00Index.html">Index</a>]</div>
+<hr><div align="center">[Package <em>aqp</em> version 1.7-6 <a href="00Index.html">Index</a>]</div>
 </body></html>

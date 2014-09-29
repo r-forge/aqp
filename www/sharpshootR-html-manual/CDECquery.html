@@ -1,0 +1,181 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Get water-related data (California only) from the CDEC...</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+
+<link rel="stylesheet" href="http://yandex.st/highlightjs/7.3/styles/github.min.css">
+<script src="http://yandex.st/highlightjs/7.3/highlight.min.js"></script>
+<script src="http://yandex.st/highlightjs/7.3/languages/r.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</head><body>
+
+<table width="100%" summary="page for CDECquery {sharpshootR}"><tr><td>CDECquery {sharpshootR}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Get water-related data (California only) from the CDEC website.</h2>
+
+<h3>Description</h3>
+
+<p>Get water-related data (California only) from the CDEC website.</p>
+
+
+<h3>Usage</h3>
+
+<pre>CDECquery(id, sensor, interval = "D", start, end)</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>id</code></td>
+<td>
+<p>station ID (e.g. 'spw'), see details</p>
+</td></tr>
+<tr valign="top"><td><code>sensor</code></td>
+<td>
+<p>the sensor ID (e.g. 45), see details</p>
+</td></tr>
+<tr valign="top"><td><code>interval</code></td>
+<td>
+<p>character, 'D' for daily, 'H' for hourly, 'M' for monthly</p>
+</td></tr>
+<tr valign="top"><td><code>start</code></td>
+<td>
+<p>starting date, in the format 'YYYY-MM-DD'</p>
+</td></tr>
+<tr valign="top"><td><code>end</code></td>
+<td>
+<p>ending date, in the format 'YYYY-MM-DD'</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+
+<dl>
+<dt>1.</dt><dd><p>Station IDs can be found here: <a href="http://cdec.water.ca.gov/staInfo.html">http://cdec.water.ca.gov/staInfo.html</a></p>
+</dd>
+<dt>2.</dt><dd><p>Sensor IDs can be found using this URL <a href="http://cdec.water.ca.gov/cgi-progs/queryCSV?station_id=">http://cdec.water.ca.gov/cgi-progs/queryCSV?station_id=</a>, followed by the station ID.</p>
+</dd>
+<dt>3.</dt><dd><p>Resevoir capacities can be found here <a href="http://cdec.water.ca.gov/misc/resinfo.html">http://cdec.water.ca.gov/misc/resinfo.html</a></p>
+</dd>
+</dl>
+
+
+
+<h3>Value</h3>
+
+<p>a <code>data.frame</code> object with the following fields: 'datetime', 'year', 'month', 'value'.</p>
+
+
+<h3>Author(s)</h3>
+
+<p>D.E. Beaudette</p>
+
+
+<h3>References</h3>
+
+<p><a href="http://cdec.water.ca.gov/queryCSV.html">http://cdec.water.ca.gov/queryCSV.html</a></p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="CDECsnowQuery.html">CDECsnowQuery</a></code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="r">## Not run: 
+##D library(latticeExtra)
+##D library(plyr)
+##D library(e1071)
+##D 
+##D # get daily resevoir storage (ac. ft) from Pinecrest, New Melones and Lyons resevoirs
+##D pinecrest &lt;- CDECquery(id=&#39;swb&#39;, sensor=15, interval=&#39;D&#39;, start=&#39;2012-09-01&#39;, end=&#39;2015-01-01&#39;)
+##D new.melones &lt;- CDECquery(id=&#39;nml&#39;, sensor=15, interval=&#39;D&#39;, start=&#39;2012-09-01&#39;, end=&#39;2015-01-01&#39;)
+##D lyons &lt;- CDECquery(id=&#39;lys&#39;, sensor=15, interval=&#39;D&#39;, start=&#39;2012-09-01&#39;, end=&#39;2015-01-01&#39;)
+##D 
+##D # compute storage capacity
+##D pinecrest$capacity &lt;- pinecrest$value / 18312 * 100
+##D new.melones$capacity &lt;- new.melones$value / 2400000 * 100
+##D lyons$capacity &lt;- lyons$value / 6228 * 100
+##D 
+##D # combine
+##D g &lt;- make.groups(new.melones, lyons, pinecrest)
+##D 
+##D # resonable date scale
+##D r &lt;- range(g$datetime)
+##D s.r &lt;- seq(from=r[1], to=r[2], by=&#39;1 month&#39;)
+##D 
+##D # better colors
+##D tps &lt;- list(superpose.line=list(lwd=2, col=brewer.pal(n=3, name=&#39;Set1&#39;)))
+##D 
+##D # plot
+##D xyplot(capacity ~ datetime, groups=which, data=g, type=&#39;l&#39;, 
+##D        xlab=&#39;&#39;, ylab=&#39;Capacity (##D 
+##D        scales=list(x=list(at=s.r, labels=format(s.r, &quot;##D 
+##D        auto.key=list(columns=3, lines=TRUE, points=FALSE),
+##D        par.settings=tps,
+##D        panel=function(...) {
+##D          panel.abline(h=seq(0, 100, by=10), col=&#39;grey&#39;)
+##D          panel.abline(v=s.r, col=&#39;grey&#39;)
+##D          panel.xyplot(...)
+##D        })
+##D 
+##D 
+##D ##
+##D # New Melones monthly data, retrieve as far back in time as possible 
+##D new.melones.monthly &lt;- CDECquery(id=&#39;nml&#39;, sensor=15, interval=&#39;M&#39;, 
+##D start=&#39;1900-01-01&#39;, end=&#39;2015-01-01&#39;)
+##D 
+##D # convert to pct. capacity
+##D new.melones.monthly$capacity &lt;- new.melones.monthly$value / 2400000 * 100
+##D 
+##D 
+##D # make a nice color ramp function
+##D cols &lt;- colorRampPalette(brewer.pal(9, &#39;Spectral&#39;), 
+##D space=&#39;Lab&#39;, interpolate=&#39;spline&#39;)
+##D 
+##D # plot, each pixel is colored by the total precip by year/month
+##D levelplot(capacity ~ year * month, data=new.melones.monthly, col.regions=cols, xlab=&#39;&#39;, 
+##D ylab=&#39;&#39;, scales=list(x=list(tick.number=20)), main=&#39;New Melones Capacity (##D 
+##D 
+##D 
+##D ##
+##D # get daily precip totals from Stan Powerhouse
+##D x &lt;- CDECquery(id=&#39;spw&#39;, sensor=45, interval=&#39;D&#39;, start=&#39;1900-01-01&#39;, end=&#39;2015-01-01&#39;)
+##D 
+##D # compute total precip by year/month
+##D a &lt;- ddply(x, c(&#39;year&#39;, &#39;month&#39;), summarize, s=sum(value, na.rm=TRUE))
+##D 
+##D # convert monthly precipitation values into Z-scores by month
+##D a.scaled &lt;- ddply(a, &#39;month&#39;, summarize, year=year, scaled.ppt=scale(s))
+##D 
+##D # make a nice color ramp function, scaled by the skewness of the underlying distribution
+##D cols &lt;- colorRampPalette(brewer.pal(9, &#39;Spectral&#39;), 
+##D space=&#39;Lab&#39;, interpolate=&#39;spline&#39;, bias=skewness(a.scaled$scaled.ppt, na.rm=TRUE))
+##D 
+##D # plot, each pixel is colored by the total precip by year/month
+##D levelplot(scaled.ppt ~ year * month, data=a.scaled, col.regions=cols, xlab=&#39;&#39;, 
+##D ylab=&#39;&#39;, scales=list(x=list(tick.number=10)), 
+##D main=&#39;Monthly Total Precipitation (as z-score) SPW&#39;)
+##D 
+##D 
+##D ##
+##D # get pre-aggregated monthly data from Sonora RS
+##D x &lt;- CDECquery(id=&#39;sor&#39;, sensor=2, interval=&#39;M&#39;, start=&#39;1900-01-01&#39;, end=&#39;2015-01-01&#39;)
+##D 
+##D # make a nice color ramp function, scaled by the skewness of the underlying distribution
+##D cols &lt;- colorRampPalette(brewer.pal(9, &#39;Spectral&#39;), space=&#39;Lab&#39;, 
+##D interpolate=&#39;spline&#39;, bias=skewness(x$value, na.rm=TRUE))
+##D 
+##D # plot
+##D levelplot(value ~ year * month, data=x, col.regions=cols, xlab=&#39;&#39;, 
+##D ylab=&#39;&#39;, scales=list(x=list(tick.number=20)), main=&#39;Monthly Total Precipitation (inches) SOR&#39;)
+## End(Not run)
+</code></pre>
+
+
+<hr><div align="center">[Package <em>sharpshootR</em> version 0.6-6 <a href="00Index.html">Index</a>]</div>
+</body></html>

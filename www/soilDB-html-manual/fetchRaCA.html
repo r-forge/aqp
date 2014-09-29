@@ -15,12 +15,12 @@
 
 <h3>Description</h3>
 
-<p>Get Rapid Carbon Assessment (RaCA) data via state, geographic bounding-box, or series query from the SoilWeb system.</p>
+<p>Get Rapid Carbon Assessment (RaCA) data via state, geographic bounding-box, RaCA site ID, or series query from the SoilWeb system.</p>
 
 
 <h3>Usage</h3>
 
-<pre>fetchRaCA(series = NULL, bbox = NULL, state = NULL, get.vnir = FALSE)</pre>
+<pre>fetchRaCA(series = NULL, bbox = NULL, state = NULL, rcasiteid = NULL, get.vnir = FALSE)</pre>
 
 
 <h3>Arguments</h3>
@@ -37,6 +37,10 @@
 <tr valign="top"><td><code>state</code></td>
 <td>
 <p>a two-letter US state abbreviation, case insensitive</p>
+</td></tr>
+<tr valign="top"><td><code>rcasiteid</code></td>
+<td>
+<p>an RaCA site id (e.g. 'C1609C01')</p>
 </td></tr>
 <tr valign="top"><td><code>get.vnir</code></td>
 <td>
@@ -89,8 +93,7 @@
 
 <h3>Examples</h3>
 
-<pre><code class="r">
-## Not run: 
+<pre><code class="r">## Not run: 
 ##D   # search by series name
 ##D   s &lt;- fetchRaCA(series=&#39;auburn&#39;)
 ##D   
@@ -110,9 +113,8 @@
 ##D   par(mar=c(0,0,0,0))
 ##D   plot(p, name=&#39;hzn_desgn&#39;, max.depth=150)
 ## End(Not run)
-
 </code></pre>
 
 
-<hr><div align="center">[Package <em>soilDB</em> version 1.2-8 <a href="00Index.html">Index</a>]</div>
+<hr><div align="center">[Package <em>soilDB</em> version 1.3-5 <a href="00Index.html">Index</a>]</div>
 </body></html>
