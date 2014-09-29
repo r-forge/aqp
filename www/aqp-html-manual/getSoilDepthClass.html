@@ -1,0 +1,97 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Generate Soil Depth Class Matrix</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+
+<link rel="stylesheet" href="http://yandex.st/highlightjs/7.3/styles/github.min.css">
+<script src="http://yandex.st/highlightjs/7.3/highlight.min.js"></script>
+<script src="http://yandex.st/highlightjs/7.3/languages/r.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</head><body>
+
+<table width="100%" summary="page for getSoilDepthClass {aqp}"><tr><td>getSoilDepthClass {aqp}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Generate Soil Depth Class Matrix</h2>
+
+<h3>Description</h3>
+
+<p>Generate a boolean matrix of soil depth classes from a SoilProfileCollection object.</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+getSoilDepthClass(f, depth.classes = c(very.shallow = 25, 
+shallow = 50, mod.deep = 100, deep = 150, very.deep = 1000), ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>f</code></td>
+<td>
+<p>a SoilProfileCollection object</p>
+</td></tr>
+<tr valign="top"><td><code>depth.classes</code></td>
+<td>
+<p>a named vector of classes and depth breaks</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>arguments passed to <code><a href="estimateSoilDepth.html">estimateSoilDepth</a></code></p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>a <code>data.frame</code> containing soil depth and depth class for each profile, see examples</p>
+
+
+<h3>Author(s)</h3>
+
+<p>D.E. Beaudette and J.M. Skovlin</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="estimateSoilDepth.html">estimateSoilDepth</a></code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="r">data(sp1)
+depths(sp1) &lt;- id ~ top + bottom
+
+# generate depth-class matrix
+sdc &lt;- getSoilDepthClass(sp1, name=&#39;name&#39;, top=&#39;top&#39;, bottom=&#39;bottom&#39;)
+
+# inspect
+head(sdc)
+</code></pre>
+
+<pre><code>##     id depth very.shallow shallow mod.deep  deep very.deep depth.class
+## 1 P001    89        FALSE   FALSE     TRUE FALSE     FALSE    mod.deep
+## 2 P002    59        FALSE   FALSE     TRUE FALSE     FALSE    mod.deep
+## 3 P003    67        FALSE   FALSE     TRUE FALSE     FALSE    mod.deep
+## 4 P004    62        FALSE   FALSE     TRUE FALSE     FALSE    mod.deep
+## 5 P005    68        FALSE   FALSE     TRUE FALSE     FALSE    mod.deep
+## 6 P006   200        FALSE   FALSE    FALSE FALSE      TRUE   very.deep
+</code></pre>
+
+<pre><code class="r"># join back into sp1 as site-level data
+site(sp1) &lt;- sdc
+
+## Not run: 
+##D # sample data
+##D data(gopheridge, package=&#39;soilDB&#39;)
+##D 
+##D getSoilDepthClass(gopheridge)
+## End(Not run)
+</code></pre>
+
+
+<hr><div align="center">[Package <em>aqp</em> version 1.7-6 <a href="00Index.html">Index</a>]</div>
+</body></html>

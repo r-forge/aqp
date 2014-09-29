@@ -1,0 +1,101 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Estimate Soil Depth</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+
+<link rel="stylesheet" href="http://yandex.st/highlightjs/7.3/styles/github.min.css">
+<script src="http://yandex.st/highlightjs/7.3/highlight.min.js"></script>
+<script src="http://yandex.st/highlightjs/7.3/languages/r.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</head><body>
+
+<table width="100%" summary="page for estimateSoilDepth {aqp}"><tr><td>estimateSoilDepth {aqp}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Estimate Soil Depth</h2>
+
+<h3>Description</h3>
+
+<p>Estimate the soil depth of a single profile within a SoilProfileCollection object.</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+estimateSoilDepth(f, name = "hzname", top = "hzdept", bottom = "hzdepb", p = 'Cr|R|Cd', 
+no.contact.depth = NULL, no.contact.assigned = NULL)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>f</code></td>
+<td>
+<p>A SoilProfileCollection object of length 1, e.g. a single profile</p>
+</td></tr>
+<tr valign="top"><td><code>name</code></td>
+<td>
+<p>the name of the column that contains horizon designations</p>
+</td></tr>
+<tr valign="top"><td><code>top</code></td>
+<td>
+<p>the name of the column that contains horizon top depths</p>
+</td></tr>
+<tr valign="top"><td><code>bottom</code></td>
+<td>
+<p>the name of the column that contains horizon bottom depths</p>
+</td></tr>
+<tr valign="top"><td><code>p</code></td>
+<td>
+<p>a REGEX pattern for determining contact with bedrock</p>
+</td></tr>
+<tr valign="top"><td><code>no.contact.depth</code></td>
+<td>
+<p>in the absense of contact with bedrock, a depth at which we can assume a standard depth</p>
+</td></tr>
+<tr valign="top"><td><code>no.contact.assigned</code></td>
+<td>
+<p>assumed standard depth</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>a single integer, the soil depth</p>
+
+
+<h3>Author(s)</h3>
+
+<p>D.E. Beaudette and J.M. Skovlin</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="getSoilDepthClass.html">getSoilDepthClass</a></code>, <code><a href="profileApply-methods.html">profileApply</a></code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="r">data(sp1)
+depths(sp1) &lt;- id ~ top + bottom
+
+# apply to each profile in a collection, and save as site-level attribute
+sp1$depth &lt;- profileApply(sp1, estimateSoilDepth, name=&#39;name&#39;, top=&#39;top&#39;, bottom=&#39;bottom&#39;)
+
+## Not run: 
+##D # sample data
+##D data(gopheridge, package=&#39;soilDB&#39;)
+##D 
+##D # run on a single profile
+##D estimateSoilDepth(gopheridge[1, ])
+##D 
+##D # apply to an entire collection
+##D profileApply(gopheridge, estimateSoilDepth)
+## End(Not run)
+</code></pre>
+
+
+<hr><div align="center">[Package <em>aqp</em> version 1.7-6 <a href="00Index.html">Index</a>]</div>
+</body></html>
