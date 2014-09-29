@@ -64,7 +64,7 @@ echo $contents; } ?>
 <li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/aqp/gen-hz-assignment.html?root=aqp">Assignment of generalized horizon labels</a></li>
 <li>Computing range in characteristics by generalized horizon label</li>
 <li>Estimation of most-likely horizonation</li>
-</ol</li>
+</ol></li>
 
 </ol>
 </p>
