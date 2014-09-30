@@ -75,13 +75,13 @@ plot(loafercreek, name='hzname', print.id=FALSE, cex.names=0.8, axis.line.offset
 
 ## Selection of Generalized Horizon Labels
 
-Generalized horizon labels represent an expert-guided selection of designations that were consistently observed in the field, and meaningful in terms of theory and management. The very first step in this process is to tabulate the number of times each horizon designation occurs.
+Generalized horizon labels represent an expert-guided selection of designations that were consistently observed in the field, and meaningful in terms of soil morphology and management. The very first step in this process is to tabulate the number of times each horizon designation occurs.
 
 ```{r tabulate-horizonation}
 sort(table(loafercreek$hzname), decreasing=TRUE)
 ```
 
-In this case [`r names(sort(table(loafercreek$hzname), decreasing=TRUE))[1:4]`] horizon designations appear to be a good starting point. However, consulting common sense, checking the [OSD](https://soilseries.sc.egov.usda.gov/OSD_Docs/L/LOAFERCREEK.html) and talking with other soil scientists may be more important than the previous tabulation. 
+In this case [`r names(sort(table(loafercreek$hzname), decreasing=TRUE))[1:4]`] horizon designations appear to be a good starting point. However, relying on field experience and expert knowledge of these soils, cross-checking against the [OSD](https://soilseries.sc.egov.usda.gov/OSD_Docs/L/LOAFERCREEK.html) and talking with other soil scientists may be more important than the previous tabulation. 
 
 A quick summary of horizon depth mid-points (e.g. average depth of horizon) can help organize the various designations and possibly give some clues as to how they can be grouped. The following plot is called a [box and whisker plot](http://en.wikipedia.org/wiki/Box_plot).
 
@@ -202,7 +202,7 @@ bwplot(hzdept ~ genhz, data=horizons(s),
 
 ### Advanced: Multivariate Soil Property Summary
 
-The evaluation of generalized horizon labels typically requires a review of more information than field-described horizon labels and depth. For example, clay content, sand content, pH, total rock fragment volume, and horizon mid-points are soil properties that can be used to differentiate horizons-- as long as the data are populated. In this document clay content, total rock fragment volume and horizon mid-points are used. Multivariate comparisons are commonly based on the concept of [pair-wise dissimilarity](http://hymenoptera.tamu.edu/courses/ento601/pdf/Sokal_1966.pdf), and subsequent reduction of the resulting [distance matrix](http://en.wikipedia.org/wiki/Distance_matrix) into a simpler representation. [Non-metric multidimensional scaling](http://en.wikipedia.org/wiki/Multidimensional_scaling) is one method for reducing the distance matrix into a new set of coordinates in two-dimensional space. A [related](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/aqp/aqp-profile-dissimilarity.html?root=aqp) document explores this idea further.
+The evaluation of generalized horizon labels typically requires a review of more information than field-described horizon labels and depth. For example, clay content, sand content, pH, total rock fragment volume, and horizon mid-points are soil properties that can be used to differentiate horizons-- as long as the data are populated. In this document clay content, total rock fragment volume and horizon mid-points are used. Multivariate comparisons are commonly based on the concept of [pair-wise dissimilarity](http://hymenoptera.tamu.edu/courses/ento601/pdf/Sokal_1966.pdf), and subsequent reduction of the resulting [distance matrix](http://en.wikipedia.org/wiki/Distance_matrix) into a simpler representation. [Non-metric multidimensional scaling](http://en.wikipedia.org/wiki/Multidimensional_scaling)(nMDS) is one method for reducing the distance matrix into a new set of coordinates in two-dimensional space. A [related](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/aqp/aqp-profile-dissimilarity.html?root=aqp) document explores this idea further.
 
 ```{r evaluate-genhz-assignment}
 # store the column names of our variables of interest
@@ -218,7 +218,7 @@ loafercreek$neighbor <- hz.eval$horizons$neighbor
 ```
 
 
-In the following figure generalized horizon labels are plotted at nMDS coordinates as colored circles, along with original horizon designations and pedon IDs. Ideally, groupings of GHL should form relatively homogeneous clusters in this figure, however, there will always be some overlap at the edges. Heterogeneous regions should probably be inspected for cases where assigned HGL may not make sense. In this case, the original designation of "Bt2" for pedon ID 09CKS036 doesn't seem to fit into the 'Bt2' generalized horizon. According to the soil properties used (clay content, total rock fragments, horizon mid-point) it may fit better into the 'Bt1' generalized horizon. Decisions like this can only be made within the context of field experience or at least some level of expert knowledge about the soils in question.
+In the following figure generalized horizon labels are plotted at nMDS coordinates as colored circles, along with original horizon designations and pedon IDs. Ideally, groupings of GHL should form relatively homogeneous clusters in this figure, however, there will always be some overlap at the edges. Heterogeneous regions should probably be inspected for cases where the assigned GHL may not make sense. In this case, the original designation of "Bt2" for pedon ID 09CKS036 doesn't seem to fit into the 'Bt2' generalized horizon. According to the soil properties used (clay content, total rock fragments, horizon mid-point) it may fit better into the 'Bt1' generalized horizon. Decisions like this can only be made within the context of field experience or at least some level of expert knowledge about the soils in question.
 ```{r mds-plot, fig.width=10, fig.height=10}
 # convert loafercreek to a data.frame
 loafercreek.df <- as(loafercreek, 'data.frame')
@@ -240,14 +240,14 @@ mdsplot +
 ```
 
 
-The [silhouette width](http://www.sciencedirect.com/science/article/pii/0377042787901257) metric is a useful indicator of how consistently group labels partition observations in a dissimilarity matrix. Silhouette widths closer to 1 indicate excellent partitioning, while values closer to 0 indicate less effective partitioning. Silhouette widths less than 0 are often associated with inappropriate label assignment. A sketch of profiles with horizons colored by silhouette width can shed some light on possible horizons with inappropriate GHL assignment or perhaps a pedon that doesn't fit within the concept of Loafercreek. For example, many of the horizons associated with pedon ID 09CKS036 don't appear to fit within the collection of soil properties associated with generalized horizon labels "Bt1", "Bt2", and "Bt3". Keep in mind that this evaluation is only based on three soil properties-- expert guidance will be required for a final assignment of GHL.
+The [silhouette width](http://www.sciencedirect.com/science/article/pii/0377042787901257) metric is a useful indicator of how consistently group labels partition observations in a dissimilarity matrix. Silhouette widths closer to 1 indicate excellent partitioning, while values closer to 0 indicate less effective partitioning. Silhouette widths less than 0 are often associated with inappropriate label assignment. A sketch of profiles with horizons colored by silhouette width can shed some light on possible horizons with inappropriate GHL assignment or perhaps a pedon that doesn't fit within the concept of Loafercreek. For example, many of the horizons associated with pedon ID 09CKS036 don't appear to fit within the collection of soil properties associated with generalized horizon labels "Bt1", "Bt2", and "Bt3". Keep in mind that this evaluation is only based on three soil properties-- expert judgement will be required for a final assignment of GHL.
 ```{r silhouette-sketch, fig.width=12, fig.height=5}
 par(mar=c(0,0,3,3))
 plot(loafercreek, name='hzname', label='pedon_id', cex.names=0.8, axis.line.offset=-4, color='sil.width')
 ```
 
 
-The following table contains information on those horizons with silhouette widths less than 0. The "neighbor" column contains the next closest GHL (in terms of soil properties used in the pair-wise dissimilarity calculation) which may be a more appropriate GHL candidate.
+The following table contains information on those horizons with silhouette widths less than 0. The "neighbor" column contains the next closest GHL (in terms of the soil properties used in the pair-wise dissimilarity calculation) which may be a more appropriate GHL candidate.
 ```{r silhouette-summary}
 # index those horizons with silhouette widths less than 0
 check.idx <- which(loafercreek.df$sil.width < 0)
@@ -262,7 +262,7 @@ hz.eval$stats
 
 
 ## Saving GHL to NASIS
-GHL assignment as decried thus far applies only to ***in-memory*** objects in the current R session. In order to use these GHL in further analysis or perform manual adjustments, the GHL need to be saved externally. If you are a NASIS user (working with data derived from NASIS) then the following code will create a text file that be read by NASIS and stored in the `dspcomplayerid` field of the "pedon horizon" table. The "Update horizon group aggregations" calculation ("Calculations" -> "Pedon Horizon" -> "Update horizon group aggregations") expects a text file at `C:/data/horizon_agg.txt`, containing phiid and generalized horizon labels.
+GHL assignment as decried thus far applies only to ***in-memory*** objects in the current R session. In order to use these GHL in further analysis or perform manual adjustments, the GHL need to be saved externally. If you are a NASIS user (working with data derived from NASIS) then the following code will create a text file that can be read by NASIS and stored in the `dspcomplayerid` field of the "pedon horizon" table. The "Update horizon group aggregations" calculation ("Calculations" -> "Pedon Horizon" -> "Update horizon group aggregations") expects a text file at the `C:/data/horizon_agg.txt` location on your system, containing phiid and generalized horizon labels.  
 
 Note that some people prefer to adjust GHL assignments in R while others prefer to make adjustments after loading the data into NASIS.
 ```{r save-to-nasis, eval=FALSE}
@@ -279,6 +279,6 @@ write.table(h, file=rules.file, row.names=FALSE, quote=FALSE, na='', col.names=F
 
 
 # Concluding Remarks
-In the next document we will work with pedon data from NASIS and use our GHL to generate estimates of "low-rv-high" style range in characteristics. An alternative approach to assignment of GHL can be performed with the "Update comp layer id by hzname (horizon group Aggregation)" calculation-- however, this calculation performs only basic pattern matching.
+In the next document we will work with pedon data from NASIS and use our GHL to generate estimates of "low-rv-high" style range in characteristics. An alternative approach to assignment of GHL can be performed with the "Update comp layer id by hzname (horizon group Aggregation)" calculation-- however, this calculation performs only basic pattern matching and the user has much less ability to guide and control the resulting GHL assignments than in the method outlined here.
 
 
