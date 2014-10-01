@@ -284,7 +284,13 @@ loafercreek.df[check.idx.sorted, c('peiid', 'pedon_id', 'hzname', 'genhz', 'neig
 hz.eval$stats
 ```
 
-
+Plot profiles with only those horizons with silhouette widths less than 0 flagged.
+```{r silhouette-sketch-flagged, fig.width=12, fig.height=5, htmlcap='Horizons with red colors warrant further investigation.'
+# add a column containing a color (red) that flags horizons with silhouette width less than 0
+loafercreek$sil.flag <- ifelse(loafercreek$sil.width < 0, 'red', 'white')
+par(mar=c(0,0,3,3))
+plot(loafercreek, name='hzname', label='pedon_id', cex.names=0.8, axis.line.offset=-4, color='sil.flag')
+```
 
 ## Saving GHL to NASIS
 GHL assignment as decried thus far applies only to ***in-memory*** objects in the current R session. In order to use these GHL in further analysis or perform manual adjustments, the GHL need to be saved externally. If you are a NASIS user (working with data derived from NASIS) then the following code will create a text file that can be read by NASIS and stored in the `dspcomplayerid` field of the "pedon horizon" table. The "Update horizon group aggregations" calculation ("Calculations" -> "Pedon Horizon" -> "Update horizon group aggregations") expects a text file at the `C:/data/horizon_agg.txt` location on your system, containing phiid and generalized horizon labels.  
