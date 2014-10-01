@@ -25,11 +25,11 @@ D.E. Beaudette, J.M. Skovlin [`r format(Sys.time(), "%Y-%m-%d")`]
 # Introduction
 
 ## An Example
-Consider the situation: you have a collection of pedons that have been correlated to a named soil series (or component) and would like to *objectively* compute a range in characteristics ("low-rv-high" values) and horizon depths. As with most collections of pedon data there may be considerable variation in description style, horizon depths, and number of horizons:
+Consider the situation: you have a collection of pedons that have been correlated to a named soil series (or component) and would like to *objectively* compute a range in characteristics ("low-rv-high" values) and horizon depths. As with most collections of pedon data there may be considerable variation in description style and horizons used, horizon depths, and number of horizons described:
 
 ![alt text](genhz-sketch.png)
 
-In this contrived example there are several obvious "micro-correlation" decisions that need to be made before e horizons can be grouped for aggregation. For example, what horizonation prototype will be used (e.g. A-Bt1-Bt2-Bt3-Cr-R)? Does it make sense to group {Bt3, Bt4, BCt, CBt} horizons for aggregation? Along those lines, what about grouping {Bt3, 2Bt3} horizons? Do {BA, AB} horizons occur frequently enough to be included in the horizonation prototype?
+In this contrived example, there are several obvious "micro-correlation" decisions that need to be made before horizons can be grouped for aggregation. For example, what horizonation prototype scheme will be used (e.g. A-Bt1-Bt2-Bt3-Cr-R) and best conveys the concept of this soil series or soil component? Does it make sense to group {Bt3, Bt4, BCt, CBt} horizons for aggregation? Along those lines, what about grouping {Bt3, 2Bt3} horizons? Do {BA, AB} horizons occur frequently enough to be included in the horizonation prototype?
 
 Based on your knowledge of the area pedon 2 might be a good "typical" pedon from which a horizonation prototype can be developed. After careful review of the data and consultation with your crew, a new set of labels are assigned to each horizon (<span style="color: red;">red labels in figure above</span>) that define groups over which soil properties will be aggregated. These new labels define *functionally-similar* groups that may span multiple genetic horizons.
 
