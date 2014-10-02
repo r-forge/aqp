@@ -58,19 +58,24 @@ d <- subset(d, ! compname %in% c('lithic haploxeralfs', 'rock outcrop', 'aquic h
 # select only those columns that we really need
 d <- d[, c('dmudesc', 'compname', 'comppct_r')]
 
+# extract map unit symbols from DMU description labels
+d$musym <- gsub('CA630', '', d$dmudesc)
+
 # check top couple of rows
 head(d)
 
 # convert into adjacency matrix, weighted by component percentage
-m <- component.adj.matrix(d, mu='dmudesc', co='compname', wt='comppct_r')
+m <- component.adj.matrix(d, mu='musym', co='compname', wt='comppct_r')
 ```
 
 
-```{r plot-network-graph, fig.width=15, fig.height=15, out.width='100%'}
+```{r plot-network-graph, fig.width=15, fig.height=15}
 # tighten margins
 par(mar=c(0,0,2,0))
 plotSoilRelationGraph(m)
 title('CA630 Components (subject to revision)')
+```
+
 ```
 
 
