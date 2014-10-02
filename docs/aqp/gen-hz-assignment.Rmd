@@ -285,7 +285,7 @@ hz.eval$stats
 ```
 
 Plot profiles with only those horizons with silhouette widths less than 0 flagged.
-```{r silhouette-sketch-flagged, fig.width=12, fig.height=5, htmlcap='Horizons with red colors warrant further investigation.'
+```{r silhouette-sketch-flagged, fig.width=12, fig.height=5, htmlcap='Horizons with red colors warrant further investigation.'}
 # add a column containing a color (red) that flags horizons with silhouette width less than 0
 loafercreek$sil.flag <- ifelse(loafercreek$sil.width < 0, 'red', 'white')
 par(mar=c(0,0,3,3))
