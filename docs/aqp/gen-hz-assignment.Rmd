@@ -324,3 +324,5 @@ write.table(h, file=rules.file, row.names=FALSE, quote=FALSE, na='', col.names=F
 In the next document we will work with pedon data from NASIS and use our GHL to generate estimates of "low-rv-high" style range in characteristics. An alternative approach to assignment of GHL can be performed with the "Update comp layer id by hzname (horizon group Aggregation)" calculation-- however, this calculation performs only basic pattern matching and the user has much less ability to guide and control the resulting GHL assignments than in the method outlined here.
 
 
+----------------------------
+This document is based on `aqp` version `r utils::packageDescription("aqp", field="Version")` and `soilDB` version `r utils::packageDescription("soilDB", field="Version")`.
