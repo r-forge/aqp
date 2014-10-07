@@ -44,6 +44,13 @@ echo $contents; } ?>
 <!-- end of project description -->
 <p>Algorithms for Quantitative Pedology (AQP) is a collection of code, ideas, documentation, and examples wrapped-up into several <b>R</b> packages. The theory behind much of the code can be found in <a href="http://dx.doi.org/10.1016/j.cageo.2012.10.020">this Computers & Geosciences paper</a>. Links to project member contacts, code, and other information hosted by R-Forge can be found <a href="http://<?php echo $domain; ?>/projects/<?php echo $group_name; ?>/">here</a>. Worked examples along with discussion and application to soil survey work can be found on the <a href="http://casoilresource.lawr.ucdavis.edu/drupal/taxonomy/term/56">CA Soil Resource Lab website</a>. AQP is very much a work in progress! If you are interested in contributing code, documentation, bug reports, or even scathing criticism, feel free to contact Dylan at debeaudette [at] ucdavis [dot] edu.</p>
 
+<p><b>Presentations</b>:
+<ol>
+<li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/presentations/aqp-esd-dsm.html">AQP, DSM, and ESD</a></li>
+<li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/presentations/AQP-num_soil_classification.pdf">Numerical Classification with AQP</a></li>
+li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/presentations/AQP-soilDB-beaudette.pdf">AQP and SoilDB Demo</a></li>
+</ol>
+</p>
 
 <p><b>Tutorials</b>:
 <ol>
