@@ -46,9 +46,11 @@ echo $contents; } ?>
 
 <p><b>Presentations</b>:
 <ol>
-<li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/presentations/aqp-esd-dsm.html">AQP, DSM, and ESD</a></li>
-<li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/presentations/AQP-num_soil_classification.pdf">Numerical Classification with AQP</a></li>
-li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/presentations/AQP-soilDB-beaudette.pdf">AQP and SoilDB Demo</a></li>
+<li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/presentations/aqp-esd-dsm.html?root=aqp">AQP, DSM, and ESD</a></li>
+<li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/presentations/AQP-num_soil_classification.pdf?root=aqp">Numerical Classification with AQP</a></li>
+<li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/presentations/AQP-soilDB-beaudette.pdf?root=aqp">AQP and SoilDB Demo</a></li>
+<li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/presentations/aqp_UseR-2011.pdf?root=aqp">2011 UseR AQP Talk</a></li>
+<li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/presentations/poster-aqp-pedometrics-2011.pdf?root=aqp">2011 Pedometrics</a></li>
 </ol>
 </p>
 
