@@ -1,0 +1,157 @@
+---
+title: "Assigning Generalized Horizon Labels"
+author: "D.E. Beaudette"
+date: "Wednesday, September 24, 2014"
+output: html_document
+---
+
+```{r setup, echo=FALSE, results='hide'}
+library(knitr)
+opts_chunk$set(message=FALSE, warning=FALSE, dpi=120, fig.align='center', dev='CairoPNG', dev.args=list(pointsize=10), tidy=FALSE)
+options(width=100, stringsAsFactors=FALSE)
+
+knit_hooks$set(htmlcap = function(before, options, envir) {
+  if(!before) {
+    paste('<p class="caption" style="font-size:85%; font-style: italic; font-weight: bold;">',options$htmlcap,"</p><hr>",sep="")
+    }
+    })
+```
+
+
+Using Generalized Horizon Labels
+================================
+D.E. Beaudette, J.M. Skovlin
+<br>
+`r format(Sys.time(), "%Y-%m-%d")`
+<br>
+This document is based on `aqp` version `r utils::packageDescription("aqp", field="Version")` and `soilDB` version `r utils::packageDescription("soilDB", field="Version")`.
+
+
+# Introduction
+
+## An Example
+Consider the situation: you have a collection of pedons that have been correlated to a named soil series (or component) and would like to *objectively* compute a range in characteristics ("low-rv-high" values) and horizon depths. As with most collections of pedon data there may be considerable variation in description style and horizons used, horizon depths, and number of horizons described:
+
+![alt text](genhz-sketch.png)
+
+In this contrived example, there are several obvious "micro-correlation" decisions that need to be made before horizons can be grouped for aggregation. For example, what horizonation prototype scheme will be used (e.g. A-Bt1-Bt2-Bt3-Cr-R) and best conveys the concept of this soil series or soil component? Does it make sense to group {Bt3, Bt4, BCt, CBt} horizons for aggregation? Along those lines, what about grouping {Bt3, 2Bt3} horizons? Do {BA, AB} horizons occur frequently enough to be included in the horizonation prototype?
+
+Based on your knowledge of the area pedon 2 might be a good "typical" pedon from which a horizonation prototype can be developed. After careful review of the data and consultation with your crew, a new set of labels are assigned to each horizon (<span style="color: red;">red labels in figure above</span>) that define groups over which soil properties will be aggregated. These new labels define *functionally-similar* groups that may span multiple genetic horizons.
+
+
+## Formalized Approach 
+This document describes an aggregation strategy based on the use of "generalized horizon labels" (GHL) through a combination of narrative, **R** code, and figures. You can follow along in an **R** session by copying code from the grey boxes and pasting it into the **R** console.
+
+Here is a basic outline of the process:
+
+  1. Select a set of GHL that best represent a group of pedons to be aggregated. This could be based on series descriptions, expert-knowledge, or even inspection of the most frequently occurring horizon designations. (previous document in this series)
+  
+  2. Assign GHL to each horizon using whatever information that is available for grouping horizons. This micro-correlation of horizon designations will likely require slightly different "rules" in each instance. Careful inspection of horizon designation and observed properties is critical. (previous document in this series)
+  
+  3. Evaluate GHL assignments and manually refine as needed. (previous document in this series) 
+  
+  4. Keep track of final GHL assignments in NASIS or text file. (previous document in this series)
+  
+  5. Compute range in characteristics, aka [low-rv-high values](http://casoilresource.lawr.ucdavis.edu/wiki/Low-rv-high), (e.g. clay, sand, pH, etc.) over GHL. (this document in this series)
+  
+  6. Estimate a most-likely horizonation (e.g. top and bottom depths) for each generalized horizon label. (next document in this series)
+
+
+
+# Setup R Envionment
+If you have never used the [aqp](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/aqp/aqp-intro.html?root=aqp) or [soildb](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/soilDB-Intro.html?root=aqp) packages before, you will likely need to install them. This only needs to be done once. 
+```{r install-packages, eval=FALSE}
+# stable version from CRAN + dependencies
+install.packages('ape', dep=TRUE) 
+install.packages('latticeExtra', dep=TRUE)
+install.packages('plyr', dep=TRUE) 
+install.packages('aqp', dep=TRUE) 
+install.packages('soilDB', dep=TRUE)
+# latest versions from R-Forge:
+install.packages('aqp', repos="http://R-Forge.R-project.org", type='source')
+install.packages('soilDB', repos="http://R-Forge.R-project.org", type='source')
+```
+
+Now that you have all of the R packages that this document depends on, it would be a good idea to load them. R packages must be **installed** anytime you change versions of R (e.g. after an upgrade), and **loaded** anytime you want to access functions from within those packages.
+
+```{r load-packages}
+library(aqp)
+library(soilDB)
+library(ape)
+library(latticeExtra)
+library(plyr)
+library(lattice)
+library(cluster)
+library(MASS)
+```
+
+# Sample Data
+While the methods outlined in this document can be applied to any collection of pedons, it is convenient to work with a standardized set of data. You can follow along with the analysis by copying code from the following blocks and running it in your **R** session. The sample data used in this document is based on 30 soil profiles that have been correlated to the [Loafercreek](https://soilseries.sc.egov.usda.gov/OSD_Docs/L/LOAFERCREEK.html) soil series from the Sierra Nevada Foothill Region of California. Note that the internal structure of the `loafercreek` data is identical to the structure returned by [`fetchNASIS()` from the soilDB package](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/soilDB-Intro.html?root=aqp). All horizon-level values are pulled from the pedon horizon table of the pedons being analyzed.
+
+```{r load-data, fig.width=12, fig.height=5, htmlcap='15 pedons correlated to the Loafercreek soil series.'}
+# load sample data from the soilDB package
+data(loafercreek, package = 'soilDB')
+# keep only the first 30 pedons
+pedons <- loafercreek[1:30, ]
+# plot profile sketches
+par(mar=c(0,0,0,0))
+plot(pedons, name='hzname', print.id=FALSE, cex.names=0.8, axis.line.offset=-4)
+```
+
+
+## Optional: Follow Along with Your Data
+The following code block demonstrates how to pull data in using the [`fetchNASIS()` function from the soilDB package](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/soilDB-Intro.html?root=aqp).
+
+```{r use-nasis-data, eval=FALSE}
+# first load the desired data set within NASIS into your NASIS selected set
+# then load data from the NASIS selected set into R
+pedons <- fetchNASIS()
+# optionally subset the data by taxon name - enter your taxon name
+pedons <- pedons[grep(pattern='ENTER_YOUR_TAXON_NAME', f$taxonname, ignore.case=TRUE), ]
+```
+
+# Methods
+
+## Assignment of Generalized Horizon Labels
+
+Once a set of generalized horizon labels have been determined a corresponding set of [regular expression](http://en.wikipedia.org/wiki/Regular_expression) (REGEX) rules were developed to convert field-described designations into GHL. Pattern matching with REGEX will typically assign useful GHL, however, there will always be cases where manual intervention is required. More on that later.
+
+From the above analysis and the [OSD](https://soilseries.sc.egov.usda.gov/OSD_Docs/L/LOAFERCREEK.html), it seems like the following sequence of GHL are appropriate: (`r c('A','Bt1','Bt2','Bt3','Cr','R')`)-- an A horizon, followed by 3 Bt horizons, then Cr and finally R. For each GHL we need a corresponding REGEX rule. For example, `'^A$|Ad|Ap'` will match 'A', 'Ad', and 'Ap'.
+
+```{r generalize-hz-names-1}
+# save our GHL
+n <- c('A','Bt1','Bt2','Bt3','Cr','R')
+# REGEX rules
+p <- c('^A$|Ad|Ap',
+       'Bt1$',
+       '^Bt2$',
+       '^Bt3|^Bt4|CBt$|BCt$|2Bt|2CB$|^C$',
+       'Cr',
+       'R')
+```
+
+
+Apply GHL pattern-matching rules and save to a new column called `genhz` and cross-tabulate the occurrence of GHL and original designations.
+```{r generalize-hz-names-2}
+pedons$genhz <- generalize.hz(pedons$hzname, n, p)
+# cross-tabulate original horizon designations and GHL
+addmargins(table(pedons$genhz, pedons$hzname))
+```
+
+From the above cross-tabulation, we can see that a couple of original designations were not matched (`not-used` in the table) by our REGEX rules: BA, Bw, and Oi horizons. In this example, we are going to make the assumption that those horizons aren't common enough for inclusion in our set of GHL.
+
+
+## Range in Characteristics by Generalized Horizon Label
+
+
+
+## Aggregate Representation of Horizon Depths
+
+
+## From Typical Pedon to Prototype Pedon
+
+
+
+# Concluding Remarks
+
+

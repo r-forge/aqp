@@ -203,7 +203,11 @@ hr {
 <body>
 <h1>Assigning Generalized Horizon Labels</h1>
 
-<p>D.E. Beaudette, J.M. Skovlin [2014-10-06]</p>
+<p>D.E. Beaudette, J.M. Skovlin
+<br>
+2014-10-22
+<br>
+This document is based on <code>aqp</code> version 1.7-6 and <code>soilDB</code> version 1.3-5.</p>
 
 <h1>Introduction</h1>
 
@@ -532,7 +536,7 @@ plot(pedons, name=&#39;hzname&#39;, label=&#39;pedon_id&#39;, cex.names=0.8, axi
 
 <h2>Saving GHL to NASIS</h2>
 
-<p>GHL assignment as decried thus far applies only to <strong><em>in-memory</em></strong> objects in the current R session. In order to use these GHL in further analysis or perform manual adjustments, the GHL need to be saved externally. If you are a NASIS user (working with data derived from NASIS) then the following code will create a text file that can be read by NASIS and stored in the <code>dspcomplayerid</code> field of the &ldquo;pedon horizon&rdquo; table. The &ldquo;Update horizon group aggregations&rdquo; calculation (&ldquo;Calculations&rdquo; -&gt; &ldquo;Pedon Horizon&rdquo; -&gt; &ldquo;Update horizon group aggregations&rdquo;) expects a text file at the <code>C:/data/horizon_agg.txt</code> location on your system, containing phiid and generalized horizon labels.  </p>
+<p>GHL assignment as described thus far applies only to <strong><em>in-memory</em></strong> objects in the current R session. In order to use these GHL in further analysis or perform manual adjustments, the GHL need to be saved externally. If you are a NASIS user (working with data derived from NASIS) then the following code will create a text file that can be read by NASIS and stored in the <code>dspcomplayerid</code> field of the &ldquo;pedon horizon&rdquo; table. The &ldquo;Update horizon group aggregations&rdquo; calculation (&ldquo;Calculations&rdquo; -&gt; &ldquo;Pedon Horizon&rdquo; -&gt; &ldquo;Update horizon group aggregations&rdquo;) expects a text file at the <code>C:/data/horizon_agg.txt</code> location on your system, containing phiid and generalized horizon labels.  </p>
 
 <p>Note that some people prefer to adjust GHL assignments in R while others prefer to make adjustments after loading the data into NASIS.</p>
 
@@ -550,10 +554,6 @@ write.table(h, file=rules.file, row.names=FALSE, quote=FALSE, na=&#39;&#39;, col
 <h1>Concluding Remarks</h1>
 
 <p>In the next document we will work with pedon data from NASIS and use our GHL to generate estimates of &ldquo;low-rv-high&rdquo; style range in characteristics. An alternative approach to assignment of GHL can be performed with the &ldquo;Update comp layer id by hzname (horizon group Aggregation)&rdquo; calculation&ndash; however, this calculation performs only basic pattern matching and the user has much less ability to guide and control the resulting GHL assignments than in the method outlined here.</p>
-
-<hr/>
-
-<p>This document is based on <code>aqp</code> version 1.7-6 and <code>soilDB</code> version 1.3-5.</p>
 
 </body>
 
