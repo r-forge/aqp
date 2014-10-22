@@ -54,7 +54,7 @@ Here is a basic outline of the process:
   
   5. Compute range in characteristics, aka [low-rv-high values](http://casoilresource.lawr.ucdavis.edu/wiki/Low-rv-high), (e.g. clay, sand, pH, etc.) over GHL. (this document in this series)
   
-  6. Estimate a most-likely horizonation (e.g. top and bottom depths) for each generalized horizon label. (next document in this series)
+  6. Estimate a most-likely horizonation (e.g. top and bottom depths) for each generalized horizon label. (this document in this series)
 
 
 
@@ -108,6 +108,38 @@ The following code block demonstrates how to pull data in using the [`fetchNASIS
 pedons <- fetchNASIS()
 # optionally subset the data by taxon name - enter your taxon name
 pedons <- pedons[grep(pattern='ENTER_YOUR_TAXON_NAME', f$taxonname, ignore.case=TRUE), ]
+```
+
+## A Quick Note on Quantiles and Box-Whisker Plots
+[Quantiles (also called percentiles)](http://en.wikipedia.org/wiki/Quantile) are a convenient way to express where a number lies within a distribution. For example, the 5th-percentile of a set of numbers is the value that splits the lowest 5% of the data from the rest. The 50th-percentile, commonly referred to as the median, splits the data exactly in half and is a good alternative to the mean for summarizing central tendency. The 25th and 75th percentiles or 5th and 95th percentiles form useful brackets around the spread around the median. A [box and whisker plot](http://en.wikipedia.org/wiki/Box_plot) uses quantiles to display the central tendency, spread, and balance of a distribution. Unlike the mean and standard deviation, quantiles offer a relatively robust (outliers, distribution shape, skewness, etc.) definition of central tendency (RV) and spread (LOW, HIGH).
+
+
+The following R code demonstrates the relationship between frequency distribution, quantiles, and box-whisker plot for a set of 500 normally-distributed values with a mean of 10 and standard deviation of 2.
+
+
+```{r quantiles, fig.width=6, fig.height=3}
+# simulate 500 values from the normal distribution: with mean = 10, sd= 2
+set.seed(1010101)
+x <- rnorm(n=500, mean=10, sd=2)
+
+# compute the 5th, 25th, 50th, 75th, and 95th percentiles of x
+q <- quantile(x, probs=c(0.05, 0.25, 0.5, 0.75, 0.95))
+
+# plot a smoothed frequency distribution
+plot(density(x), main='Quantile Demonstration', ylim=c(0, 0.3), ylab='', xlab='', axes=FALSE)
+
+# mark quantiles we computed above
+abline(v=q, lty=3, col='red')
+text(x=q, y=0.1, labels=c('5th', '25th', '50th', '75th', '95th'))
+
+# overlay a box-whisker plot
+boxplot(x, at=0.25, add=TRUE, horizontal=TRUE, boxwex=0.1, border='DarkBlue', axes=FALSE)
+
+# overlay lines at the original values
+rug(x, side=3, col='DarkBlue')
+
+# add x-axis
+axis(side=1, at=pretty(x))
 ```
 
 # Methods
