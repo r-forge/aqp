@@ -89,6 +89,8 @@ echo $contents; } ?>
 
 <p><b>Sample Figures</b></p>
 
+<img src="mineralking-set1-elevation.png" border="0">
+
 <img src="miami-and-related.png" border="0">
 
 <img src="OSD-dend.png" border="0">
