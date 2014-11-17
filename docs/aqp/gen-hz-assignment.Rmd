@@ -36,7 +36,7 @@ Consider this situation: you have a collection of pedons that have been correlat
 
 In this scenario, there are several obvious &ldquo;micro-correlation&rdquo; decisions that need to be made before horizons can be grouped for aggregation. For example, what horizonation prototype scheme (e.g., A-Bt1-Bt2-Bt3-Cr-R) best conveys the concept of this soil series or soil component? Does it make sense to group [Bt3, Bt4, BCt, CBt] horizons for aggregation? Or what about grouping [Bt3, 2Bt3] horizons? Do [BA, AB] horizons occur frequently enough to be included in the horizonation prototype?
 
-Based on your knowledge of the area, pedon 2 might be a good "typical" pedon to use in developing a horizonation prototype. After careful review of the data and consultation with your crew, a new set of labels are assigned to each horizon (<span style="color: red;">red labels in figure above</span>) that define groups over which soil properties will be aggregated. These new labels define *functionally-similar* groups that may span multiple genetic horizons.
+Based on your knowledge of the area, pedon 2 might be a good "typical" pedon to use in developing a horizonation prototype. After careful review of the data and consultation with your crew, a new set of labels are assigned to each horizon (<span style="color: red;">red labels in figure above</span>) that define groups over which soil properties will be aggregated. These new labels define *functionally similar* groups that may span multiple genetic horizons.
 
 
 ## Formalized Approach 
@@ -52,9 +52,9 @@ Here is a basic outline of the process:
   
   4. Keep track of final GHL assignments in NASIS or text file. 
   
-  5. Compute range in characteristics, aka [low-rv-high values](http://casoilresource.lawr.ucdavis.edu/wiki/Low-rv-high), (e.g. clay, sand, pH, etc.) over GHL. (next document in this series)
+  5. Compute range in characteristics, aka [low-rv-high values](http://casoilresource.lawr.ucdavis.edu/wiki/Low-rv-high), for clay, sand, pH, etc. over GHL. (next document in this series)
   
-  6. Estimate a most-likely horizonation (e.g. top and bottom depths) for each generalized horizon label. (next document in this series)
+  6. Estimate a most likely horizonation (e.g., top and bottom depths) for each generalized horizon label. (next document in this series)
 
 
 
@@ -179,7 +179,7 @@ plot(pedons, name='hzname', print.id=FALSE, cex.names=0.8, axis.line.offset=-4, 
 
 ## Assignment of Generalized Horizon Labels
 
-Once a set of generalized horizon labels have been determined a corresponding set of [regular expression](http://en.wikipedia.org/wiki/Regular_expression) (REGEX) rules are developed to convert field-described designations into GHL. Pattern matching with REGEX will typically assign useful GHL; however, there will always be cases where manual intervention is required. More on that will follow.
+Once a set of generalized horizon labels have been determined, a corresponding set of [regular expression](http://en.wikipedia.org/wiki/Regular_expression) (REGEX) rules are developed to convert field-described designations into GHL. Pattern matching with REGEX will typically assign useful GHL; however, there will always be cases where manual intervention is required. More on that will follow.
 
 From the above analysis and the [OSD](https://soilseries.sc.egov.usda.gov/OSD_Docs/L/LOAFERCREEK.html), it seems like the following sequence of GHL is appropriate: (`r c('A','Bt1','Bt2','Bt3','Cr','R')`) -- an A horizon, followed by 3 Bt horizons, then Cr, and finally R. For each GHL, a corresponding REGEX rule is needed. For example, `'^A$|Ad|Ap'` will match 'A', 'Ad', and 'Ap'.
 
@@ -288,7 +288,7 @@ plot(pedons, name='hzname', label='pedon_id', cex.names=0.8, axis.line.offset=-4
 ```
 
 
-The following table contains information on those horizons with silhouette widths less than 0. The "neighbor" column contains the next closest GHL (in terms of the soil properties used in the pair-wise dissimilarity calculation), which may be a more appropriate to use.
+The following table contains information on those horizons with silhouette widths less than 0. The "neighbor" column contains the next closest GHL (in terms of the soil properties used in the pair-wise dissimilarity calculation), which may be more appropriate to use.
 ```{r silhouette-summary}
 # index those horizons with silhouette widths less than 0
 check.idx <- which(pedons.df$sil.width < 0)
@@ -309,7 +309,7 @@ plot(pedons, name='hzname', label='pedon_id', cex.names=0.8, axis.line.offset=-4
 ```
 
 ## Saving GHL to NASIS
-GHL assignment as described thus far applies only to ***in-memory*** objects in the current R session. In order to use these GHL in further analysis or perform manual adjustments, the GHL need to be saved externally. If you are a NASIS user (working with data derived from NASIS) then the following code will create a text file that can be read by NASIS and stored in the `dspcomplayerid` field of the "pedon horizon" table. The "Update horizon group aggregations" calculation ("Calculations" -> "Pedon Horizon" -> "Update horizon group aggregations") expects a text file at the `C:/data/horizon_agg.txt` location on your system, containing phiid and generalized horizon labels.  
+GHL assignment as described thus far applies only to ***in-memory*** objects in the current R session. In order to use these GHL in further analysis or perform manual adjustments, the GHL need to be saved externally. If you are a NASIS user (working with data derived from NASIS) then the following code will create a text file that can be read by NASIS and stored in the `dspcomplayerid` field of the pedon horizon table. The "Update horizon group aggregations" calculation ("Calculations" -> "Pedon Horizon" -> "Update horizon group aggregations") expects a text file at the `C:/data/horizon_agg.txt` location on your system, containing phiid and generalized horizon labels.  
 
 Note that some people prefer to adjust GHL assignments in R while others prefer to make adjustments after loading the data into NASIS.
 ```{r save-to-nasis, eval=FALSE}
@@ -326,6 +326,6 @@ write.table(h, file=rules.file, row.names=FALSE, quote=FALSE, na='', col.names=F
 
 
 # Concluding Remarks
-In the next document, we will work with pedon data from NASIS and use our GHL to generate estimates of "low-rv-high" style range in characteristics. An alternative approach to assignment of GHL can be performed with the "Update comp layer id by hzname (horizon group Aggregation)" calculation. This calculation, however, performs only basic pattern matching and therefore much less flexible than the GHL assignment method outlined in this document.
+In the next document, we will work with pedon data from NASIS and use our GHL to generate estimates of "low-rv-high" style range in characteristics. An alternative approach to assignment of GHL can be performed with the "Update comp layer id by hzname (horizon group Aggregation)" calculation. This calculation, however, performs only basic pattern matching and likely requires considerable manual intervention.
 
 
