@@ -32,7 +32,7 @@ m.2 <- component.adj.matrix(amador)
 print(round(m.2, 2))
 
 # compare two methods
-par(mfcol=c(1,2), mar=c(0,0,0,0))
+par(mfcol=c(1,2), mar=c(0,0,1,0))
 plotSoilRelationGraph(m.1, s='amador')
 title('Occurence')
 plotSoilRelationGraph(m.2, s='amador')
@@ -127,9 +127,7 @@ plotSoilRelationGraph(m, spanning.tree='max', vertex.scaling.factor=1, edge.scal
 
 plotSoilRelationGraph(m, spanning.tree=0.75, vertex.scaling.factor=1, edge.scaling.factor=8, s='amador', main='CA630 Components\n(max spanning tree + edges with weights > 75th percentile)')
 
-plotSoilRelationGraph(m, vertex.scaling.factor=1, edge.scaling.factor=8, s='loafercreek', del.edges=0.25, main='CA630 Components\n(edge weights\n< 25th percentile pruned)')
-```
-
+plotSoilRelationGraph(m, vertex.scaling.factor=1, edge.scaling.factor=8, s='loafercreek', del.edges=0.25, main='CA630 Components\n(edge weights < 25th percentile pruned)')
 ```
 
 
