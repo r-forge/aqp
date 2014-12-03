@@ -5,12 +5,11 @@ options(width=100, stringsAsFactors=FALSE)
 
 # Generating Soil Component Relation Diagrams
 
-Component association is a function of how frequently components co-occur, weighted by component percentage. This summary should generate structures that are related to soil-landscape concepts that were used to construct collections of map units associated with one or more soil survey legends. These diagrams are 2D approximations of the multi-dimensional relationship between components-- where each node is a component, lines (edges) connect components that have been mapped together, colors define groups of components that frequently co-occur, node proximity is proportional to co-occurrence, and size is proportional to "connectivity".
 
 Details pending. [A recent discussion on the topic](http://casoilresource.lawr.ucdavis.edu/wiki/SoilSeriesRelationGraph#Recent_Dialog).
 
 ## Simple Example
-```{r libraries-and-sample, fig.width=14, fig.height=7, out.width='100%'}
+```{r libraries-and-sample, fig.width=14, fig.height=7}
 # load libraries
 library(soilDB)
 library(sharpshootR)
@@ -25,14 +24,37 @@ data(amador)
 head(amador)
 
 # convert into adjacency matrix, based on no. times component co-occur
-m <- component.adj.matrix(amador, method='occurrence')
-print(m)
+m.1 <- component.adj.matrix(amador, method='occurrence')
+print(m.1)
 
 # convert into adjacency matrix, weighted by component percent
-m <- component.adj.matrix(amador)
-print(round(m, 2))
+m.2 <- component.adj.matrix(amador)
+print(round(m.2, 2))
 
-# tighten margins
+# compare two methods
+par(mfcol=c(1,2), mar=c(0,0,0,0))
+plotSoilRelationGraph(m.1, s='amador')
+title('Occurence')
+plotSoilRelationGraph(m.2, s='amador')
+title('Community Matrix')
+```
+
+```{r layout-examples, fig.width=14, fig.height=7}
+# compute adjacency matrix via community matrix method
+m <- component.adj.matrix(amador)
+# try a bunch of layouts
+par(mfrow=c(2,3), mar=c(0,0,1,0))
+plotSoilRelationGraph(m, s='amador', main='fruchterman.reingold (default)')
+plotSoilRelationGraph(m, s='amador', g.layout=layout.grid, main='grid')
+plotSoilRelationGraph(m, s='amador', g.layout=layout.circle, main='circle')
+plotSoilRelationGraph(m, s='amador', g.layout=layout.mds, main='MDS')
+plotSoilRelationGraph(m, s='amador', g.layout=layout.spring, main='spring')
+plotSoilRelationGraph(m, s='amador', g.layout=layout.star, main='star')
+```
+
+
+```{r dendrogram-representation, fig.width=14, fig.height=7}
+# setup page
 par(mfcol=c(1,2), mar=c(0,0,0,0))
 # plot as network diagram, with Amador soil highlighted
 plotSoilRelationGraph(m, s='amador')
@@ -42,17 +64,17 @@ plotSoilRelationGraph(m, s='amador', plot.style='dendrogram')
 
 ```{r mst, fig.width=14, fig.height=7}
 # tighten margins
-par(mfcol=c(1,2), mar=c(0,0,0,0))
+par(mfcol=c(1,2), mar=c(0,0,1,0))
 # plot as network diagram, with Amador soil highlighted
-plotSoilRelationGraph(m, s='amador'); title(main='Full Graph', line=-1)
-plotSoilRelationGraph(m, s='amador', spanning.tree='max'); title(main='Maximum Spanning Tree', line=-1)
+plotSoilRelationGraph(m, s='amador', main='Full Graph')
+plotSoilRelationGraph(m, s='amador', spanning.tree='max', main='Maximum Spanning Tree')
 ```
 
 ```{r prune-edges, fig.width=15, fig.height=3}
 par(mar=c(1,1,1,1), mfcol=c(1,5))
 for(i in seq(0, 1, length.out = 5)) {
-  plotSoilRelationGraph(m, vertex.scaling.factor=4, del.edges=i)
-  title(paste0('Edge weight > ', i, ' quantile'), cex.main=0.9, line=-1)
+  plotSoilRelationGraph(m, vertex.scaling.factor=3, del.edges=i)
+  title(paste0('Edge weight < ', i, '-tile pruned'), cex.main=0.9, line=-1)
   box()
 }
 ```
@@ -60,8 +82,8 @@ for(i in seq(0, 1, length.out = 5)) {
 ```{r prune-edges-mst, fig.width=15, fig.height=3}
 par(mar=c(1,1,1,1), mfcol=c(1,5))
 for(i in seq(0, 1, length.out = 5)) {
-  plotSoilRelationGraph(m, vertex.scaling.factor=4, del.edges=i, spanning.tree='max')
-  title(main=paste0('Edge weight > ', i, ' quantile'), sub='Max Spanning Tree', cex.main=0.9, line=-1)
+  plotSoilRelationGraph(m, vertex.scaling.factor=3, del.edges=i, spanning.tree='max')
+  title(main=paste0('Edge weight < ', i, '-tile pruned'), sub='Max Spanning Tree', cex.main=0.9, line=-1)
   box()
 }
 ```
@@ -99,16 +121,13 @@ m <- component.adj.matrix(d, mu='musym', co='compname', wt='comppct_r')
 ```{r plot-network-graph, fig.width=15, fig.height=15}
 # tighten margins
 par(mar=c(0,0,2,0))
-plotSoilRelationGraph(m, vertex.scaling.factor=1)
-title('CA630 Components')
-plotSoilRelationGraph(m, spanning.tree='max', vertex.scaling.factor=1, edge.scaling.factor=8, s='amador')
-title('CA630 Components (max spanning tree)')
-plotSoilRelationGraph(m, spanning.tree='max', vertex.scaling.factor=1, edge.scaling.factor=8, s='loafercreek')
-title('CA630 Components (max spanning tree)')
-plotSoilRelationGraph(m, vertex.scaling.factor=1, edge.scaling.factor=8, s='loafercreek', del.edges=0.25)
-title('CA630 Components (edge weights > 25th percentile)')
-plotSoilRelationGraph(m, vertex.scaling.factor=1, edge.scaling.factor=8, s='loafercreek', del.edges=0.05)
-title('CA630 Components (edge weights > 5th percentile)')
+plotSoilRelationGraph(m, vertex.scaling.factor=1, main='CA630 Components')
+
+plotSoilRelationGraph(m, spanning.tree='max', vertex.scaling.factor=1, edge.scaling.factor=8, s='amador', main='CA630 Components\n(max spanning tree)')
+
+plotSoilRelationGraph(m, spanning.tree=0.75, vertex.scaling.factor=1, edge.scaling.factor=8, s='amador', main='CA630 Components\n(max spanning tree + edges with weights > 75th percentile)')
+
+plotSoilRelationGraph(m, vertex.scaling.factor=1, edge.scaling.factor=8, s='loafercreek', del.edges=0.25, main='CA630 Components\n(edge weights\n< 25th percentile pruned)')
 ```
 
 ```
@@ -132,11 +151,14 @@ res <- SDA_query(q)
 m <- component.adj.matrix(res)
 ```
 
-```{r plot-SSURGO-network-graph, fig.width=15, fig.height=15, out.width='100%'}
+```{r plot-SSURGO-network-graph, fig.width=15, fig.height=15}
 # tighten margins
 par(mar=c(0,0,2,0))
-plotSoilRelationGraph(m, vertex.scaling.factor=1, edge.scaling.factor=8)
-title('CA654 Components')
+plotSoilRelationGraph(m, vertex.scaling.factor=1, edge.scaling.factor=8, main='CA654 Components\nFull Graph')
+
+plotSoilRelationGraph(m, vertex.scaling.factor=1, edge.scaling.factor=8, spanning.tree='max', main='CA654 Components\nMaximum Spanning Tree')
+
+plotSoilRelationGraph(m, vertex.scaling.factor=1, edge.scaling.factor=8, spanning.tree=0.75, main='CA654 Components\nMaximum Spanning Tree + edges with weight > 75th percentile')
 ```
 
 ----------------------------
