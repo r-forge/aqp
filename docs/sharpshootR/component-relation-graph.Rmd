@@ -105,7 +105,11 @@ d <- subset(d, compkind != 'miscellaneous area')
 d <- subset(d, ! compname %in% c('lithic haploxeralfs', 'rock outcrop', 'aquic haploxeralfs', 'ultic haploxeralfs', 'riparian'))
 
 # select only those columns that we really need
-d <- d[, c('dmudesc', 'compname', 'comppct_r')]
+d <- d[, c('dmudesc', 'compname', 'comppct_r', 'majcompflag')]
+
+# how frequently is any given component a "major" component?
+maj.comp.freq <- ddply(d, 'compname', summarize, 1 - prop.table(table(majcompflag))[1])
+names(maj.comp.freq) <- c('compname', 'freq')
 
 # extract map unit symbols from DMU description labels
 d$musym <- gsub('CA630', '', d$dmudesc)
@@ -128,6 +132,8 @@ plotSoilRelationGraph(m, spanning.tree='max', vertex.scaling.factor=1, edge.scal
 plotSoilRelationGraph(m, spanning.tree=0.75, vertex.scaling.factor=1, edge.scaling.factor=8, s='amador', main='CA630 Components\n(max spanning tree + edges with weights > 75th percentile)')
 
 plotSoilRelationGraph(m, vertex.scaling.factor=1, edge.scaling.factor=8, s='loafercreek', del.edges=0.25, main='CA630 Components\n(edge weights < 25th percentile pruned)')
+
+plotSoilRelationGraph(m, spanning.tree='max', vertex.scaling.factor=1, edge.scaling.factor=8, s='amador', main='CA630 Components\n(max spanning tree and maj. component flag label adjustment)', vertex.label.cex=sqrt(maj.comp.freq$freq+0.5))
 ```
 
 

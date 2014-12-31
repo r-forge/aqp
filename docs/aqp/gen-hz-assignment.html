@@ -205,9 +205,9 @@ hr {
 
 <p>D.E. Beaudette, J.M. Skovlin (edited for clarity by Jenny Sutherland)
 <br>
-2014-11-17
+2014-12-31
 <br>
-This document is based on <code>aqp</code> version 1.7-7 and <code>soilDB</code> version 1.3-6.</p>
+This document is based on <code>aqp</code> version 1.7-9 and <code>soilDB</code> version 1.4-2.</p>
 
 <h1>Introduction</h1>
 
@@ -286,7 +286,7 @@ plot(pedons, name=&#39;hzname&#39;, print.id=FALSE, cex.names=0.8, axis.line.off
 # then load data from the NASIS selected set into R
 pedons &lt;- fetchNASIS()
 # optionally subset the data by taxon name - enter your taxon name
-pedons &lt;- pedons[grep(pattern=&#39;ENTER_YOUR_TAXON_NAME&#39;, f$taxonname, ignore.case=TRUE), ]
+pedons &lt;- pedons[grep(pattern=&#39;ENTER_YOUR_TAXON_NAME&#39;, pedons$taxonname, ignore.case=TRUE), ]
 </code></pre>
 
 <h1>Methods</h1>

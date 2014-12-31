@@ -107,7 +107,7 @@ The following code block demonstrates how to pull data in using the [`fetchNASIS
 # then load data from the NASIS selected set into R
 pedons <- fetchNASIS()
 # optionally subset the data by taxon name - enter your taxon name
-pedons <- pedons[grep(pattern='ENTER_YOUR_TAXON_NAME', f$taxonname, ignore.case=TRUE), ]
+pedons <- pedons[grep(pattern='ENTER_YOUR_TAXON_NAME', pedons$taxonname, ignore.case=TRUE), ]
 ```
 
 # Methods
