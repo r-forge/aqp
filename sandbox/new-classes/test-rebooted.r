@@ -1,11 +1,18 @@
 library(sp)
 library(rgdal)
 library(raster)
+library(aqp)
 library(plyr)
 library(stringr)
 
 source('classes-rebooted.r')
-source('methods-rebooted.r')
+
+source('init.r')
+source('accessors.r')
+source('setters.r')
+source('overloads.r')
+source('coerce.r')
+source('spatial.r')
 
 data(sp4, package = 'aqp')
 foo <- sp4
