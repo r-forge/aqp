@@ -64,7 +64,35 @@ as.SoilProfileCollection.SPC <- function(from) {
   .depths_aqp <- getMethod('depths<-', 'data.frame', "package:aqp")
   .site_aqp <- getMethod('site<-', 'SoilProfileCollection', "package:aqp")
   f_depths <- as.formula(paste(nm$id, "~", paste(nm$depths, collapse = "+")))
-  spc <- .depths_aqp(as.data.frame(from), f_depths)
+  
+  # Convert from to df
+  df <- as.data.frame(from)
+  
+  # Initiate SoilProfileCollection object from data.frame
+  #
+  
+  # extract components of formula: 1. user id, 2. top, 3. bottom
+  mf <- model.frame(f_depths, df)
+  # get column names containing id, top, bottom
+  nm_from <- names(mf)
+  # re-order data: IDs, top hz depths
+  new.order <- order(df[[nm_from[1]]], df[[nm_from[2]]])
+    
+  # check for factor-class ID
+  if(class(df[[nm_from[1]]]) == 'factor') {
+    warning('converting IDs from factor to character', call.=FALSE)
+    df[[nm_from[1]]] <- as.character(df[[nm_from[1]]])
+  }
+        
+  # create object
+  spc <- SoilProfileCollection(idcol = nm_from[1], depthcols = c(nm_from[2], nm_from[3]), horizons = df[new.order, , drop = FALSE])
+    
+  # add default metadata: depths are cm
+  spc@metadata <- data.frame(depth_units = 'cm', stringsAsFactors = FALSE)
+  # add default site data: profile IDs in same order as hz
+  site.temp <- data.frame(xxx = aqp::profile_id(spc), stringsAsFactors = FALSE)
+  names(site.temp) <- aqp::idname(spc)
+  spc@site <- site.temp
   
   # Initiate site slot if present
   if (length(nm$site) > 0) {
