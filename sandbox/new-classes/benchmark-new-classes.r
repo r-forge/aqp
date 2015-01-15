@@ -7,7 +7,12 @@ library(sp)
 library(plyr)
 library(stringr)
 source('classes-rebooted.r')
-source('methods-rebooted.r')
+source('init.r')
+source('accessors.r')
+source('setters.r')
+source('overloads.r')
+source('coerce.r')
+source('spatial.r')
 
 ## Benchmark parameters
 
