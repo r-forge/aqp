@@ -106,8 +106,20 @@ as.SoilProfileCollection.SPC <- function(from) {
     .proj4string_aqp <- getMethod('proj4string<-', 'SoilProfileCollection', "package:aqp")
     
     f_sp <- as.formula(paste("~", paste(nm$sp, collapse = "+")))
+    
     # Put coords in site data
-    spc <- .site_aqp(spc, as.formula(paste("~", paste(nm$sp, collapse = "+"))))
+        
+    mf_sp <- data.frame(
+      spc@horizons[, aqp::idname(spc), drop = FALSE], 
+      model.frame(f_sp, spc@horizons, na.action=na.pass), 
+      stringsAsFactors = FALSE # don't automatically make strings into factors
+    )
+        
+    new_site_data <- ddply(mf_sp, aqp::idname(spc), function(x) unique(x[, nm$sp]))
+    
+    # if site data is already present in the object, we don't want to erase it
+    spc@site <- join(aqp::site(spc), new_site_data, by = aqp::idname(spc))
+    
     # Set coordinates and proj4string
     spc <- .coordinates_aqp(spc, f_sp)
     spc <- .proj4string_aqp(spc, proj4string(from))
