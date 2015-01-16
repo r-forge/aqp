@@ -111,14 +111,14 @@ setMethod("site", "SPC",
 # 
 
 setMethod("names", "SoilProfile",
-  function(object) {
+  function(x) {
     res <- c(horizons = horizonNames(object), site = siteNames(object))
     return(res)
   }
 )
 
 setMethod("names", "SPC",
-  function(object) {
+  function(x) {
     names(profiles(object, 1))
   }
 )
