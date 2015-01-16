@@ -107,6 +107,22 @@ setMethod("site", "SPC",
           }
 )
 
+# return a concatenated vector of horizon + site names
+# 
+
+setMethod("names", "SoilProfile",
+  function(object) {
+    res <- c(horizons = horizonNames(object), site = siteNames(object))
+    return(res)
+  }
+)
+
+setMethod("names", "SPC",
+  function(object) {
+    names(profiles(object, 1))
+  }
+)
+
 ## get horizon column names
 ##
 
