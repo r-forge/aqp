@@ -106,3 +106,35 @@ setMethod("site", "SPC",
             res
           }
 )
+
+## get horizon column names
+##
+
+if (!isGeneric("horizonNames"))
+  setGeneric("horizonNames", function(object, ...) standardGeneric("horizonNames"))
+
+setMethod("horizonNames", "SoilProfile",
+          function(object)
+            return(names(horizons(object)))
+)
+
+setMethod("horizonNames", "SPC",
+          function(object)
+            # unnecessary coutious implementation:
+            # unique(unlist(lapply(profiles(object), horizonNames)))
+            return(horizonNames(profiles(object, 1)))
+)
+
+## get site column names
+## 
+
+if (!isGeneric("siteNames"))
+  setGeneric("siteNames", function(object, ...) standardGeneric("siteNames"))
+
+setMethod("siteNames", "SoilProfile",
+          function(object) names(site(object))
+)
+
+setMethod("siteNames", "SPC",
+          function(object) siteNames(profiles(object, 1))
+)
