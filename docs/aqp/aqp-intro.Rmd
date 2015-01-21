@@ -58,11 +58,13 @@ horizonDepths(sp4) # self-explanitory
 depth_units(sp4) # defaults to 'cm'
 metadata(sp4) # not much to start with
 profile_id(sp4) # vector of profile IDs
+horizonNames(sp4) # column names from horizon data
+siteNames(sp4) # column names from site data
 
 # further inspection with common function overloads
 length(sp4) # number of profiles in the collection
 nrow(sp4) # number of horizons in the collection
-names(sp4) # column names from site and horizon data
+names(sp4) # column names from site and horizon data, concatenated into a single vector
 min(sp4) # shallowest profile depth in collection
 max(sp4) # deepest profile depth in collection
 ```
