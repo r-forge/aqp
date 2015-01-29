@@ -283,6 +283,7 @@ mdsplot +
 
 The [silhouette width](http://www.sciencedirect.com/science/article/pii/0377042787901257) metric is a useful indicator of how consistently group labels partition observations in a dissimilarity matrix. Silhouette widths closer to 1 indicate excellent partitioning, while values closer to 0 indicate less effective partitioning. Silhouette widths less than 0 are often associated with inappropriate label assignment. A sketch of profiles with horizons colored by silhouette width can indicate possible horizons with inappropriate GHL assignment or a pedon that does not fit within the concept of Loafercreek. For example, many of the horizons associated with pedon ID 09CKS036 do not appear to fit within the collection of soil properties associated with generalized horizon labels "Bt1", "Bt2", and "Bt3". Keep in mind that this evaluation is only based on three soil properties-- expert judgement will be required for a final assignment of GHL.
 ```{r silhouette-sketch, fig.width=12, fig.height=5, htmlcap='Blue and green colors warrant further investigation.'}
+# plot silhouette width metric
 par(mar=c(0,0,3,3))
 plot(pedons, name='hzname', label='pedon_id', cex.names=0.8, axis.line.offset=-4, color='sil.width')
 ```

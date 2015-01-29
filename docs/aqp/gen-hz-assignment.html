@@ -205,9 +205,9 @@ hr {
 
 <p>D.E. Beaudette, J.M. Skovlin (edited for clarity by Jenny Sutherland)
 <br>
-2014-12-31
+2015-01-29
 <br>
-This document is based on <code>aqp</code> version 1.7-9 and <code>soilDB</code> version 1.4-2.</p>
+This document is based on <code>aqp</code> version 1.7-10 and <code>soilDB</code> version 1.4-6.</p>
 
 <h1>Introduction</h1>
 
@@ -478,7 +478,8 @@ mdsplot +
 
 <p>The <a href="http://www.sciencedirect.com/science/article/pii/0377042787901257">silhouette width</a> metric is a useful indicator of how consistently group labels partition observations in a dissimilarity matrix. Silhouette widths closer to 1 indicate excellent partitioning, while values closer to 0 indicate less effective partitioning. Silhouette widths less than 0 are often associated with inappropriate label assignment. A sketch of profiles with horizons colored by silhouette width can indicate possible horizons with inappropriate GHL assignment or a pedon that does not fit within the concept of Loafercreek. For example, many of the horizons associated with pedon ID 09CKS036 do not appear to fit within the collection of soil properties associated with generalized horizon labels &ldquo;Bt1&rdquo;, &ldquo;Bt2&rdquo;, and &ldquo;Bt3&rdquo;. Keep in mind that this evaluation is only based on three soil properties&ndash; expert judgement will be required for a final assignment of GHL.</p>
 
-<pre><code class="r">par(mar=c(0,0,3,3))
+<pre><code class="r"># plot silhouette width metric
+par(mar=c(0,0,3,3))
 plot(pedons, name=&#39;hzname&#39;, label=&#39;pedon_id&#39;, cex.names=0.8, axis.line.offset=-4, color=&#39;sil.width&#39;)
 </code></pre>
 
