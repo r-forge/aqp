@@ -1,0 +1,132 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Plot a collection of Soil Profiles linked to their position...</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+
+<link rel="stylesheet" href="http://yandex.st/highlightjs/7.3/styles/github.min.css">
+<script src="http://yandex.st/highlightjs/7.3/highlight.min.js"></script>
+<script src="http://yandex.st/highlightjs/7.3/languages/r.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</head><body>
+
+<table width="100%" summary="page for plotTransect {sharpshootR}"><tr><td>plotTransect {sharpshootR}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Plot a collection of Soil Profiles linked to their position along some gradient (e.g. transect).</h2>
+
+<h3>Description</h3>
+
+<p>Plot a collection of Soil Profiles linked to their position along some gradient (e.g. transect).</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+plotTransect(s, grad.var.name, transect.col = "RoyalBlue", 
+tick.number=7, y.offset = 100, 
+scaling.factor = 0.5, 
+distance.axis.title = "Distance Along Transect (km)", 
+crs = NULL, grad.axis.title = NULL, ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>s</code></td>
+<td>
+<p>a <code>SoilProfileCollection</code> object</p>
+</td></tr>
+<tr valign="top"><td><code>grad.var.name</code></td>
+<td>
+<p>the name of a site-level attribute containing gradient values</p>
+</td></tr>
+<tr valign="top"><td><code>transect.col</code></td>
+<td>
+<p>color used to plot gradient (transect) values</p>
+</td></tr>
+<tr valign="top"><td><code>tick.number</code></td>
+<td>
+<p>number of desired ticks and labels on the gradient axis</p>
+</td></tr>
+<tr valign="top"><td><code>y.offset</code></td>
+<td>
+<p>vertical offset used to position profile sketches</p>
+</td></tr>
+<tr valign="top"><td><code>scaling.factor</code></td>
+<td>
+<p>scaling factor used to adjust profile sketches</p>
+</td></tr>
+<tr valign="top"><td><code>distance.axis.title</code></td>
+<td>
+<p>a tital for the along-transect distances</p>
+</td></tr>
+<tr valign="top"><td><code>crs</code></td>
+<td>
+<p>an optional <code>CRS</code> object used to convert coordinates into a planar system</p>
+</td></tr>
+<tr valign="top"><td><code>grad.axis.title</code></td>
+<td>
+<p>a title for the gradient axis</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>further arguments passed to <code>plotSPC</code></p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>Depending on the nature of your SoilProfileCollection and associated gradient values, it may be necessary to tinker with figure margins, <code>y.offset</code> and <code>scaling.factor</code>.</p>
+
+
+<h3>Value</h3>
+
+<p>An invisibly-returned <code>data.frame</code> object:
+</p>
+
+<dl>
+<dt>scaled.grad</dt><dd><p>scaled gradient values</p>
+</dd>
+<dt>scaled.distance</dt><dd><p>cumulative distance, scaled to the interval of <code>0.5, nrow(coords) + 0.5</code></p>
+</dd>
+<dt>distance</dt><dd><p>cumulative distance computed along gradient, e.g. transect distance</p>
+</dd>
+<dt>variable</dt><dd><p>sorted gradient values</p>
+</dd>
+<dt>x</dt><dd><p>x coordinates, ordered by gradient values</p>
+</dd>
+<dt>y</dt><dd><p>y coordinate, ordered by gradient values</p>
+</dd>
+<dt>grad.order</dt><dd><p>a vector index describing the sort order defined by gradient values</p>
+</dd>
+</dl>
+
+
+<h3>Note</h3>
+
+<p>This function is very much a work in progress, ideas welcome!</p>
+
+
+<h3>Author(s)</h3>
+
+<p>D.E. Beaudette</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="r">## Not run: 
+##D data(loafercreek, package=&#39;soilDB&#39;)
+##D 
+##D x &lt;- loafercreek[1:10, ]
+##D coordinates(x) &lt;- ~ x_std + y_std
+##D proj4string(x) &lt;- &#39;+proj=longlat +datum=NAD83&#39;
+##D 
+##D par(mar=c(4,3,1,1))
+##D plotTransect(x, &#39;elev_field&#39;, crs=CRS(&#39;+proj=utm +zone=10 +datum=NAD83&#39;), max.depth=185)
+## End(Not run)
+</code></pre>
+
+
+<hr><div align="center">[Package <em>sharpshootR</em> version 0.7 <a href="00Index.html">Index</a>]</div>
+</body></html>
