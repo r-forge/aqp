@@ -1,0 +1,107 @@
+---
+title: "Profile Summaries"
+author: "D.E. Beaudette"
+date: "Thursday, February 6, 2015"
+output: html_document
+---
+
+```{r setup, echo=FALSE, results='hide'}
+library(knitr)
+opts_chunk$set(message=FALSE, warning=FALSE, dpi=120, fig.align='center', dev='CairoPNG', dev.args=list(pointsize=10), tidy=FALSE)
+options(width=100, stringsAsFactors=FALSE)
+
+knit_hooks$set(htmlcap = function(before, options, envir) {
+  if(!before) {
+    paste('<p class="caption" style="font-size:85%; font-style: italic; font-weight: bold;">',options$htmlcap,"</p><hr>",sep="")
+    }
+    })
+```
+
+
+Profile Summaries
+===============================
+D.E. Beaudette
+<br>
+`r format(Sys.time(), "%Y-%m-%d")`
+<br>
+This document is based on `aqp` version `r utils::packageDescription("aqp", field="Version")` and `soilDB` version `r utils::packageDescription("soilDB", field="Version")`.
+
+
+# Introduction
+
+
+```{r load-packages}
+library(soilDB)
+library(lattice)
+library(reshape2)
+library(plyr)
+
+x <- fetchNASIS(rmHzErrors = FALSE, nullFragsAreZero = FALSE)
+
+# subset select taxa
+idx <- grep('whiterock|copperopolis|shabarudo|dunstone|loafercreek|argonaut|crimeahouse|hennekenot', x$taxonname, ignore.case = TRUE)
+x <- x[idx, ]
+
+
+# normalize taxonnames
+for(i in c('Whiterock', 'Copperopolis', 'Shabarudo', 'Dunstone', 'Loafercreek', 'Argonaut','Crimeahouse', 'Hennekenot'))
+  x$taxonname[grep(i, x$taxonname, ignore.case = TRUE)] <- i
+
+
+# aggregate data by generalized taxonname
+a.colors <- slab(x, taxonname ~ m_r + m_g + m_b + clay + phfield + total_frags_pct, slab.fun=mean, na.rm=TRUE)
+a.colors <- subset(a.colors, subset=bottom < 150)
+
+# convert long -> wide format
+x.colors <- dcast(a.colors, taxonname + top + bottom ~ variable, value.var = 'value')
+
+# generate a color for plotting, from RGB triplets
+x.colors$soil_color <- NA
+not.na <- which(complete.cases(x.colors[, c('m_r', 'm_g', 'm_b')]))
+x.colors$soil_color[not.na] <- with(x.colors[not.na, ], rgb(m_r, m_g, m_b))
+
+# aggregate bedrock depth probabilty by taxonname
+x$soil.flag <- rep('soil', times=nrow(x))
+x$soil.flag[grep('Cd|Cr|R', x$hzname)] <- 'not-soil'
+table(x$soil.flag)
+
+# slice-wise probabilities sum to contributing fraction
+a.ml.soil <- slab(x, taxonname ~ soil.flag, cpm=2)
+
+## note: this is important when aggregating over several depth classes
+# compute adjusted soil flag probability: cf * Pr(soil)
+a.ml.soil$adj.soil.flag <- with(a.ml.soil, contributing_fraction * soil)
+
+# extract depth at specific probability of contact
+depth.prob <- ddply(a.ml.soil, 'taxonname', .fun=function(i) {
+  max(i$top[which(i$adj.soil.flag >= 0.1)])
+})
+
+# add soil top and fix names
+names(depth.prob)[2] <- 'soil.bottom'
+depth.prob$soil.top <- 0
+
+# init SPC and splice-in 90% soil interval as site attribute
+depths(x.colors) <- taxonname ~ top + bottom
+site(x.colors) <- depth.prob
+
+# generate index for new ordering
+new.order <- match(c('Whiterock', 'Copperopolis', 'Shabarudo', 'Dunstone', 'Loafercreek', 'Argonaut', 'Crimeahouse', 'Hennekenot'), profile_id(x.colors))
+```
+
+```{r plots, fig.width=10, fig.height=4, htmlcap='Soil properties aggregated over 1-cm slices, by taxon.'}
+par(mar=c(1,0,3,0))
+plot(x.colors, divide.hz=FALSE, name='', plot.order=new.order, col.label='Soil Color', lwd=1.25, axis.line.offset=-6, cex.depth.axis=1, cex.id=1)
+addBracket(x.colors$soil.top, x.colors$soil.bottom, col='black', label='Pr(soil >= 90%)', label.cex=0.6)
+title('Aggregate Soil Properties (mean)')
+
+plot(x.colors, divide.hz=FALSE, color='clay', name='', plot.order=new.order, col.label='Clay Content (%)', lwd=1.25, axis.line.offset=-6, cex.depth.axis=1, cex.id=1)
+addBracket(x.colors$soil.top, x.colors$soil.bottom, col='black', label='Pr(soil >= 90%)', label.cex=0.6)
+
+plot(x.colors, divide.hz=FALSE, color='phfield', name='', plot.order=new.order, col.label='pH', lwd=1.25, axis.line.offset=-6, cex.depth.axis=1, cex.id=1)
+addBracket(x.colors$soil.top, x.colors$soil.bottom, col='black', label='Pr(soil >= 90%)', label.cex=0.6)
+
+plot(x.colors, divide.hz=FALSE, color='total_frags_pct', name='', plot.order=new.order, col.label='Total Rock Fragment Volume (%)', lwd=1.25, axis.line.offset=-6, cex.depth.axis=1, cex.id=1)
+addBracket(x.colors$soil.top, x.colors$soil.bottom, col='black', label='Pr(soil >= 90%)', label.cex=0.6)
+```
+
