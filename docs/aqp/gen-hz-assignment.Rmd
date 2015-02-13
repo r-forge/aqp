@@ -49,9 +49,10 @@ Here is a basic outline of the process:
   
   4. Keep track of final GHL assignments in NASIS or text file. 
   
-  5. Compute range in characteristics, aka [low-rv-high values](http://casoilresource.lawr.ucdavis.edu/wiki/Low-rv-high), for clay, sand, pH, etc. over GHL. (next document in this series)
+  5. Estimate a most likely horizonation (e.g., top and bottom depths) for each generalized horizon label. (next document in this series)
   
-  6. Estimate a most likely horizonation (e.g., top and bottom depths) for each generalized horizon label. (next document in this series)
+  6. Compute range in characteristics, aka [low-rv-high values](http://casoilresource.lawr.ucdavis.edu/wiki/Low-rv-high), for clay, sand, pH, etc. over GHL. (next document in this series)
+  
 
 
 
