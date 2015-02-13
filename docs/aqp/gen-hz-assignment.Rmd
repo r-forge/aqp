@@ -65,8 +65,8 @@ install.packages('plyr', dep=TRUE)
 install.packages('aqp', dep=TRUE) 
 install.packages('soilDB', dep=TRUE)
 # latest versions from R-Forge:
-install.packages('aqp', repos="http://R-Forge.R-project.org", type='source')
-install.packages('soilDB', repos="http://R-Forge.R-project.org", type='source')
+install.packages('aqp', repos="http://R-Forge.R-project.org")
+install.packages('soilDB', repos="http://R-Forge.R-project.org")
 ```
 
 Once you have all of the R packages on which  this document depends, it is a good idea to load them. R packages must be **installed** anytime you change versions of R (e.g., after an upgrade) and **loaded** anytime you want to access functions from within those packages.
