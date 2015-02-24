@@ -1,6 +1,16 @@
+---
+output:
+  html_document:
+    theme: journal
+    mathjax: null
+    jquery: null
+    smart: false
+---
+
 ```{r setup, echo=FALSE, results='hide'}
 # setup
-opts_chunk$set(message=FALSE, warning=FALSE, background='#F7F7F7', dpi=100, fig.align='center', dev='CairoPNG', tidy=FALSE, verbose=FALSE)
+library(knitr, quietly=TRUE)
+opts_chunk$set(message=FALSE, warning=FALSE, background='#F7F7F7', fig.align='center', fig.retina=1, dev='png', tidy=FALSE, verbose=FALSE)
 options(width=100, stringsAsFactors=FALSE)
 ```
 
@@ -15,6 +25,8 @@ Dylan Beaudette
 With a recent version of R, it should be possible to get all of the packages that this tutorial depends on via:
 ```{r install-deps, eval=FALSE}
 # run these commands in the R console
+install.packages('aqp', dep=TRUE) # stable version from CRAN + dependencies
+install.packages('RODBC', dep=TRUE) # stable version from CRAN + dependencies
 install.packages('soilDB', dep=TRUE) # stable version from CRAN + dependencies
 install.packages("soilDB", repos="http://R-Forge.R-project.org") # most recent copy from r-forge
 ```
@@ -114,7 +126,7 @@ p.ph <- xyplot(mid ~ p.q50 | generalized_bedrock, upper=a$p.q75, lower=a$p.q25, 
 
 
 ### Apply plot style and combine figures into a single composite
-```{r plot, fig.width=15, fig.height=10, out.width="100%"}
+```{r plot, fig.width=17, fig.height=10}
 # apply styling/colors
 trellis.par.set(tps)
 

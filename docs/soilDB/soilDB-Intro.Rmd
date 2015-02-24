@@ -1,19 +1,21 @@
-<!--
-manually process like this:
-library(knitr); library(markdown)
-knit('soilDB-Intro.Rmd')
-markdownToHTML('soilDB-Intro.md', 'soilDB-Intro.html')
--->
-
-<title>Soil Database Interface: the soilDB package</title>
-# Soil Database Interface: the <tt>soilDB</tt> package
+---
+output:
+  html_document:
+    theme: journal
+    mathjax: null
+    jquery: null
+    smart: false
+---
 
 ```{r setup, echo=FALSE, results='hide'}
 # setup
-opts_chunk$set(message=FALSE, warning=FALSE, background='#F7F7F7', dpi=100, fig.align='center', dev='CairoPNG', tidy=FALSE, verbose=FALSE)
+library(knitr, quietly=TRUE)
+opts_chunk$set(message=FALSE, warning=FALSE, background='#F7F7F7', fig.align='center', fig.retina=1, dev='png', tidy=FALSE, verbose=FALSE)
 options(width=100, stringsAsFactors=FALSE)
 ```
 
+<title>Soil Database Interface: the soilDB package</title>
+# Soil Database Interface: the <tt>soilDB</tt> package
 
 ## Introduction
 This package provides methods for extracting soils information from local PedonPC and AK Site databases (MS Access format), local NASIS databases (MS SQL Server), and the SDA web-service. Currently USDA-NCSS data sources are supported, however, there are plans to develop interfaces to outside systems such as the Global Soil Mapping project.
@@ -23,6 +25,7 @@ This package provides methods for extracting soils information from local PedonP
 With a recent version of R, it should be possible to get all of the packages that `soilDB` depends on via:
 ```{r ssoap-deps, eval=FALSE}
 # run these commands in the R console
+install.packages("RODBC", dep=TRUE) # stable version from CRAN + dependencies
 install.packages("soilDB", dep=TRUE) # stable version from CRAN + dependencies
 install.packages("SSOAP", repos = "http://www.omegahat.org/R", type="source") # SSOAP and XMLSchema
 ```
@@ -344,7 +347,7 @@ gopheridge$paralithic.contact.depth <- profileApply(gopheridge, f.diag.top, d.hz
 
 
 Re-order the `gopheridge` profiles by presence/absence of paralithic contact, plot, and then annotate depth of Cr contact.
-```{r basic_plotting, fig.width=12, fig.height=5, out.width='100%'}
+```{r basic_plotting, fig.width=12, fig.height=5}
 # order by presence of paralithic contact and its depth
 new.order <- order(gopheridge$paralithic.contact, gopheridge$paralithic.contact.depth)
 # setup margins:

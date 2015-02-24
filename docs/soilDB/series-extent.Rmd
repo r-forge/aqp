@@ -1,6 +1,16 @@
+---
+output:
+  html_document:
+    theme: journal
+    mathjax: null
+    jquery: null
+    smart: false
+---
+
 ```{r setup, echo=FALSE, results='hide'}
 # setup
-opts_chunk$set(message=FALSE, warning=FALSE, background='#F7F7F7', dpi=100, fig.align='center', dev='CairoPNG', tidy=TRUE, verbose=FALSE)
+library(knitr, quietly=TRUE)
+opts_chunk$set(message=FALSE, warning=FALSE, background='#F7F7F7', fig.align='center', fig.retina=1, dev='png', tidy=FALSE, verbose=FALSE)
 options(width=100, stringsAsFactors=FALSE)
 ```
 
@@ -24,21 +34,21 @@ install.packages('maps', dep=TRUE)
 
 ### Examples 
 **Illustrate the extent of SSURGO map units associated with the Amador series.**
-```{r example-1, results='hide'}
+```{r libraries, results='hide'}
 # load required libraries
 library(soilDB)
 library(dismo)
+library(maps)
+library(RColorBrewer)
+```
 
+```{r example-1, eval=FALSE}
 # plot map
 seriesExtentAsGmap('amador')
 ```
 
 **Illustrate the extent of SSURGO map units associated with several soil series from MLRA 17 and 18.**
 ```{r example-2, results='hide'}
-# load required libraries
-library(maps)
-library(RColorBrewer)
-
 # define some nice colors
 cols <- brewer.pal('Set1', n=3)
 

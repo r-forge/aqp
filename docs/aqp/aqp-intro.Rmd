@@ -1,7 +1,16 @@
+---
+output:
+  html_document:
+    theme: journal
+    mathjax: null
+    jquery: null
+    smart: false
+---
 
 ```{r setup, echo=FALSE, results='hide'}
-library(knitr)
-opts_chunk$set(message=FALSE, warning=FALSE, background='#F7F7F7', dpi=100, fig.align='center', dev='CairoPNG', tidy=FALSE)
+# setup
+library(knitr, quietly=TRUE)
+opts_chunk$set(message=FALSE, warning=FALSE, background='#F7F7F7', fig.align='center', fig.retina=1, dev='png', tidy=FALSE, verbose=FALSE)
 options(width=100, stringsAsFactors=FALSE)
 ```
 
@@ -266,7 +275,7 @@ Horizon-level attributes that represent a volume fraction (e.g. coarse-fragment 
 ```{r plotting-vol-fraction, fig.height=4, fig.width=8}
 par(mar=c(0,0,3,0)) # tighter figure margins
 sp4$frag_pct <- sp4$CF * 100 # convert fraction -> percent
-plot(sp4, name='name', col='frag_pct')
+plot(sp4, name='name', color='frag_pct')
 addVolumeFraction(sp4, 'frag_pct') # symbolize volume fraction data
 ```
 
