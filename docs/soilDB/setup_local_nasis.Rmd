@@ -28,14 +28,15 @@ This document describes how setup an ODBC link between a local NASIS database an
 
 ### Example
 ```{r example, eval=FALSE}
+# install packages (only first time)
+install.packages("RODBC", dep=TRUE) # stable version from CRAN + dependencies
+install.packages("soilDB", dep=TRUE) # stable version from CRAN + dependencies
+
 # load the library
 library(soilDB)
 
 # fetch all pedons from the local database
 fp <- fetchNASIS()
-
-# check for horizonation errors:
-fp.errors <- getHzErrorsNASIS()
 
 # fetch all DMU records from the local database
 fc <- fetchNASIS_component_data()

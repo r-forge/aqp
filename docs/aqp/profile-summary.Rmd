@@ -1,13 +1,16 @@
 ---
-title: "Profile Summaries"
-author: "D.E. Beaudette"
-date: "Thursday, February 6, 2015"
-output: html_document
+output:
+  html_document:
+    theme: journal
+    mathjax: null
+    jquery: null
+    smart: false
 ---
 
 ```{r setup, echo=FALSE, results='hide'}
-library(knitr)
-opts_chunk$set(message=FALSE, warning=FALSE, dpi=120, fig.align='center', dev='CairoPNG', dev.args=list(pointsize=10), tidy=FALSE)
+# setup
+library(knitr, quietly=TRUE)
+opts_chunk$set(message=FALSE, warning=FALSE, background='#F7F7F7', fig.align='center', fig.retina=1, dev='png', tidy=FALSE, verbose=FALSE)
 options(width=100, stringsAsFactors=FALSE)
 
 knit_hooks$set(htmlcap = function(before, options, envir) {
@@ -16,6 +19,7 @@ knit_hooks$set(htmlcap = function(before, options, envir) {
     }
     })
 ```
+
 
 
 Profile Summaries
