@@ -1,13 +1,12 @@
 ---
 output:
   html_document:
-    theme: journal
     mathjax: null
     jquery: null
-    smart: false
+    smart: no
 ---
 
-```{r setup, echo=FALSE, results='hide'}
+```{r setup, echo=FALSE, results='hide', warning=FALSE}
 # setup
 library(knitr, quietly=TRUE)
 opts_chunk$set(message=FALSE, warning=FALSE, background='#F7F7F7', fig.align='center', fig.retina=1, dev='png', tidy=FALSE, verbose=FALSE)

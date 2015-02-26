@@ -1,3 +1,12 @@
+---
+output:
+  html_document:
+    mathjax: null
+    jquery: null
+    smart: no
+    self_contained: no
+---
+
 ## Setup an ODBC Connection to the Local NASIS Database
 NASIS 6.2
 `r format(Sys.time(), "%Y-%m-%d")`
@@ -19,11 +28,12 @@ This document describes how setup an ODBC link between a local NASIS database an
  * Select the "SQL Server Native Client" driver.
  * Name the data source `nasis_local`, the data source description is optional.
  * The server location is `XXXXXX\NASISSQLEXPRESS`, where `XXXXXX` is the [full name of your local machine](http://windows.microsoft.com/en-us/windows7/find-your-computer-name). It is usually on the outside of your computer somewhere, or can be accessed by right-clicking on the "My Computer" icon and then clicking on the "Properties" tab. It will look something like: `CASONORA00L354`. When finished click "Next".
- * Choose the second option: "SQL Server authentication...":
-  * login: `NASISSQLRO`
-  * password: `nasisRe@d0n1y`
- * On the next screen, select "Nasis-local" as the default data base.
- * Click "Next" and then "Finish" the finalize the connection.
+
+* Choose the second option: "SQL Server authentication...":
+* login: `NASISSQLRO`
+* password: `nasisRe@d0n1y`
+* On the next screen, select "Nasis-local" as the default data base.
+* Click "Next" and then "Finish" the finalize the connection.
 
 
 ### Example
