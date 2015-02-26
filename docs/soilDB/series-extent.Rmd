@@ -1,10 +1,10 @@
 ---
 output:
   html_document:
-    theme: journal
-    mathjax: null
+    fig_caption: yes
     jquery: null
-    smart: false
+    mathjax: null
+    smart: no
 ---
 
 ```{r setup, echo=FALSE, results='hide'}
