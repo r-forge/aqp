@@ -86,7 +86,7 @@ The `soilDB` package provides two layers of functionality for extracting data fr
 When loading pedons with the `fetchNASIS()` or `fetchPedonPC()` functions, checks are performed for:
  * multiple map datums: results reported to the user, data are not modified
  * inconsistent horizon boundaries: pedons with inconsistent horizon boundaries are not loaded
- * missing lower horizon depths: offending horizons are **fixed** by replacing the missing bottom depth with the top depth
+ * missing lower horizon depths: offending horizons are **fixed** by replacing the missing bottom depth with the top depth + 2cm
  * sites missing pedon records: these data are not loaded
 
 
@@ -96,8 +96,10 @@ The `fetchNASIS()` function will load pedons from the "selected set" in your loc
 
 ```{r local-nasis-demo, eval=FALSE}
 library(soilDB)
-# pedons
-f <- fetchNASIS()
+# fetch pedons from the selected set, replace NULL rock fragment fractions with 0
+f <- fetchNASIS(nullFragsAreZero=TRUE)
+# fetch pedons from the selected set, do not replace NULL rock fragment fractions with 0
+f <- fetchNASIS(nullFragsAreZero=FALSE)
 
 # DMU data
 fc <- fetchNASIS_component_data()

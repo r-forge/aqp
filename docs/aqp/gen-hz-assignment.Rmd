@@ -1,6 +1,6 @@
 ---
 output:
-  html_document:
+  html_vignette:
     mathjax: null
     jquery: null
     smart: no
@@ -107,7 +107,8 @@ The following code block demonstrates how to pull data in using the [`fetchNASIS
 ```{r use-nasis-data, eval=FALSE}
 # first load the desired data set within NASIS into your NASIS selected set
 # then load data from the NASIS selected set into R
-pedons <- fetchNASIS()
+# note that the `nullFragsAreZero` argument converts NULL rock fragment class data into 0s
+pedons <- fetchNASIS(nullFragsAreZero=TRUE)
 # optionally subset the data by taxon name - enter your taxon name
 pedons <- pedons[grep(pattern='ENTER_YOUR_TAXON_NAME', pedons$taxonname, ignore.case=TRUE), ]
 ```
