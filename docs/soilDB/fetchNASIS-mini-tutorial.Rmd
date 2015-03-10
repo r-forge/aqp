@@ -1,0 +1,35 @@
+---
+output:
+  html_document:
+    fig_caption: yes
+    jquery: null
+    mathjax: null
+    smart: no
+---
+
+```{r setup, echo=FALSE, results='hide'}
+# setup
+library(knitr, quietly=TRUE)
+opts_chunk$set(message=FALSE, warning=FALSE, background='#F7F7F7', fig.align='center', fig.retina=1, dev='png', tidy=FALSE, verbose=FALSE)
+options(width=100, stringsAsFactors=FALSE)
+```
+
+# Tips on getting data from NASIS into R
+`r format(Sys.time(), "%Y-%m-%d")`
+<br>D.E. Beaudette, J.M. Skovlin, S.Roecker
+
+### Introduction
+
+
+## Load Data from the NASIS Selected Set
+```{r setup-and-get-data, results='show', message=TRUE}
+# load required libraries
+library(soilDB)
+
+# get pedons from selected set, using defaults
+p <- fetchNASIS()
+```
+
+
+----------------------------
+This document is based on `aqp` version `r utils::packageDescription("aqp", field="Version")` and `soilDB` version `r utils::packageDescription("soilDB", field="Version")`.
