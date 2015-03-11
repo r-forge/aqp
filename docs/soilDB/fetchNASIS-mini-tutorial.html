@@ -203,31 +203,120 @@ hr {
 <body>
 <h1>Tips on getting data from NASIS into R</h1>
 
-<p>2015-03-10
-<br>D.E. Beaudette, J.M. Skovlin, S.Roecker</p>
+<p>2015-03-11
+<br>D.E. Beaudette, J.M. Skovlin, S. Roecker</p>
 
-<h3>Introduction</h3>
+<blockquote>
+<p>This tutorial is based on essential background material described in the <a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/soilDB-Intro.html?root=aqp">soilDB</a> and related <a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/setup_local_nasis.html?root=aqp">NASIS ODBC connection</a> tutorials. If you have not reviewed those tutorials, please do so before proceeding.</p>
+</blockquote>
 
-<h2>Load Data from the NASIS Selected Set</h2>
+<h2>Introduction</h2>
+
+<p>The <code>soilDB</code> package contains a number of <strong>convenience functions</strong> (usually having a prefix of &ldquo;fetch&rdquo;) for extracting data from commonly used databases, performing basic quality control checks, and returning the result as a <a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/aqp/aqp-intro.html?root=aqp">SoilProfileCollection</a> object. In order to simplify the process of stitching-together the many linked (and sometimes nested) tables associated with pedon data in NASIS, the convenience function <code>fetchNASIS()</code> must make a number of assumptions about the data. This document describes how those assumptions can be adjusted and how they may affect subsequent data analysis.</p>
+
+<h2>Pedon Data</h2>
+
+<p>Pedon data are extracted from the selected set using the <code>fetchNASIS()</code> convenience function. The resulting object is a distillation of the complex NASIS representation of a pedon into &ldquo;site&rdquo;, &ldquo;horizon&rdquo;, and &ldquo;diagnostic&rdquo; attributes. [elaborate as needed]. </p>
+
+<p>Load up your local database and selected set with some pedons and follow along with the code blocks below.</p>
 
 <pre><code class="r"># load required libraries
 library(soilDB)
 
-# get pedons from selected set, using defaults
+# get data, using default assumptions
 p &lt;- fetchNASIS()
 </code></pre>
 
-<pre><code>## multiple horizontal datums present, consider using WGS84 coordinates (x_std, y_std)
-## *** sites without pedons: use `get(&#39;sites.missing.pedons&#39;, envir=soilDB.env)` for a list of usersiteid values
-## mixing dry colors ... [17 of 2250 horizons]
-## mixing moist colors ... [51 of 2642 horizons]
-## replacing missing lower horizon depths with top depth + 1cm ... [68 horizons]
-## *** horizon errors detected, use `get(&#39;bad.pedon.ids&#39;, envir=soilDB.env)` for a list of userpedonid values
+<h3>Status and QC Messages</h3>
+
+<p>As part of the quality control process, a number of possible messages are printed to the console when running <code>fetchNASIS()</code>. These messages and their meaning are described below:</p>
+
+<ul>
+<li><p><code>mixing dry colors ... [17 of 2250 horizons]</code>
+In this case, 17 of the 2250 horizons loaded into the selected set have more than 1 dry color described. Multiple colors are mixed via weighted average in order to simplify analysis.</p></li>
+<li><p><code>mixing moist colors ... [51 of 2642 horizons]</code>
+In this case, 51 of the 2642 horizons loaded into the selected set have more than 1 moist color described. Multiple colors are mixed via weighted average in order to simplify analysis.</p></li>
+<li><p><code>replacing missing lower horizon depths with top depth + 1cm ... [68 horizons]</code>
+In this case, 68 horizons have no lower depth defined. A missing lower horizon depth can create problems so a <em>surrogate</em> value is created by adding 1cm to the associated top depth.</p></li>
+<li><p><code>-&gt; QC: sites without pedons ...</code>
+As the message suggests, there are sites with no associated pedons. While this isn&#39;t necessarily a quality control issue, it should be investigated. The associated user site ID values can be extracted interactively with <code>get(&#39;sites.missing.pedons&#39;, envir=soilDB.env)</code>.</p></li>
+<li><p><code>-&gt; QC: horizon errors detected ...</code>
+Horizon depths are checked for gaps, overlap, or bottom depths than are shallower than top depths. In most cases pedons flagged as having errors suggests a quality control issue. However, combination horizons (e.g. B/C) that have been entered as two distinct horizons sharing the same horizon depths will trigger this warning.</p></li>
+</ul>
+
+<h3>Adjusting the Defaults</h3>
+
+<p>Some of the assumptions made by <code>fetchNASIS()</code> can be adjusted using arguments to the function:</p>
+
+<ul>
+<li><p><code>rmHzErrors = TRUE</code>
+Setting this value to <code>TRUE</code> (the default) will enable checks for horizon depth consistency. Consider setting this argument to <code>FALSE</code> if you aren&#39;t concerned about horizon depth errors, or know that your selected set contains many combination horizons. Note that any pedons flagged as having horizon depths errors (<code>rmHzErrors = TRUE</code>) will be omitted from the data returned by <code>fetchNASIS()</code>.</p></li>
+<li><p><code>nullFragsAreZero = TRUE</code>
+Setting this value to <code>TRUE</code> (the default) will convert NULL rock fragment volumes to 0s. This is typically the right assumption as rock fragment data are typically populated <em>only</em> when observed. If you know that your data contain a combination of <em>ommited</em> information (e.g. there are no rock fragment volumes populated) then consider setting this argument to <code>FALSE</code>. Note that this argument will have significant effects on the rock fragment data returned by <code>fetchNASIS()</code> as illustrated below:</p></li>
+</ul>
+
+<pre><code class="r"># load required libraries
+library(soilDB)
+library(plyr)
+library(reshape2)
+
+# default setting, NULL fragment volume is interpreted as 0
+f.1 &lt;- fetchNASIS(nullFragsAreZero = FALSE)
+
+# assume NULL fragment volume is NULL
+f.2 &lt;- fetchNASIS(nullFragsAreZero = TRUE)
+
+# fragment classes to investigate
+vars &lt;- c(&quot;fine_gravel&quot;, &quot;gravel&quot;, &quot;cobbles&quot;, &quot;stones&quot;, &quot;boulders&quot;, &quot;paragravel&quot;, &quot;paracobbles&quot;, &quot;channers&quot;, &quot;flagstones&quot;)
+
+# get those horizon-level attributes from each set
+s.1 &lt;- (horizons(f.1)[, vars])
+s.2 &lt;- (horizons(f.2)[, vars])
+
+# assign fragment interpretation style
+s.1$null.frags &lt;- &#39;NULL&#39;
+s.2$null.frags &lt;- &#39;Zero&#39;
+
+# stack and convert to long format
+s &lt;- rbind(s.1, s.2)
+s.long &lt;- melt(s, id.vars=&#39;null.frags&#39;)
+
+# tabular comparison, using 5th, 50th, and 95th percentiles as low-rv-high
+ddply(s.long, c(&#39;variable&#39;, &#39;null.frags&#39;), function(i) {
+  q &lt;- quantile(i$value, na.rm=TRUE, probs=c(0.05, 0.5, 0.95))
+  n &lt;- length(na.omit(i$value))
+  data.frame(stats=paste0(round(q), collapse=&#39;-&#39;), horizons.with.data=n)
+})
 </code></pre>
+
+<pre><code>##       variable null.frags   stats horizons.with.data
+## 1  fine_gravel       NULL  1-6-30                361
+## 2  fine_gravel       Zero  0-0-10               2865
+## 3       gravel       NULL 2-15-50               1806
+## 4       gravel       Zero  0-5-45               2865
+## 5      cobbles       NULL 1-10-35               1222
+## 6      cobbles       Zero  0-0-25               2865
+## 7       stones       NULL 1-10-35                794
+## 8       stones       Zero  0-0-20               2865
+## 9     boulders       NULL 2-10-50                131
+## 10    boulders       Zero   0-0-0               2865
+## 11  paragravel       NULL 2-15-49                 83
+## 12  paragravel       Zero   0-0-0               2865
+## 13 paracobbles       NULL  1-8-26                 37
+## 14 paracobbles       Zero   0-0-0               2865
+## 15    channers       NULL 3-15-40                 59
+## 16    channers       Zero   0-0-0               2865
+## 17  flagstones       NULL 0-10-40                 73
+## 18  flagstones       Zero   0-0-0               2865
+</code></pre>
+
+<p>An increased level of verbosity in the quality control messages can be enabled by setting the option: <code>options(soilDB.verbose=TRUE)</code>. This is not generally suggested, but may be useful if you are having difficulty loading data from NASIS.</p>
+
+<h2>Component Data</h2>
 
 <hr/>
 
-<p>This document is based on <code>aqp</code> version 1.8-3 and <code>soilDB</code> version 1.5-2.</p>
+<p>This document is based on <code>aqp</code> version 1.8-3 and <code>soilDB</code> version 1.5-3.</p>
 
 </body>
 
