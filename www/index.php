@@ -57,17 +57,31 @@ echo $contents; } ?>
 <p><b>Tutorials</b>:
 <ol>
 <li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/aqp/aqp-intro.html?root=aqp">SoilProfileCollection object introduction</a></li>
+
 <li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/aqp/dealing-with-bad-data.html?root=aqp">dealing with bad data</a></li>
+
 <li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/properties-by-bedrock.html?root=aqp">aggregate properties by bedrock kind</a></li>
+
 <li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/aqp/aqp-profile-dissimilarity.html?root=aqp">soil profile dissimilarity</a></li>
+
 <li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/aqp/vertical_vs_perpendicular.html?root=aqp">vertical vs. perpendicular horizon measurements</a></li>
-<li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/soilDB-Intro.html?root=aqp">getting soils data from USDA-NCSS databases</a></li>
-<li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/KSSL-demo.html?root=aqp">getting/comparing KSSL data</a></li>
+
 <!-- <li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/RaCA-demo.html?root=aqp">getting RaCA data</a></li> -->
 <li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/series-extent.html?root=aqp">getting, plotting, saving detailed soil series extent data (US-only)</a></li>
-<li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/gSSURGO-SDA.html?root=aqp">gridded SSURRGO (gSSURGO) and SDA</a></li>
+
 <li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/sharpshootR/component-relation-graph.html?root=aqp">Component Relation Graphs</a></li>
+
 <li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/sharpshootR/OSD-dendrogram.html?root=aqp">OSD Dendrogram</a></li>
+
+<li>USDA-NRCS Data Sources<ol>
+<li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/soilDB-Intro.html?root=aqp">getting soils data from USDA-NCSS databases</a></li>
+
+<li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/KSSL-demo.html?root=aqp">getting/comparing KSSL data</a></li>
+
+<li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/fetchNASIS-mini-tutorial.html?root=aqp">Tips on getting data from NASIS into R</a></li>
+
+<li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/gSSURGO-SDA.html?root=aqp">gridded SSURRGO (gSSURGO) and SDA</a></li>
+</ol></li>
 
 <li>Pedon Data Aggregation<ol>
 <li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/aqp/gen-hz-assignment.html?root=aqp">Assignment of generalized horizon labels</a></li>
