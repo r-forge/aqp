@@ -39,23 +39,6 @@ In this contrived example, there are several obvious "micro-correlation" decisio
 Based on your knowledge of the area pedon 2 might be a good "typical" pedon from which a horizonation prototype can be developed. After careful review of the data and consultation with your crew, a new set of labels are assigned to each horizon (<span style="color: red;">red labels in figure above</span>) that define groups over which soil properties will be aggregated. These new labels define *functionally-similar* groups that may span multiple genetic horizons.
 
 
-## Formalized Approach 
-This document describes an aggregation strategy based on the use of "generalized horizon labels" (GHL) through a combination of narrative, **R** code, and figures. You can follow along in an **R** session by copying code from the grey boxes and pasting it into the **R** console.
-
-Here is a basic outline of the process:
-
-  1. Select a set of GHL that best represent a group of pedons to be aggregated. This could be based on series descriptions, expert-knowledge, or even inspection of the most frequently occurring horizon designations. (previous document in this series)
-  
-  2. Assign GHL to each horizon using whatever information that is available for grouping horizons. This micro-correlation of horizon designations will likely require slightly different "rules" in each instance. Careful inspection of horizon designation and observed properties is critical. (previous document in this series)
-  
-  3. Evaluate GHL assignments and manually refine as needed. (previous document in this series) 
-  
-  4. Keep track of final GHL assignments in NASIS or text file. (previous document in this series)
-  
-  5. Compute range in characteristics, aka [low-rv-high values](http://casoilresource.lawr.ucdavis.edu/wiki/Low-rv-high), (e.g. clay, sand, pH, etc.) over GHL. (this document in this series)
-  
-  6. Estimate a most-likely horizonation (e.g. top and bottom depths) for each generalized horizon label. (this document in this series)
-
 
 
 # Setup R Envionment

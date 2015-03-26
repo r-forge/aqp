@@ -221,21 +221,6 @@ This document is based on <code>aqp</code> version 1.8-3 and <code>soilDB</code>
 
 <p>Based on your knowledge of the area pedon 2 might be a good &ldquo;typical&rdquo; pedon from which a horizonation prototype can be developed. After careful review of the data and consultation with your crew, a new set of labels are assigned to each horizon (<span style="color: red;">red labels in figure above</span>) that define groups over which soil properties will be aggregated. These new labels define <em>functionally-similar</em> groups that may span multiple genetic horizons.</p>
 
-<h2>Formalized Approach</h2>
-
-<p>This document describes an aggregation strategy based on the use of &ldquo;generalized horizon labels&rdquo; (GHL) through a combination of narrative, <strong>R</strong> code, and figures. You can follow along in an <strong>R</strong> session by copying code from the grey boxes and pasting it into the <strong>R</strong> console.</p>
-
-<p>Here is a basic outline of the process:</p>
-
-<ol>
-<li><p>Select a set of GHL that best represent a group of pedons to be aggregated. This could be based on series descriptions, expert-knowledge, or even inspection of the most frequently occurring horizon designations. (previous document in this series)</p></li>
-<li><p>Assign GHL to each horizon using whatever information that is available for grouping horizons. This micro-correlation of horizon designations will likely require slightly different &ldquo;rules&rdquo; in each instance. Careful inspection of horizon designation and observed properties is critical. (previous document in this series)</p></li>
-<li><p>Evaluate GHL assignments and manually refine as needed. (previous document in this series) </p></li>
-<li><p>Keep track of final GHL assignments in NASIS or text file. (previous document in this series)</p></li>
-<li><p>Compute range in characteristics, aka <a href="http://casoilresource.lawr.ucdavis.edu/wiki/Low-rv-high">low-rv-high values</a>, (e.g. clay, sand, pH, etc.) over GHL. (this document in this series)</p></li>
-<li><p>Estimate a most-likely horizonation (e.g. top and bottom depths) for each generalized horizon label. (this document in this series)</p></li>
-</ol>
-
 <h1>Setup R Envionment</h1>
 
 <p>If you have never used the <a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/aqp/aqp-intro.html?root=aqp">aqp</a> or <a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/soilDB-Intro.html?root=aqp">soildb</a> packages before, you will likely need to install them. This only needs to be done once. </p>
