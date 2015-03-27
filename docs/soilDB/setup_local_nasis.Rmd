@@ -17,7 +17,7 @@ This document describes how setup an ODBC link between a local NASIS database an
 
 
 ### Open the ODBC Data Source Administrator
- 1. Windows 7: Start->search for 'OBCC'. See [this page](http://msdn.microsoft.com/en-us/library/ms188691.aspx) for details. 
+ 1. Windows 7: Start->search for 'ODBC'. See [this page](http://msdn.microsoft.com/en-us/library/ms188691.aspx) for details. 
  
  2. Windows XP: Start->Run, then paste in `odbccp32.cpl` and hit enter. This will open a small panel of ODBC connections. 
  
