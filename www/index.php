@@ -87,6 +87,11 @@ echo $contents; } ?>
 <li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/aqp/gen-hz-assignment.html?root=aqp">Assignment of generalized horizon labels</a></li>
 <li>Computing range in characteristics by generalized horizon label</li>
 <li>Estimation of most-likely horizonation</li>
+<li><ul>
+<li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/example-reports/dunstone.html?root=aqp">Dunstone Pedon Summary</a></li>
+<li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/example-reports/loafercreek.html?root=aqp">Loafercreek Pedon Summary</a></li>
+<li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/example-reports/amador.html?root=aqp">Amador Pedon Summary</a></li>
+</ul></li>
 </ol></li>
 
 </ol>
