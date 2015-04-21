@@ -77,16 +77,16 @@ new.order <- match(c('Whiterock', 'Copperopolis', 'Shabarudo', 'Dunstone', 'Loaf
 ```{r plots, fig.width=14, fig.height=6}
 par(mar=c(1,0,3,0))
 plot(x.colors, divide.hz=FALSE, name='', plot.order=new.order, col.label='Soil Color', lwd=1.25, axis.line.offset=-6, cex.depth.axis=1, cex.id=1)
-addBracket(x.colors$soil.top, x.colors$soil.bottom, col='black', label='Pr(soil >= 90%)', label.cex=0.6)
+addBracket(x.colors$soil.top, x.colors$soil.bottom, col='black', label='Pr(soil >= 90%)', label.cex=0.85)
 title('Aggregate Soil Properties (mean)')
 
 plot(x.colors, divide.hz=FALSE, color='clay', name='', plot.order=new.order, col.label='Clay Content (%)', lwd=1.25, axis.line.offset=-6, cex.depth.axis=1, cex.id=1)
-addBracket(x.colors$soil.top, x.colors$soil.bottom, col='black', label='Pr(soil >= 90%)', label.cex=0.6)
+addBracket(x.colors$soil.top, x.colors$soil.bottom, col='black', label='Pr(soil >= 90%)', label.cex=0.85)
 
 plot(x.colors, divide.hz=FALSE, color='phfield', name='', plot.order=new.order, col.label='pH', lwd=1.25, axis.line.offset=-6, cex.depth.axis=1, cex.id=1)
-addBracket(x.colors$soil.top, x.colors$soil.bottom, col='black', label='Pr(soil >= 90%)', label.cex=0.6)
+addBracket(x.colors$soil.top, x.colors$soil.bottom, col='black', label='Pr(soil >= 90%)', label.cex=0.85)
 
 plot(x.colors, divide.hz=FALSE, color='total_frags_pct', name='', plot.order=new.order, col.label='Total Rock Fragment Volume (%)', lwd=1.25, axis.line.offset=-6, cex.depth.axis=1, cex.id=1)
-addBracket(x.colors$soil.top, x.colors$soil.bottom, col='black', label='Pr(soil >= 90%)', label.cex=0.6)
+addBracket(x.colors$soil.top, x.colors$soil.bottom, col='black', label='Pr(soil >= 90%)', label.cex=0.85)
 ```
 
