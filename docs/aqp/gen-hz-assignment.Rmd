@@ -7,7 +7,8 @@ output:
 ---
 
 ```{r setup, echo=FALSE, results='hide', warning=FALSE}
-library(knitr)
+library(knitr, quietly = TRUE)
+library(printr, quietly = TRUE)
 opts_chunk$set(message=FALSE, warning=FALSE, dpi=120, fig.align='center', dev='CairoPNG', dev.args=list(pointsize=10), tidy=FALSE)
 options(width=100, stringsAsFactors=FALSE)
 
