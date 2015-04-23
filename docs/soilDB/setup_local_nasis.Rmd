@@ -58,7 +58,7 @@ par(mar=c(0,0,0,0))
 plot(fp[1:10, ], name='hzname', label='taxonname')
 ```
 
-Good job, that wasn't so hard. Now is a good time to check out [some of the tutorials on the AQP website](http://aqp.r-forge.r-project.org/).
+Good job, that wasn't so hard. Now is a good time to check out [some of the tutorials on the AQP website](http://aqp.r-forge.r-project.org/). Details on loading NASIS data into R can be found in [this tutorial](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/fetchNASIS-mini-tutorial.html?root=aqp).
 
 
 
