@@ -35,7 +35,7 @@ This document describes how setup an ODBC link between a local NASIS database an
 
 
 ### Install Required Packages
-You will need to install a couple of packages before R is able to read data from the local NASIS database. This only has to be done once, usually the first time you open RStudio on your machine. Open RStudio (start menu, search for RStudio) and copy and paste the following lines into the R console. Press the enter key and wait: R will automatically download and install these packages.
+You will need to install a couple of packages before R is able to read data from the local NASIS database. This only has to be done once, usually the first time you open RStudio on your machine. Open RStudio (start menu, search for RStudio) and copy and paste the following lines into the R console. Press the enter key and wait: R will automatically download and install these packages. If this is the first time you have installed packages, you may notice that many more than the following two packages are being installed. This is normal-- the `RODBC` and `soilDB` packages depend on [many other related packages](http://mran.revolutionanalytics.com/packagedata/graphs/soilDB.png), which must be installed first.
 ```{r install-packages, eval=FALSE}
 # install packages (only first time)
 install.packages("RODBC", dep=TRUE) # stable version from CRAN + dependencies
@@ -56,3 +56,4 @@ fp <- fetchNASIS()
 fc <- fetchNASIS_component_data()
 ```
 
+All done. Good job!
