@@ -204,8 +204,8 @@ hr {
 <h2>Setup an ODBC Connection to the Local NASIS Database</h2>
 
 <p>NASIS 6.2
-2015-03-27
-DEB</p>
+<br>2015-04-23
+<br>DEB</p>
 
 <h3>Introduction</h3>
 
@@ -214,8 +214,7 @@ DEB</p>
 <h3>Open the ODBC Data Source Administrator</h3>
 
 <ol>
-<li><p>Windows 7: Start-&gt;search for &#39;ODBC&#39;. See <a href="http://msdn.microsoft.com/en-us/library/ms188691.aspx">this page</a> for details. </p></li>
-<li><p>Windows XP: Start-&gt;Run, then paste in <code>odbccp32.cpl</code> and hit enter. This will open a small panel of ODBC connections. </p></li>
+<li><p>Go to the Start Menu and search for &#39;ODBC&#39;. See <a href="http://msdn.microsoft.com/en-us/library/ms188691.aspx">this page</a> if you get lost. </p></li>
 <li><p>With the &ldquo;User DSN&rdquo; tab selected, create a new data source by clicking on the &ldquo;Add&hellip;&rdquo; button. </p></li>
 </ol>
 
@@ -235,13 +234,20 @@ DEB</p>
 </ul></li>
 </ul>
 
-<h3>Example</h3>
+<h3>Install Required Packages</h3>
+
+<p>You will need to install a couple of packages before R is able to read data from the local NASIS database. This only has to be done once, usually the first time you open RStudio on your machine. Open RStudio and Copy and paste the following lines into the R console. Press the enter key and wait: R will automatically download and install these packages.</p>
 
 <pre><code class="r"># install packages (only first time)
 install.packages(&quot;RODBC&quot;, dep=TRUE) # stable version from CRAN + dependencies
 install.packages(&quot;soilDB&quot;, dep=TRUE) # stable version from CRAN + dependencies
+</code></pre>
 
-# load the library
+<h3>An example R session</h3>
+
+<p>After installing the above packages, load some pedons or components into the selected set and try loading them into your R session.</p>
+
+<pre><code class="r"># load the library
 library(soilDB)
 
 # fetch all pedons from the local database
