@@ -256,9 +256,13 @@ fp &lt;- fetchNASIS()
 
 # fetch all DMU records from the selected set in local NASIS database
 fc &lt;- fetchNASIS_component_data()
+
+# make sketches of the first 10 pedons:
+par(mar=c(0,0,0,0))
+plot(fp[1:10, ], label=&#39;taxonname&#39;)
 </code></pre>
 
-<p>All done. Good job!</p>
+<p>Good job, that wasn&#39;t so hard. If you are still interested, try <a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/aqp/aqp-intro.html?root=aqp">some examples from this tutorial</a>.</p>
 
 </body>
 
