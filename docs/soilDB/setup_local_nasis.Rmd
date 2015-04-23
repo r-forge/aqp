@@ -31,10 +31,11 @@ This document describes how setup an ODBC link between a local NASIS database an
 * password: `nasisRe@d0n1y`
 * On the next screen, select "Nasis-local" as the default data base.
 * Click "Next" and then "Finish" the finalize the connection.
+* Close the ODBC control panel by clicking on 'OK'
 
 
 ### Install Required Packages
-You will need to install a couple of packages before R is able to read data from the local NASIS database. This only has to be done once, usually the first time you open RStudio on your machine. Open RStudio and Copy and paste the following lines into the R console. Press the enter key and wait: R will automatically download and install these packages.
+You will need to install a couple of packages before R is able to read data from the local NASIS database. This only has to be done once, usually the first time you open RStudio on your machine. Open RStudio (start menu, search for RStudio) and copy and paste the following lines into the R console. Press the enter key and wait: R will automatically download and install these packages.
 ```{r install-packages, eval=FALSE}
 # install packages (only first time)
 install.packages("RODBC", dep=TRUE) # stable version from CRAN + dependencies
@@ -43,18 +44,15 @@ install.packages("soilDB", dep=TRUE) # stable version from CRAN + dependencies
 
 
 ### An example R session
-After installing the above packages, load some pedons or components into the selected set and try loading them into your R session.
+After installing the above packages, add some pedons or components into the selected set and try loading them into your R session.
 ```{r example, eval=FALSE}
-# load the library
+# load required libraries
 library(soilDB)
 
-# fetch all pedons from the local database
+# fetch all pedons from the selected set in local NASIS database
 fp <- fetchNASIS()
 
-# fetch all DMU records from the local database
+# fetch all DMU records from the selected set in local NASIS database
 fc <- fetchNASIS_component_data()
-
-# access the online manual
-help(soilDB)
 ```
 
