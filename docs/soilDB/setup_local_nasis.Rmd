@@ -36,6 +36,7 @@ This document describes how setup an ODBC link between a local NASIS database an
 
 ### Install Required Packages
 You will need to install a couple of packages before R is able to read data from the local NASIS database. This only has to be done once, usually the first time you open RStudio on your machine. Open RStudio (start menu, search for RStudio) and copy and paste the following lines into the R console. Press the enter key and wait: R will automatically download and install these packages. If this is the first time you have installed packages, you may notice that many more than the following two packages are being installed. This is normal-- the `RODBC` and `soilDB` packages depend on [many other related packages](http://mran.revolutionanalytics.com/packagedata/graphs/soilDB.png), which must be installed first.
+
 ```{r install-packages, eval=FALSE}
 # install packages (only first time)
 install.packages("RODBC", dep=TRUE) # stable version from CRAN + dependencies
@@ -44,7 +45,7 @@ install.packages("soilDB", dep=TRUE) # stable version from CRAN + dependencies
 
 
 ### An example R session
-After installing the above packages, add some pedons or components into the selected set and try loading them into your R session.
+After installing the above packages, add some sites/pedons into the selected set and try loading them into your R session.
 ```{r example, eval=FALSE}
 # load required libraries
 library(soilDB)
@@ -52,14 +53,16 @@ library(soilDB)
 # fetch all pedons from the selected set in local NASIS database
 fp <- fetchNASIS()
 
-# fetch all DMU records from the selected set in local NASIS database
-fc <- fetchNASIS_component_data()
-
 # make sketches of the first 10 pedons:
 par(mar=c(0,0,0,0))
-plot(fp[1:10, ], label='taxonname')
+plot(fp[1:10, ], name='hzname', label='taxonname')
 ```
 
-Good job, that wasn't so hard. If you are still interested, try [some examples from this tutorial](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/aqp/aqp-intro.html?root=aqp).
+Good job, that wasn't so hard. Now is a good time to check out [some of the tutorials on the AQP website](http://aqp.r-forge.r-project.org/).
+
+
+
+
+
 
 

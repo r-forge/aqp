@@ -8,6 +8,7 @@ output:
 
 ```{r setup, echo=FALSE, results='hide', warning=FALSE}
 library(knitr, quietly=TRUE)
+library(printr, quietly=TRUE)
 opts_chunk$set(message=FALSE, warning=FALSE, background='#F7F7F7', fig.align='center', fig.retina=1, dev='png', tidy=FALSE, verbose=FALSE)
 options(width=100, stringsAsFactors=FALSE)
 ```
@@ -157,7 +158,7 @@ x <- mapunit_geom_by_ll_bbox(b)
 
 **Get basic horizon morphology and taxonomic data from Official Series Descriptions**
 
-The `fetchOSD()` function accepts a character vector of soil series names, and returns a `SpatialPolygonsDataFrame` class object of basic data from those series. Note that this service is provided by the [CA Soil Resource Lab](http://casoilresource.lawr.ucdavis.edu/drupal/) as an experimental prototype. The **official** [series descriptions](http://soils.usda.gov/technical/classification/osd/index.html) should still be used to verify series information.
+The `fetchOSD()` function accepts a character vector of soil series names, and returns a `SpatialPolygonsDataFrame` class object of basic data from those series. Note that this service is provided by the [CA Soil Resource Lab](http://casoilresource.lawr.ucdavis.edu) as an experimental prototype. The **official** [series descriptions](http://soils.usda.gov/technical/classification/osd/index.html) should still be used to verify series information.
 ```{r OSD-example, eval=FALSE}
 # soils of interest
 s.list <- c('musick', 'cecil', 'drummer', 'amador', 'pentz', 'reiff')
@@ -173,7 +174,7 @@ plot(s, name='hzname', cex.names=0.85, axis.line.offset=-4)
 
 **Get the most commonly used data from the Kellog Soil Science Lab database** (formerly NSSL database)
 
-The `fetchKSSL()` function accepts either a soil series name or bounding box in WGS84 geographic coordinates, and returns a `SpatialPolygonsDataFrame` class object containing the matching records. Note that this service is provided by the [CA Soil Resource Lab](http://casoilresource.lawr.ucdavis.edu/drupal/) as an experimental prototype, based on the June 2012 KSSL snapshot. If newer data are needed, it is best to consult the **official** [KSSL data](http://ncsslabdatamart.sc.egov.usda.gov/).
+The `fetchKSSL()` function accepts either a soil series name or bounding box in WGS84 geographic coordinates, and returns a `SpatialPolygonsDataFrame` class object containing the matching records. Note that this service is provided by the [CA Soil Resource Lab](http://casoilresource.lawr.ucdavis.edu) as an experimental prototype, based on the June 2012 KSSL snapshot. If newer data are needed, it is best to consult the **official** [KSSL data](http://ncsslabdatamart.sc.egov.usda.gov/).
 ```{r KSSL-example, eval=FALSE}
 # fetch and convert data into an SPC
 s <- fetchKSSL(series='Pardee')
@@ -308,7 +309,7 @@ res <- SDA_query(q)
 
 
 ### The `Gopheridge` Sample Dataset
-The `gopheridge` sample dataset is very similar to the type of data returned from `fetchNASIS()` or `fetchPedonPC()`. The following demonstration is geared towards intermediate users of R and who are familiar with the classes and methods defined by the `aqp` package. Before proceeding it may be helpful to review the `aqp` manual pages: `library(aqp) ; help(aqp)`, or the [AQP kick-start](http://casoilresource.lawr.ucdavis.edu/drupal/node/1028).
+The `gopheridge` sample dataset is very similar to the type of data returned from `fetchNASIS()` or `fetchPedonPC()`. The following demonstration is geared towards intermediate users of R and who are familiar with the classes and methods defined by the `aqp` package. Before proceeding it may be helpful to review the `aqp` manual pages: `library(aqp) ; help(aqp)`, or the [SoilProfileCollection object introduction](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/aqp/aqp-intro.html?root=aqp).
 
 Open R, and setup the environment by loading packages and the sample dataset.
 ```{r gopheridge-demo-1, eval=TRUE}
