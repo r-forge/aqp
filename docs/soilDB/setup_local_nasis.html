@@ -231,12 +231,13 @@ hr {
 <li>password: <code>nasisRe@d0n1y</code></li>
 <li>On the next screen, select &ldquo;Nasis-local&rdquo; as the default data base.</li>
 <li>Click &ldquo;Next&rdquo; and then &ldquo;Finish&rdquo; the finalize the connection.</li>
+<li>Close the ODBC control panel by clicking on &#39;OK&#39;</li>
 </ul></li>
 </ul>
 
 <h3>Install Required Packages</h3>
 
-<p>You will need to install a couple of packages before R is able to read data from the local NASIS database. This only has to be done once, usually the first time you open RStudio on your machine. Open RStudio and Copy and paste the following lines into the R console. Press the enter key and wait: R will automatically download and install these packages.</p>
+<p>You will need to install a couple of packages before R is able to read data from the local NASIS database. This only has to be done once, usually the first time you open RStudio on your machine. Open RStudio (start menu, search for RStudio) and copy and paste the following lines into the R console. Press the enter key and wait: R will automatically download and install these packages.</p>
 
 <pre><code class="r"># install packages (only first time)
 install.packages(&quot;RODBC&quot;, dep=TRUE) # stable version from CRAN + dependencies
@@ -245,19 +246,16 @@ install.packages(&quot;soilDB&quot;, dep=TRUE) # stable version from CRAN + depe
 
 <h3>An example R session</h3>
 
-<p>After installing the above packages, load some pedons or components into the selected set and try loading them into your R session.</p>
+<p>After installing the above packages, add some pedons or components into the selected set and try loading them into your R session.</p>
 
-<pre><code class="r"># load the library
+<pre><code class="r"># load required libraries
 library(soilDB)
 
-# fetch all pedons from the local database
+# fetch all pedons from the selected set in local NASIS database
 fp &lt;- fetchNASIS()
 
-# fetch all DMU records from the local database
+# fetch all DMU records from the selected set in local NASIS database
 fc &lt;- fetchNASIS_component_data()
-
-# access the online manual
-help(soilDB)
 </code></pre>
 
 </body>
