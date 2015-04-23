@@ -38,7 +38,7 @@ Setting up this connection is simple, and outlined in this [guide](https://r-for
   
 
 ### R Notes
-A basic understanding of R syntax, object structure, package management system, and programming style will greatly help with integration of the `soilDB` and `aqp` packages into standard workflows. Here are some reminders. Recall that online help documents can be accessed via :
+A basic understanding of R syntax, object structure, package management system, and programming style will greatly help with integration of the `soilDB` and `aqp` packages into standard workflows. Lines that start with a `#` are treated as comments and ignored by R. Recall that online help documents can be accessed via:
 
 ```{r manual-pages, eval=FALSE}
 # get the manual page for a known function
@@ -50,6 +50,8 @@ help(aqp)
 demo(aqp)
 # use fuzzy matching to search for a topic or keyword
 help.search(boxplot)
+# shortcut:
+?plot
 ```
 
 **Mini R Tutorial**
