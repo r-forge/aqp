@@ -5,7 +5,7 @@ options(width=100, stringsAsFactors=FALSE)
 ```
 
 ## Export Pedon Spatial Data from NASIS
-2012-12-20
+`r format(Sys.time(), "%Y-%m-%d")`
 Dylan Beaudette
 
 ### Introduction
@@ -16,7 +16,6 @@ With a recent version of R, it should be possible to get all of the packages tha
 ```{r install-deps, eval=FALSE}
 # run these commands in the R console
 install.packages('soilDB', dep=TRUE) # stable version from CRAN + dependencies
-install.packages("soilDB", repos="http://R-Forge.R-project.org") # most recent copy from r-forge
 install.packages('rgdal', dep=TRUE)
 install.packages('rgeos', dep=TRUE)
 ```
