@@ -9,6 +9,7 @@ output:
 ```{r setup, echo=FALSE, results='hide', warning=FALSE}
 # setup
 library(knitr, quietly=TRUE)
+library(printr, quietly=TRUE)
 opts_chunk$set(message=FALSE, warning=FALSE, background='#F7F7F7', fig.align='center', fig.retina=1, dev='png', tidy=FALSE, verbose=FALSE)
 options(width=100, stringsAsFactors=FALSE)
 ```
@@ -31,7 +32,6 @@ install.packages('soilDB', repos="http://R-Forge.R-project.org", type='source') 
 ```
 
 ### Getting KSSL Data
-
 Data can be queried by "taxonname"" (typically a soil series) or using a geographic bounding-box in WGS84 referenced coordinates. Taxonname matching is case-insensitive and based on the most current taxonname in NASIS as of August 2014. See `?fetchKSSL()` for details. In this example, we are downloading KSSL data for the [musick](https://soilseriessc.egov.usda.gov/OSD_Docs/M/MUSIC.html), [chaix](https://soilseries.sc.egov.usda.gov/OSD_Docs/C/CHAIX.html), and [holland](https://soilseries.sc.egov.usda.gov/OSD_Docs/H/HOLLAND.html) soils; commonly found on granitic rocks of the Sierra Nevada Mountain region of California.
 ```{r get-data, fig.width=5, fig.height=5}
 # load libraries
