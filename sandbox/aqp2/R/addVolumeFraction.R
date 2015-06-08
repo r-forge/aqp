@@ -47,6 +47,8 @@ addVolumeFraction <- function(x, colname, res=10, cex.min=0.1, cex.max=0.5, pch=
 	hd <- depthNames(x)
 	
   ## TODO: adapt to new class structure
+  ## 1. lapply / implicit-looping
+  
 	# iterate over profiles
 	for(p.i in 1:length(x)) {
 		
