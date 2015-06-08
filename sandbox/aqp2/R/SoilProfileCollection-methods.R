@@ -94,8 +94,13 @@ if (!isGeneric('site'))
 
 setMethod("site", "SoilProfile",
   function(object) {
-    res <- data.frame(object@id, object@site, stringsAsFactors = FALSE)
-    names(res)[1] <- idname(object)
+    if (nrow(object@site) > 0) {
+      res <- data.frame(object@id, object@site, stringsAsFactors = FALSE)
+      names(res)[1] <- idname(object)
+    } else {
+      res <- data.frame()
+    }
+    
     res
   })
 
