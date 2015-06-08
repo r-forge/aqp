@@ -42,14 +42,13 @@ setMethod("profile_id", "SoilProfileCollection",
 
 setMethod("names", "SoilProfile",
           function(x) {
-            res <- c(horizons = horizonNames(object), site = siteNames(object))
-            return(res)
+            c(horizons = horizonNames(x), site = siteNames(x))
           }
 )
 
 setMethod("names", "SoilProfileCollection",
           function(x) {
-            names(profiles(object, 1))
+            names(profiles(x, 1))
           }
 )
 
@@ -78,7 +77,7 @@ if (!isGeneric("siteNames"))
   setGeneric("siteNames", function(object, ...) standardGeneric("siteNames"))
 
 setMethod("siteNames", "SoilProfile",
-          function(object) names(site(object))
+          function(object) names(site(object))[-1]
 )
 
 setMethod("siteNames", "SoilProfileCollection",
@@ -96,11 +95,10 @@ setMethod("site", "SoilProfile",
   function(object) {
     if (nrow(object@site) > 0) {
       res <- cbind(object@id, object@site, stringsAsFactors = FALSE, row.names = NULL)
-      names(res)[1] <- idname(object)
     } else {
-      res <- data.frame()
+      res <- data.frame(object@id)
     }
-    
+    names(res)[1] <- idname(object)
     res
   })
 
