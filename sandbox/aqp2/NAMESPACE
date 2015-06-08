@@ -122,6 +122,7 @@ exportMethods(
   profile_id,
   proj4string,
   "proj4string<-",
+  slice,
   site,
   "site<-"
 )
