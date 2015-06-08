@@ -62,7 +62,7 @@ setMethod(
   definition = function(object){
     cat(paste("Object of class ", class(object), "\n", sep = ""))
     cat("Soil depth range: ", min(object),"-", max(object), " ", depth_units(object), "\n", sep = "")
-    cat(ncol(horizons(object))," horizon attributes, ", ncol(site(object))," site attributes\n", sep = "")
+    cat(ncol(horizons(object)) - 3," horizon attributes, ", ncol(site(object)) - 1," site attributes\n", sep = "")
   }
 )
 
@@ -73,7 +73,7 @@ setMethod(
     cat(paste("Object of class ", class(object), "\n", sep = ""))
     cat("Collection of ", length(object)," soil profiles\n", sep='')
     cat("Soil depth range: ", min(object),"-", max(object), " ", depth_units(object), "\n", sep = "")
-    cat(ncol(horizons(object))," horizon attributes, ", ncol(site(object))," site attributes\n", sep = "")
+    cat(ncol(horizons(object)) - 3," horizon attributes, ", ncol(site(object)) - 1," site attributes\n", sep = "")
   }
 )
 
