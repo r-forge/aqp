@@ -3,7 +3,7 @@
 if (!isGeneric("profileApply"))
  	setGeneric("profileApply", function(object, FUN, simplify=TRUE, ...) standardGeneric("profileApply"))
 
-setMethod(f = 'profileApply', signature = 'SPC',
+setMethod(f = 'profileApply', signature = 'SoilProfileCollection',
 	function(object, FUN, simplify = TRUE, ...) {
 	  
 	  res <- lapply(profiles(object), FUN = FUN, ...)

@@ -87,44 +87,85 @@ setMethod("siteNames", "SoilProfileCollection",
 
 ## Get site data
 ##
+
 if (!isGeneric('site'))
   setGeneric('site', function(object, ...) 
     standardGeneric('site'))
 
 setMethod("site", "SoilProfile",
-          function(object) {
-            object@site
-          })
+  function(object) {
+    res <- data.frame(object@id, object@site, stringsAsFactors = FALSE)
+    names(res)[1] <- idname(object)
+    res
+  })
 
 setMethod("site", "SoilProfileCollection",
-          function(object, as.list = FALSE) {
-            res <- lapply(profiles(object), site)
-            if (!as.list) {
-              res <- data.frame(do.call('rbind', res), row.names = NULL)
-            }
-            res
-          }
+  function(object, as.list = FALSE) {
+    
+    if (as.list) {
+      res <- lapply(profiles(object), function(x) x@site)
+    } else {
+      res <- ldply(object@profiles, site, .id = idname(object))
+    }
+    
+    res
+  }
 )
 
 ## Get horizons data
 ##
+
 if (!isGeneric('horizons'))
   setGeneric('horizons', function(object, ...) 
     standardGeneric('horizons'))
 
 setMethod("horizons", "SoilProfile",
-          function(object) {
-            object@horizons
-          })
+  function(object) {
+    res <- data.frame(object@id, object@depths, object@horizons, stringsAsFactors = FALSE)
+    names(res)[1] <- idname(object)
+    res
+  })
 
 setMethod("horizons", "SoilProfileCollection",
-          function(object, as.list = FALSE) {
-            res <- lapply(object@profiles, function(x) x@horizons)
-            if (!as.list) {
-              res <- data.frame(do.call('rbind', res), row.names = NULL)
-            }
-            res
-          })
+  function(object, as.list = FALSE) {
+    
+    if (as.list) {
+      res <- lapply(object@profiles, function(x) x@horizons)
+    } else {
+      res <- ldply(object@profiles, horizons, .id = idname(object))
+    }
+    
+    res
+  })
+
+## Get depths
+##
+
+if (!isGeneric('depths'))
+  setGeneric('depths', function(object, ...) 
+    standardGeneric('depths'))
+
+setMethod("depths", "SoilProfile",
+  function(object) {
+    res <- data.frame(object@id, object@depths, stringsAsFactors = FALSE)
+    names(res)[1] <- idname(object)
+    res
+  }
+)
+
+setMethod("depths", "SoilProfileCollection",
+          
+  function(object, as.list = FALSE) {
+    
+    if (as.list) {
+      res <- lapply(object@profiles, function(x) x@depths)
+    } else {
+      res <- ldply(object@profiles, depths, .id = idname(object))
+    }
+    
+    res
+  }
+)
 
 # Depth units
 # 
@@ -144,3 +185,18 @@ setMethod("depth_units", "SoilProfileCollection",
             unique(laply(object@profiles, depth_units))
           }
 )
+
+## Get list or unique SoilProfile
+##
+
+if (!isGeneric('profiles'))
+  setGeneric('profiles', function(object, i = NULL) 
+    standardGeneric('profiles'))
+
+setMethod("profiles", "SoilProfileCollection",
+          function(object, i = NULL) {
+            if (is.null(i)) object@profiles
+            else object@profiles[[i]]
+          }
+)
+
