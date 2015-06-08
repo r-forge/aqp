@@ -53,6 +53,7 @@ importFrom(plyr,
   ddply,
   llply,
   ldply,
+  laply,
   dlply,
   join,
   summarise
@@ -72,7 +73,8 @@ importFrom(stringr,
   fixed,
   str_c,
   str_split,
-  str_trim
+  str_trim,
+  str_length
 )
 
 importFrom(sp,
@@ -100,39 +102,28 @@ importFrom(plotrix,
 )
 
 exportClasses(SoilProfileCollection)
+exportClasses(SoilProfile)
 
+## TODO: export specific functions after this stabilizes
 exportMethods(  
-  "[",
-  "$",
-  "$<-",
   coordinates,
   "coordinates<-",
   "depths<-", 
   depth_units,
-  "depth_units<-",
-  diagnostic_hz,
-  "diagnostic_hz<-",
   horizons,
-  "horizons<-",
-  horizonDepths,
+  depthNames,
   idname,
-  length,
   max,
-  metadata,
-  "metadata<-", 
   min,
   names,
   nrow,
   plot,
   profileApply,
-  profile_compare,
   profile_id,
   proj4string,
   "proj4string<-",
   site,
-  "site<-",
-  slab,
-  slice
+  "site<-"
 )
 
 exportPattern("^[^\\.]")
