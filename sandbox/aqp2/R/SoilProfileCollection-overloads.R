@@ -124,7 +124,7 @@ setMethod("[", "SoilProfile",
             # In this case i is always one
             # Now subsetting horizon data using j
             
-            if(!missing(j)) {
+            if(!missing(j) & !is.null(j)) {
               
               j <- as.integer(j)
               
@@ -186,6 +186,8 @@ setMethod("[", "SoilProfileCollection",
               stop('NA not permitted in horizon/slice index', call.=FALSE)
             }
             
+          } else {
+            j <- NULL
           }
           
           # Subset horizons in the profiles
