@@ -167,6 +167,23 @@ setMethod("depths", "SoilProfileCollection",
   }
 )
 
+if (!isGeneric('horizonDepths'))
+  setGeneric('horizonDepths', function(object, ...) 
+    standardGeneric('horizonDepths'))
+
+setMethod("horizonDepths", "SoilProfile",
+  function(object) {
+    colnames(object@depths)
+  }
+)
+
+setMethod("horizonDepths", "SoilProfileCollection",
+  
+  function(object, as.list = FALSE) {
+    horizonDepths(profiles(object, 1))
+  }
+)
+
 # Depth units
 # 
 
