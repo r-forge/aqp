@@ -95,7 +95,7 @@ if (!isGeneric('site'))
 setMethod("site", "SoilProfile",
   function(object) {
     if (nrow(object@site) > 0) {
-      res <- data.frame(object@id, object@site, stringsAsFactors = FALSE)
+      res <- cbind(object@id, object@site, stringsAsFactors = FALSE, row.names = NULL)
       names(res)[1] <- idname(object)
     } else {
       res <- data.frame()
@@ -126,7 +126,7 @@ if (!isGeneric('horizons'))
 
 setMethod("horizons", "SoilProfile",
   function(object) {
-    res <- cbind(object@id, object@depths, object@horizons, stringsAsFactors = FALSE)
+    res <- cbind(object@id, object@depths, object@horizons, stringsAsFactors = FALSE, row.names = NULL)
     names(res)[1] <- idname(object)
     res
   })
