@@ -121,7 +121,7 @@ if (!isGeneric('horizons'))
 
 setMethod("horizons", "SoilProfile",
   function(object) {
-    res <- data.frame(object@id, object@depths, object@horizons, stringsAsFactors = FALSE)
+    res <- cbind(object@id, object@depths, object@horizons, stringsAsFactors = FALSE)
     names(res)[1] <- idname(object)
     res
   })
@@ -211,9 +211,13 @@ if (!isGeneric('profiles'))
     standardGeneric('profiles'))
 
 setMethod("profiles", "SoilProfileCollection",
-          function(object, i = NULL) {
-            if (is.null(i)) object@profiles
-            else object@profiles[[i]]
-          }
+  function(object, i = NULL) {
+    if (is.null(i)) {
+      res <- object@profiles
+    } else {
+      object@profiles[[i]]
+    }
+    res
+  }
 )
 
