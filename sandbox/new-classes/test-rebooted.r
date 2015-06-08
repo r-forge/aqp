@@ -39,6 +39,7 @@ ids(foo)
 depths(foo)
 horizons(foo)
 horizons(foo, as.list = TRUE) # for use with l*ply type functions
+# horizons(foo, as.list = TRUE) %>% ldply(identity, .id = "foo")
 site(foo)
 
 # Extracting profiles
@@ -54,6 +55,7 @@ nrow(foo) # total number of hz
 nrow(profiles(foo, 1)) # number of hz in first profile 
 lapply(profiles(foo), nrow) # Number of hz in each profile
 lapply(profiles(foo), nrow) > 3 # Just an example of application
+lapply(profiles(foo), function(i) i$clay)
 
 # Min depths
 min(foo) # minimum depth in collection
@@ -119,6 +121,9 @@ extract_covariates(foo, s)
 extract_covariates(foo, spdf)
 extract_covariates(foo, spdf[,'band.1'])
 extract_covariates(foo, polydf)
+
+extract_covariates(foo, r) %>% class
+site(foo) <- df
 
 baz <- add_covariates(foo, r)
 site(baz)
