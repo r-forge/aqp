@@ -167,20 +167,20 @@ setMethod("depths", "SoilProfileCollection",
   }
 )
 
-if (!isGeneric('horizonDepths'))
-  setGeneric('horizonDepths', function(object, ...) 
-    standardGeneric('horizonDepths'))
+if (!isGeneric('depthNames'))
+  setGeneric('depthNames', function(object, ...) 
+    standardGeneric('depthNames'))
 
-setMethod("horizonDepths", "SoilProfile",
+setMethod("depthNames", "SoilProfile",
   function(object) {
     colnames(object@depths)
   }
 )
 
-setMethod("horizonDepths", "SoilProfileCollection",
+setMethod("depthNames", "SoilProfileCollection",
   
   function(object, as.list = FALSE) {
-    horizonDepths(profiles(object, 1))
+    depthNames(profiles(object, 1))
   }
 )
 
