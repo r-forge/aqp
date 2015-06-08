@@ -62,7 +62,7 @@
 ## 3. puts **only** x and y in @horizons, z in @site, and discards the rest
 ## depths(foo) <- id ~ top + bottom ~ x + y ~ z
 ##
-## 4. puts **only** x and y in @site, and the rest in @horizons
+## 4. (**not implemented**) puts **only** x and y in @site, and the rest in @horizons
 ## depths(foo) <- id ~ top + bottom ~ ... ~ x + y
 ##
 if (!isGeneric('depths<-'))

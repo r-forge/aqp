@@ -4,7 +4,6 @@
 ## The concept here is to detach the physical support of soil data
 ## from the attribute space.
 ##
-require(sp)
 
 ## Class describing a single soil profile
 ##
