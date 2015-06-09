@@ -198,4 +198,41 @@ setMethod("[", "SoilProfileCollection",
         }
       )
 
+setMethod("[[", "SoilProfileCollection",
+          function(x, i, ...) {
             
+            # check for missing i
+            if(missing(i)) {
+              stop('must provide either a profile index or name', call.=FALSE)
+            }
+            
+            # convert to integer
+            if(!missing(i)) {
+              
+              if(any(is.na(i))) {
+                stop('NA not permitted in profile index', call.=FALSE)
+              }
+              
+              # convert logical to integer per standard vector/list
+              # indexing rules (thanks Jos? Padarian for the suggestion!)
+              if(is.logical(i)) {
+                i <- (1:length(x))[i]
+              }
+              
+              # convert character to integer
+              if (is.character(i)) {
+                i <- which(profile_id(x) %in% i)
+              }
+              
+              i <- as.integer(i)
+              
+            } else { # if no index is provided, the user wants all profiles
+              i <- 1:length(x)
+            }
+            
+            # Subset profiles 
+            SoilProfileCollection(profiles = profiles(x)[i])
+            
+          }
+)
+
