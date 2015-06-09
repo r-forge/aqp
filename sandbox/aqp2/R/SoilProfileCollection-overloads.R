@@ -50,6 +50,17 @@ setMethod("max", "SoilProfileCollection",
           }
 )
 
+# Concatenation of objects
+
+rbind.SoilProfileCollection <- function(...) {
+  lsp <- unlist(lapply(list(...), profiles))
+  SoilProfileCollection(profiles = lsp)
+}
+
+c.SoilProfileCollection <- function(...) {
+  rbind.SoilProfileCollection(...)
+}
+
 ## Attributes access
 
 setMethod(
@@ -113,6 +124,7 @@ setMethod(
     return(res)
   }
 )
+
 
 ## matrix / DF style access: only to horizon data
 ##
