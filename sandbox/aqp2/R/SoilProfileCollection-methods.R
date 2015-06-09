@@ -218,7 +218,11 @@ setMethod("profiles", "SoilProfileCollection",
     if (is.null(i)) {
       res <- object@profiles
     } else {
-      res <- object@profiles[i]
+      if (length(i) > 1) {
+        res <- object@profiles[i]
+      } else {
+        res <- object@profiles[[i]]
+      }
     }
     res
   }
