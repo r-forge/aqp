@@ -52,6 +52,9 @@ setMethod("max", "SoilProfileCollection",
 
 # Concatenation of objects
 
+# TODO Check ID and Top/Bottom colnames consistency 
+# TODO Add methods for SoilProfile (concatenating SP = SPC)
+
 rbind.SoilProfileCollection <- function(...) {
   lsp <- unlist(lapply(list(...), profiles))
   SoilProfileCollection(profiles = lsp)
