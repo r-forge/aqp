@@ -42,7 +42,7 @@ setMethod("profile_id", "SoilProfileCollection",
 
 setMethod("names", "SoilProfile",
           function(x) {
-            c(horizons = horizonNames(x), site = siteNames(x))
+            c(id = idname(x), depths = depthNames(x), horizons = horizonNames(x), site = siteNames(x))
           }
 )
 
@@ -59,13 +59,16 @@ if (!isGeneric("horizonNames"))
   setGeneric("horizonNames", function(object, ...) standardGeneric("horizonNames"))
 
 setMethod("horizonNames", "SoilProfile",
-          function(object)
-            return(names(horizons(object)))
+          function(object) {
+            nm <- names(horizons(object))
+            idx_rm <- which(nm %in% c(idname(object), depthNames(object)))
+            return(nm[-idx_rm])
+          }
 )
 
 setMethod("horizonNames", "SoilProfileCollection",
           function(object)
-            # unnecessary coutious implementation:
+            # unnecessary cautious implementation:
             # unique(unlist(lapply(profiles(object), horizonNames)))
             return(horizonNames(profiles(object, 1)))
 )
