@@ -16,19 +16,24 @@
   detect_dots <- lapply(elements, function(x) any(x == "..."))
   idx_dots <- which(unlist(detect_dots))
   
-  # Sanity checks
-  if (idx_dots %in% c(1, 2)) {
-    stop("Wrong formula.\nYou can't use '...' to set the ID or the depths of a SoilProfileCollection object.\nRefer to the documentation for more details.", call. = FALSE)
-  }
-  if (length(idx_dots) > 1) {
-    stop("Wrong formula.\nYou can't use '...' more than once. \nRefer to the documentation for more details.", call. = FALSE)
-  } else if (length(idx_dots) == 1) {
-    # All variables
-    nm_df <- names(object)
-    # Variables used in other part of the formula
-    nm_call <- unlist(elements[-idx_dots])
-    # Replace dots by the remaining var names
-    elements[[idx_dots]] <- setdiff(nm_df, nm_call)
+  # If `...` is used
+  if (length(idx_dots) > 0 ) {
+    
+    # Sanity checks
+    if (idx_dots %in% c(1, 2)) {
+      stop("Wrong formula.\nYou can't use '...' to set the ID or the depths of a SoilProfileCollection object.\nRefer to the documentation for more details.", call. = FALSE)
+    }
+  
+    if (length(idx_dots) > 1) {
+      stop("Wrong formula.\nYou can't use '...' more than once. \nRefer to the documentation for more details.", call. = FALSE)
+    } else if (length(idx_dots) == 1) {
+      # All variables
+      nm_df <- names(object)
+      # Variables used in other part of the formula
+      nm_call <- unlist(elements[-idx_dots])
+      # Replace dots by the remaining var names
+      elements[[idx_dots]] <- setdiff(nm_df, nm_call)
+    }
   }
   
   # Replacing any void elemnt by NULL
