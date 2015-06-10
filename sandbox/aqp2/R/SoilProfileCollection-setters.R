@@ -12,6 +12,25 @@
   length_elements <- lapply(elements, str_length)
   elements <- lapply(str_split(elements, "[+*]"), str_trim)
   
+  # Managing dots
+  detect_dots <- lapply(elements, function(x) any(x == "..."))
+  idx_dots <- which(unlist(detect_dots))
+  
+  # Sanity checks
+  if (idx_dots %in% c(1, 2)) {
+    stop("Wrong formula.\nYou can't use '...' to set the ID or the depths of a SoilProfileCollection object.\nRefer to the documentation for more details.", call. = FALSE)
+  }
+  if (length(idx_dots) > 1) {
+    stop("Wrong formula.\nYou can't use '...' more than once. \nRefer to the documentation for more details.", call. = FALSE)
+  } else if (length(idx_dots) == 1) {
+    # All variables
+    nm_df <- names(object)
+    # Variables used in other part of the formula
+    nm_call <- unlist(elements[-idx_dots])
+    # Replace dots by the remaining var names
+    elements[[idx_dots]] <- setdiff(nm_df, nm_call)
+  }
+  
   # Replacing any void elemnt by NULL
   elements <- lapply(elements, function(x) 
     if(any(lapply(x, str_length) == 0)) x = NULL
@@ -42,11 +61,11 @@
     cols_site <- elements[[4]]
   }
   else {
-    stop('wrong formula.')
+    stop('Wrong formula.\nThere is a problem in the number of elements in your formula.\nRefer to the documentation for more details.', call. = FALSE)
   }
   
   # Sanity check: at this point ID can't be NULL
-  if (is.null(cols_id)) stop('wrong formula')
+  if (is.null(cols_id)) stop('Wrong formula.\nYou need to specify an ID column for the SoilProfileCollection.\nRefer to the documentation for more details.', call. = FALSE)
   
   list(id = cols_id, depths = cols_depths, horizons = cols_hz, site = cols_site)
 }
