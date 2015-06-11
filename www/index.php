@@ -46,6 +46,7 @@ echo $contents; } ?>
 
 <p><b>Presentations</b>:
 <ol>
+<li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/presentations/2015-digital-morphometrics-aqp.html?root=aqp">2015 Digital Soil Morphometrics - AQP Talk</a></li>
 <li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/presentations/ghl-aggregation.html?root=aqp">Soil Data Aggregation</a></li>
 <li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/presentations/aqp-esd-dsm.html?root=aqp">AQP, DSM, and ESD</a></li>
 <li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/presentations/AQP-num_soil_classification.pdf?root=aqp">Numerical Classification with AQP</a></li>
