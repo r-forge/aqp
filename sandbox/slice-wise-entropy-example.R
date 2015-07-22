@@ -42,6 +42,7 @@ f.sig.to.noise <- function(v) {
 }
 
 # http://en.wikipedia.org/wiki/Quartile_coefficient_of_dispersion
+# http://stats.stackexchange.com/questions/38635/ratio-of-range-to-iqr-vs-coefficient-of-variation-which-is-the-more-useful-r
 f.qcd <- function(v) {
   res <- IQR(v, na.rm=TRUE) / median(v, na.rm=TRUE)
   
