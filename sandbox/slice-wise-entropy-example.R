@@ -119,7 +119,6 @@ useOuterStrips(p, strip=strip.custom(bg=grey(0.85)), strip.left = strip.custom(h
 
 
 ## investigate weighted mean QCD, weighted by contributing fraction
-a.4 <- slab(sp3, ~ clay + A + cec + ph, slab.fun=f.qcd)
 
 ## must remove 0's and NA before computing weighted mean QCD
 ## when n=1, IQR = 0 => QCD = 0
@@ -181,7 +180,7 @@ wtd.sum.qcd <- function(i){
 
 ## how is this useful?
 ## TODO: compare between soils
-ddply(a.4, 'variable', .fun=wtd.mean.qcd)
-ddply(a.4, 'variable', .fun=wtd.sum.qcd)
+ddply(a.3, 'variable', .fun=wtd.mean.qcd)
+ddply(a.3, 'variable', .fun=wtd.sum.qcd)
 
 
