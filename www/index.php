@@ -91,6 +91,7 @@ echo $contents; } ?>
 <li>Pedon Data Aggregation<ol>
 <li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/aqp/gen-hz-assignment.html?root=aqp">Assignment of generalized horizon labels</a></li>
 <li>Computing range in characteristics by generalized horizon label</li>
+<li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/sharpshootR/aggregate-soil-color.html?root=aqp">Soil color aggregation ideas</a></li>
 <li>Estimation of most-likely horizonation</li>
 <li>Sample Reports<ul>
 <li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/example-reports/dunstone.html?root=aqp">Dunstone Pedon Summary</a></li>
