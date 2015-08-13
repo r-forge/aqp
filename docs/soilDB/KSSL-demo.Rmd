@@ -10,7 +10,7 @@ output:
 # setup
 library(knitr, quietly=TRUE)
 library(printr, quietly=TRUE)
-opts_chunk$set(message=FALSE, warning=FALSE, background='#F7F7F7', fig.align='center', fig.retina=1, dev='png', tidy=FALSE, verbose=FALSE)
+opts_chunk$set(message=FALSE, warning=FALSE, background='#F7F7F7', fig.align='center', fig.retina=2, dev='png', tidy=FALSE, verbose=FALSE)
 options(width=100, stringsAsFactors=FALSE)
 ```
 
@@ -19,7 +19,7 @@ Getting and Comparing KSSL Data
 `r format(Sys.time(), "%Y-%m-%d")`
 Dylan Beaudette
 
-### Introduction
+## Introduction
 This document demonstrates how to use the [soilDB](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/soilDB-Intro.html?root=aqp) package to download [KSSL](http://ncsslabdatamart.sc.egov.usda.gov/) data from SoilWeb. These data are from the August 2014 snapshot, and will be updated as future snapshots are released. Comparisons are made via graphical summaries of key soil properties with depth, using [data structures and functions](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/aqp/aqp-intro.html?root=aqp) from the [aqp](http://aqp.r-forge.r-project.org/) package.
 
 ### Installation
@@ -31,9 +31,9 @@ install.packages('soilDB', dep=TRUE) # stable version from CRAN + dependencies
 install.packages('soilDB', repos="http://R-Forge.R-project.org", type='source') # most recent copy from r-forge
 ```
 
-### Getting KSSL Data
-Data can be queried by "taxonname"" (typically a soil series) or using a geographic bounding-box in WGS84 referenced coordinates. Taxonname matching is case-insensitive and based on the most current taxonname in NASIS as of August 2014. See `?fetchKSSL()` for details. In this example, we are downloading KSSL data for the [musick](https://soilseriessc.egov.usda.gov/OSD_Docs/M/MUSIC.html), [chaix](https://soilseries.sc.egov.usda.gov/OSD_Docs/C/CHAIX.html), and [holland](https://soilseries.sc.egov.usda.gov/OSD_Docs/H/HOLLAND.html) soils; commonly found on granitic rocks of the Sierra Nevada Mountain region of California.
-```{r get-data, fig.width=5, fig.height=5}
+## Getting KSSL Data
+Data can be queried by "taxonname"" (typically a soil series), using a geographic bounding-box in WGS84 referenced coordinates, or by MLRA. Taxonname matching is case-insensitive and based on the most current taxonname in NASIS as of August 2014. See `?fetchKSSL()` for details. In this example, we are downloading KSSL data for the [musick](https://soilseriessc.egov.usda.gov/OSD_Docs/M/MUSIC.html), [chaix](https://soilseries.sc.egov.usda.gov/OSD_Docs/C/CHAIX.html), and [holland](https://soilseries.sc.egov.usda.gov/OSD_Docs/H/HOLLAND.html) soils; commonly found on granitic rocks of the Sierra Nevada Mountain region of California.
+```{r get-data, fig.width=6, fig.height=7}
 # load libraries
 library(soilDB)
 library(plyr)
@@ -63,9 +63,12 @@ legend('topright', pch=21, pt.bg=c('RoyalBlue', 'DarkRed', 'DarkGreen'), legend=
 ```
 
 
+
+
 ### Profile Plots
 Generate "thematic" profile sketches by coloring horizons according to clay content.
 ```{r plot-pedons, fig.width=10, fig.height=6}
+par(mar=c(0,1,5,1))
 plot(musick, name='hzn_desgn', color='clay')
 plot(holland, name='hzn_desgn', color='clay')
 plot(chaix, name='hzn_desgn', color='clay')
@@ -74,7 +77,7 @@ plot(chaix, name='hzn_desgn', color='clay')
 
 ### Combining Data
 Since the results from `fetchKSSL()` function always returns data in the same format, it is possible to stack the results of several KSSL queries using `rbind()`.
-```{r combine-data}
+```{r combine-data, fig.width=10, fig.height=6}
 # check "correlated as" names from each object
 table(musick$taxonname)
 table(holland$taxonname)
@@ -90,6 +93,19 @@ g <- rbind(chaix, musick, holland)
 
 # tabulate number of pedons by normalized series name
 table(g$taxonname)
+
+# plot the grouped object, with profiles arranged by taxonname
+par(mar=c(0,1,5,1))
+groupedProfilePlot(g, groups = 'taxonname', color='clay', group.name.offset = -10)
+
+# estimate soil depth based on horizon designations
+sdc <- getSoilDepthClass(g, name='hzn_desgn', top='hzn_top', bottom='hzn_bot')
+
+# splice-into site data
+site(g) <- sdc
+
+# summarize soil depth by taxonname
+tapply(g$depth, g$taxonname, summary)
 ```
 
 
@@ -119,7 +135,7 @@ levels(g.slab$variable) <- c('Clay (%)', 'pH 1:1 H2O', 'Base Saturation at pH 8.
 ```
 
 
-### Graphically Compare
+## Graphically Compare
 The slice-wise median and 25th/75th percentiles are reasonable estimations of central tendency and spread. "Contributing fraction" values (% of pedons with data at a given depth) are printed along the right-hand side of each panel. These values provide both an indication of how deep the soils are, and, how much confidence can be placed in the aggregate data at any given depth.
 ```{r plot, fig.width=9, fig.height=6}
 # plot grouped, aggregate data
