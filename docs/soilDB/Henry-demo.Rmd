@@ -38,6 +38,7 @@ With a recent version of R (>= 2.15), it is possible to get all of the packages 
 install.packages('plyr', dep=TRUE) # stable version from CRAN + dependencies
 install.packages('reshape2', dep=TRUE) # stable version from CRAN + dependencies
 install.packages('dismo', dep=TRUE) # stable version from CRAN + dependencies
+install.packages('rgdal', dep=TRUE) # stable version from CRAN + dependencies
 install.packages('soilDB', dep=TRUE) # stable version from CRAN + dependencies
 install.packages('soilDB', repos="http://R-Forge.R-project.org", type='source') # most recent copy from r-forge
 ```
@@ -134,7 +135,7 @@ ddply(x$soiltemp, c('id'), summarize, MAST=mean(sensor_value, na.rm=TRUE))
 1. Get the number of non-missing observations for each site and year:
 ```{r additional-examples}
 # get period of record for each, not including NA-padding
-ddply(x$soiltemp, c('id', 'year'), function(i) {
+ddply(x$soiltemp, c('id'), function(i) {
   idx <- which(!is.na(i$sensor_value))
   start.date <- min(i$date_time[idx], na.rm=TRUE)
   end.date <- max(i$date_time[idx], na.rm=TRUE)
@@ -142,8 +143,11 @@ ddply(x$soiltemp, c('id', 'year'), function(i) {
   })
 ```
 
-
-
+2. Save sites as shape file:
+```{r save-as-shp, eval=FALSE}
+library(rgdal)
+writeOGR(x$sites, dsn='foldername', layer='filename', format='ESRI Shapefile')
+```
 
 
 ----------------------------
