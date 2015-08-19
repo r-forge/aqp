@@ -35,8 +35,7 @@ This document demonstrates how to use the [soilDB](https://r-forge.r-project.org
 With a recent version of R (>= 2.15), it is possible to get all of the packages that this tutorial depends on via:
 ```{r install-deps, eval=FALSE}
 # run these commands in the R console
-install.packages('plyr', dep=TRUE) # stable version from CRAN + dependencies
-install.packages('reshape2', dep=TRUE) # stable version from CRAN + dependencies
+install.packages('reshape', dep=TRUE) # stable version from CRAN + dependencies
 install.packages('dismo', dep=TRUE) # stable version from CRAN + dependencies
 install.packages('rgdal', dep=TRUE) # stable version from CRAN + dependencies
 install.packages('soilDB', dep=TRUE) # stable version from CRAN + dependencies
@@ -48,105 +47,85 @@ install.packages('soilDB', repos="http://R-Forge.R-project.org", type='source') 
 Data can be queried by:
  
  * project (typically a soil survey area, 'CA630')
- * NASIS user site ID
+ * NASIS user site ID (e.g. "2006CA7920001")
+
+and optionally filtered by:
+
+ * start date ("YYYY-MM-DD")
+ * end date ("YYYY-MM-DD")
+ * sensor type ("soiltemp" is the only type currently available)
  
-```{r get-data, fig.width=6, fig.height=7}
-library(reshape2)
+and aggregated to the following granularity:
+
+ * "day" (MAST and mean summer/winter temperatures are automatically computed)
+ * "week"
+ * "month"
+ * "year"
+ 
+```{r get-data, fig.width=6, fig.height=7, results='hide'}
 library(soilDB)
 library(lattice)
-library(plyr)
-library(dismo)
 
-# get data from Sequoia / Kings Canyon soil survey
-x <- fetchHenry(project='CA792')
-
-# quick listing of site names, IDs, and coordinates
-head(as.data.frame(x$sites)[, c('user_site_id', 'name', 'serial_number', 'wgs84_latitude', 'wgs84_longitude')])
+# get daily soil temperature data and summaries from Sequoia / Kings Canyon soil survey
+x <- fetchHenry(project='CA792', gran = 'day')
 ```
 
-
-### Overlay Points on a Google Map
-```{r map-data, eval=FALSE}
-g <- gmap(x$sites)
-plot(g, interpolate=TRUE)
-points(Mercator(x$sites), col='red')
+Quick listing of site names, IDs, and coordinates
+```{r view-data, fig.width=6, fig.height=7}
+head(as.data.frame(x$sites)[, c('user_site_id', 'name', 'serial_number', 'MAST', 'Winter', 'Summer', 'functional.yrs', 'complete.yrs', 'dslv')])
 ```
 
 
 ### Plot Data
 Note that there are gaps in the data: between site visits and lack of synchronization of site visits with start/end of the year.
 ```{r plot-time-series, fig.width=10, fig.height=7}
-xyplot(sensor_value ~ date_time | id, data=x$soiltemp, type=c('l', 'g'), as.table=TRUE)
+xyplot(sensor_value ~ date_time | id, data=x$soiltemp, type=c('l', 'g'), as.table=TRUE, layout=c(1,5), xlab='Date', ylab='Deg C')
 ```
 
+```{r plot-time-series-levelplot, fig.width=10, fig.height=10}
+# inspect data gaps
+levelplot(factor(!is.na(sensor_value)) ~ doy * factor(year) | id, 
+data=x$soiltemp, layout=c(1,5), col.regions=c('grey', 'RoyalBlue'), cuts=1, 
+colorkey=FALSE, as.table=TRUE, scales=list(alternating=3), 
+par.strip.text=list(cex=1), strip=strip.custom(bg='yellow'), 
+xlab='Julian Day', ylab='Year')
+
+# view data as levelplot
+levelplot(sensor_value ~ doy * factor(year) | id, 
+data=x$soiltemp, layout=c(1,5), col.regions = topo.colors(100),
+colorkey=list(space='top'), as.table=TRUE, scales=list(alternating=3), 
+par.strip.text=list(cex=1), strip=strip.custom(bg='grey'), 
+xlab='Julian Day', ylab='Year')
+```
 
 
 ## Data Summaries
 
 In the presence of missing data, MAST calculations will be biased towards those data that are not missing. For example, a block of missing data in January will result in an estimated MAST that is too high due to the missing data from the middle of winter. It is possible to estimate (mostly) unbiased MAST values in the presence of some missing data by averaging multiple years of data by Julian day.  This approach will generate reasonable summaries in the presence of missing data, as long as data gaps are "covered" by corresponding data from another year. The longer the period of record and shorter the data gaps, the better.
 
-The following custom function (copy / paste into your R console) is a starting point for computing un-biased estimates of MAST, mean summer, and mean winter temperatures.
-```{r custom-function}
-summarizeSoilTemperature <- function(s) {
-  # compute summaries by DOY:
-  # n: number of non-NA records
-  # daily.mean: mean of non-NA values
-  d <- ddply(s, c('id', 'doy'), summarize, n=length(na.omit(sensor_value)), 
-             daily.mean=mean(sensor_value, na.rm=TRUE))
-  
-  # convert DOY -> month
-  d$month <- format(as.Date(as.character(d$doy), format="%j"), "%b")
-  d$season <- soilDB:::.month2season(d$month)
-  
-  # compute unbiased MAST, number of obs
-  d.mast <- ddply(d, 'id', summarize, obs=sum(n), MAST=round(mean(daily.mean, na.rm=TRUE), 2))
-    
-  # compute unbiased seasonal averages
-  d.seasonal.long <- ddply(d[which(d$season %in% c('Winter', 'Summer')), ], c('season', 'id'), 
-  summarize, seasonal.mean.temp=round(mean(daily.mean, na.rm=TRUE), 2))
-  
-  # convert seasonal avgs to wide format
-  d.season <- dcast(d.seasonal.long, id ~ season, value.var = 'seasonal.mean.temp')
-  
-  # combine columns
-  d.summary <- join(d.mast, d.season, by = 'id')
-  
-  return(d.summary)
-}
-```
-
-
-
-Compute un-biased summaries in the presence of missing data.
+When daily data are queried, unbiased summaries and indices of data "completeness" are calculated.
 ```{r data-summary, fig.width=6, fig.height=7}
-summarizeSoilTemperature(x$soiltemp)
+as.data.frame(x$sites)[, c('user_site_id', 'name', 'MAST', 'Winter', 'Summer', 'functional.yrs', 'complete.yrs')]
 ```
 
-
-Compare these biased estimates generates from the raw data.
-```{r biased-data-summary, fig.width=6, fig.height=7}
-ddply(x$soiltemp, c('id'), summarize, MAST=mean(sensor_value, na.rm=TRUE))
-```
 
 
 
 ### Additional Ideas
 
-1. Get the number of non-missing observations for each site and year:
-```{r additional-examples}
-# get period of record for each, not including NA-padding
-ddply(x$soiltemp, c('id'), function(i) {
-  idx <- which(!is.na(i$sensor_value))
-  start.date <- min(i$date_time[idx], na.rm=TRUE)
-  end.date <- max(i$date_time[idx], na.rm=TRUE)
-  return(data.frame(start.date, end.date, n.obs=length(idx)))
-  })
-```
-
-2. Save sites as shape file:
+1. Save sites as shape file:
 ```{r save-as-shp, eval=FALSE}
 library(rgdal)
 writeOGR(x$sites, dsn='foldername', layer='filename', format='ESRI Shapefile')
+```
+
+2. Overlay site locations on a Google map
+
+```{r map-data, eval=FALSE}
+library(dismo)
+g <- gmap(x$sites)
+plot(g, interpolate=TRUE)
+points(Mercator(x$sites), col='red')
 ```
 
 
