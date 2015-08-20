@@ -16,35 +16,31 @@ options(width=100, stringsAsFactors=FALSE)
 
 Henry Mount Soil Climate Database Tutorial
 ==========================================
-`r format(Sys.time(), "%Y-%m-%d")`
 D.E. Beaudette
+<br>
+`r format(Sys.time(), "%Y-%m-%d")`
+
 
 
 ## Introduction
-This document demonstrates how to use the [soilDB](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/soilDB-Intro.html?root=aqp) package to download data from the Henry Mount soil climate database.
-
-
-### Data Collection
-
-
-### Current Work and Future Plans
-
+This document demonstrates how to use the [soilDB](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/soilDB-Intro.html?root=aqp) package to download data from the Henry Mount soil climate database. Soil climate data are routinely collected by SSO staff via burried sensor/data-logger devices ("hobos") and now above ground weather stations. The Henry Mount Soil Climate database was established to assist with the management and analysis of these data.
 
 
 ## Setup R Environment
 With a recent version of R (>= 2.15), it is possible to get all of the packages that this tutorial depends on via:
 ```{r install-deps, eval=FALSE}
 # run these commands in the R console
-install.packages('reshape', dep=TRUE) # stable version from CRAN + dependencies
-install.packages('dismo', dep=TRUE) # stable version from CRAN + dependencies
-install.packages('rgdal', dep=TRUE) # stable version from CRAN + dependencies
+install.packages('RColorBrewer', dep=TRUE)
+install.packages('reshape', dep=TRUE)
+install.packages('dismo', dep=TRUE)
+install.packages('rgdal', dep=TRUE)
 install.packages('soilDB', dep=TRUE) # stable version from CRAN + dependencies
 install.packages('soilDB', repos="http://R-Forge.R-project.org", type='source') # most recent copy from r-forge
 ```
 
 
 ## Getting and Viewing Data
-Data can be queried by:
+Soil climate data can be queried by:
  
  * project (typically a soil survey area, 'CA630')
  * NASIS user site ID (e.g. "2006CA7920001")
@@ -61,16 +57,18 @@ and aggregated to the following granularity:
  * "week"
  * "month"
  * "year"
- 
+
+
+Query daily soil temperature data associated with the Sequoia / Kings Canyon soil survey.
 ```{r get-data, fig.width=6, fig.height=7, results='hide'}
 library(soilDB)
 library(lattice)
+library(RColorBrewer)
 
-# get daily soil temperature data and summaries from Sequoia / Kings Canyon soil survey
 x <- fetchHenry(project='CA792', gran = 'day')
 ```
 
-Quick listing of site names, IDs, and coordinates
+Quick listing of essiential site-level data. "Functional years" is the number of years of non-missing data, after grouping data by Julian day. "Complete years" is the number of years that have 365 days of non-missing data. "dslv" is the number of days since the data-logger was last visited.
 ```{r view-data, fig.width=6, fig.height=7}
 head(as.data.frame(x$sites)[, c('user_site_id', 'name', 'serial_number', 'MAST', 'Winter', 'Summer', 'functional.yrs', 'complete.yrs', 'dslv')])
 ```
@@ -82,18 +80,24 @@ Note that there are gaps in the data: between site visits and lack of synchroniz
 xyplot(sensor_value ~ date_time | id, data=x$soiltemp, type=c('l', 'g'), as.table=TRUE, layout=c(1,5), xlab='Date', ylab='Deg C')
 ```
 
-```{r plot-time-series-levelplot, fig.width=10, fig.height=10}
-# inspect data gaps
+
+Another approach for investigating data gaps, blue: data, grey: no data.
+```{r plot-time-series-levelplot, fig.width=9, fig.height=9}
 levelplot(factor(!is.na(sensor_value)) ~ doy * factor(year) | id, 
 data=x$soiltemp, layout=c(1,5), col.regions=c('grey', 'RoyalBlue'), cuts=1, 
-colorkey=FALSE, as.table=TRUE, scales=list(alternating=3), 
+colorkey=FALSE, as.table=TRUE, scales=list(alternating=3, cex=0.75), 
 par.strip.text=list(cex=1), strip=strip.custom(bg='yellow'), 
 xlab='Julian Day', ylab='Year')
+```
 
-# view data as levelplot
-levelplot(sensor_value ~ doy * factor(year) | id, 
-data=x$soiltemp, layout=c(1,5), col.regions = topo.colors(100),
-colorkey=list(space='top'), as.table=TRUE, scales=list(alternating=3), 
+This style of plotting data can be useful for making comparisons between years. 
+```{r plot-time-series-levelplot-2, fig.width=9, fig.height=9}
+# generate some better colors
+cols <- colorRampPalette(rev(brewer.pal(11, 'RdYlBu')), space='Lab', interpolate='spline')
+
+levelplot(sensor_value ~ doy * factor(year) | id, main='Daily Soil Temperature at 50cm\nDeg. C',
+data=x$soiltemp, layout=c(1,5), col.regions=cols,
+colorkey=list(space='top'), as.table=TRUE, scales=list(alternating=3, cex=0.75), 
 par.strip.text=list(cex=1), strip=strip.custom(bg='grey'), 
 xlab='Julian Day', ylab='Year')
 ```
@@ -113,14 +117,13 @@ as.data.frame(x$sites)[, c('user_site_id', 'name', 'MAST', 'Winter', 'Summer', '
 
 ### Additional Ideas
 
-1. Save sites as shape file:
+1. Save sites as shape file
 ```{r save-as-shp, eval=FALSE}
 library(rgdal)
 writeOGR(x$sites, dsn='foldername', layer='filename', format='ESRI Shapefile')
 ```
 
 2. Overlay site locations on a Google map
-
 ```{r map-data, eval=FALSE}
 library(dismo)
 g <- gmap(x$sites)
