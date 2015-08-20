@@ -70,7 +70,7 @@ x <- fetchHenry(project='CA792', gran = 'day')
 
 Quick listing of essiential site-level data. "Functional years" is the number of years of non-missing data, after grouping data by Julian day. "Complete years" is the number of years that have 365 days of non-missing data. "dslv" is the number of days since the data-logger was last visited.
 ```{r view-data, fig.width=6, fig.height=7}
-head(as.data.frame(x$sites)[, c('user_site_id', 'name', 'serial_number', 'MAST', 'Winter', 'Summer', 'functional.yrs', 'complete.yrs', 'dslv')])
+head(as.data.frame(x$sites)[, c('user_site_id', 'name', 'serial_number', 'MAST', 'Winter', 'Summer', 'STR', 'functional.yrs', 'complete.yrs', 'dslv')])
 ```
 
 
@@ -107,9 +107,11 @@ xlab='Julian Day', ylab='Year')
 
 In the presence of missing data, MAST calculations will be biased towards those data that are not missing. For example, a block of missing data in January will result in an estimated MAST that is too high due to the missing data from the middle of winter. It is possible to estimate (mostly) unbiased MAST values in the presence of some missing data by averaging multiple years of data by Julian day.  This approach will generate reasonable summaries in the presence of missing data, as long as data gaps are "covered" by corresponding data from another year. The longer the period of record and shorter the data gaps, the better.
 
+Soil temperature regime assignment for gelic and cryic conditions are approximate, thus marked with an '*'.
+
 When daily data are queried, unbiased summaries and indices of data "completeness" are calculated.
 ```{r data-summary, fig.width=6, fig.height=7}
-as.data.frame(x$sites)[, c('user_site_id', 'name', 'MAST', 'Winter', 'Summer', 'functional.yrs', 'complete.yrs')]
+as.data.frame(x$sites)[, c('user_site_id', 'name', 'MAST', 'Winter', 'Summer', 'STR', 'functional.yrs', 'complete.yrs')]
 ```
 
 

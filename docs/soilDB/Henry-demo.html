@@ -106,7 +106,7 @@ library(RColorBrewer)
 
 x &lt;- fetchHenry(project='CA792', gran = 'day')</code></pre>
 <p>Quick listing of essiential site-level data. &quot;Functional years&quot; is the number of years of non-missing data, after grouping data by Julian day. &quot;Complete years&quot; is the number of years that have 365 days of non-missing data. &quot;dslv&quot; is the number of days since the data-logger was last visited.</p>
-<pre class="r"><code>head(as.data.frame(x$sites)[, c('user_site_id', 'name', 'serial_number', 'MAST', 'Winter', 'Summer', 'functional.yrs', 'complete.yrs', 'dslv')])</code></pre>
+<pre class="r"><code>head(as.data.frame(x$sites)[, c('user_site_id', 'name', 'serial_number', 'MAST', 'Winter', 'Summer', 'STR', 'functional.yrs', 'complete.yrs', 'dslv')])</code></pre>
 <table>
 <thead>
 <tr class="header">
@@ -116,6 +116,7 @@ x &lt;- fetchHenry(project='CA792', gran = 'day')</code></pre>
 <th align="right">MAST</th>
 <th align="right">Winter</th>
 <th align="right">Summer</th>
+<th align="left">STR</th>
 <th align="right">functional.yrs</th>
 <th align="right">complete.yrs</th>
 <th align="right">dslv</th>
@@ -129,6 +130,7 @@ x &lt;- fetchHenry(project='CA792', gran = 'day')</code></pre>
 <td align="right">1.31</td>
 <td align="right">-1.60</td>
 <td align="right">5.10</td>
+<td align="left">cryic*</td>
 <td align="right">7</td>
 <td align="right">7</td>
 <td align="right">25</td>
@@ -140,6 +142,7 @@ x &lt;- fetchHenry(project='CA792', gran = 'day')</code></pre>
 <td align="right">NA</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
+<td align="left">NA</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
@@ -151,6 +154,7 @@ x &lt;- fetchHenry(project='CA792', gran = 'day')</code></pre>
 <td align="right">5.48</td>
 <td align="right">1.18</td>
 <td align="right">10.90</td>
+<td align="left">frigid</td>
 <td align="right">2</td>
 <td align="right">2</td>
 <td align="right">28</td>
@@ -162,6 +166,7 @@ x &lt;- fetchHenry(project='CA792', gran = 'day')</code></pre>
 <td align="right">6.79</td>
 <td align="right">1.50</td>
 <td align="right">12.64</td>
+<td align="left">frigid</td>
 <td align="right">2</td>
 <td align="right">2</td>
 <td align="right">28</td>
@@ -173,6 +178,7 @@ x &lt;- fetchHenry(project='CA792', gran = 'day')</code></pre>
 <td align="right">4.02</td>
 <td align="right">0.86</td>
 <td align="right">8.87</td>
+<td align="left">frigid</td>
 <td align="right">2</td>
 <td align="right">2</td>
 <td align="right">26</td>
@@ -184,6 +190,7 @@ x &lt;- fetchHenry(project='CA792', gran = 'day')</code></pre>
 <td align="right">4.54</td>
 <td align="right">0.80</td>
 <td align="right">9.29</td>
+<td align="left">frigid</td>
 <td align="right">2</td>
 <td align="right">2</td>
 <td align="right">26</td>
@@ -217,8 +224,9 @@ xlab='Julian Day', ylab='Year')</code></pre>
 <div id="data-summaries" class="section level2">
 <h2>Data Summaries</h2>
 <p>In the presence of missing data, MAST calculations will be biased towards those data that are not missing. For example, a block of missing data in January will result in an estimated MAST that is too high due to the missing data from the middle of winter. It is possible to estimate (mostly) unbiased MAST values in the presence of some missing data by averaging multiple years of data by Julian day. This approach will generate reasonable summaries in the presence of missing data, as long as data gaps are &quot;covered&quot; by corresponding data from another year. The longer the period of record and shorter the data gaps, the better.</p>
+<p>Soil temperature regime assignment for gelic and cryic conditions are approximate, thus marked with an '*'.</p>
 <p>When daily data are queried, unbiased summaries and indices of data &quot;completeness&quot; are calculated.</p>
-<pre class="r"><code>as.data.frame(x$sites)[, c('user_site_id', 'name', 'MAST', 'Winter', 'Summer', 'functional.yrs', 'complete.yrs')]</code></pre>
+<pre class="r"><code>as.data.frame(x$sites)[, c('user_site_id', 'name', 'MAST', 'Winter', 'Summer', 'STR', 'functional.yrs', 'complete.yrs')]</code></pre>
 <table>
 <thead>
 <tr class="header">
@@ -227,6 +235,7 @@ xlab='Julian Day', ylab='Year')</code></pre>
 <th align="right">MAST</th>
 <th align="right">Winter</th>
 <th align="right">Summer</th>
+<th align="left">STR</th>
 <th align="right">functional.yrs</th>
 <th align="right">complete.yrs</th>
 </tr>
@@ -238,6 +247,7 @@ xlab='Julian Day', ylab='Year')</code></pre>
 <td align="right">1.31</td>
 <td align="right">-1.60</td>
 <td align="right">5.10</td>
+<td align="left">cryic*</td>
 <td align="right">7</td>
 <td align="right">7</td>
 </tr>
@@ -247,6 +257,7 @@ xlab='Julian Day', ylab='Year')</code></pre>
 <td align="right">NA</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
+<td align="left">NA</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
 </tr>
@@ -256,6 +267,7 @@ xlab='Julian Day', ylab='Year')</code></pre>
 <td align="right">5.48</td>
 <td align="right">1.18</td>
 <td align="right">10.90</td>
+<td align="left">frigid</td>
 <td align="right">2</td>
 <td align="right">2</td>
 </tr>
@@ -265,6 +277,7 @@ xlab='Julian Day', ylab='Year')</code></pre>
 <td align="right">6.79</td>
 <td align="right">1.50</td>
 <td align="right">12.64</td>
+<td align="left">frigid</td>
 <td align="right">2</td>
 <td align="right">2</td>
 </tr>
@@ -274,6 +287,7 @@ xlab='Julian Day', ylab='Year')</code></pre>
 <td align="right">4.02</td>
 <td align="right">0.86</td>
 <td align="right">8.87</td>
+<td align="left">frigid</td>
 <td align="right">2</td>
 <td align="right">2</td>
 </tr>
@@ -283,6 +297,7 @@ xlab='Julian Day', ylab='Year')</code></pre>
 <td align="right">4.54</td>
 <td align="right">0.80</td>
 <td align="right">9.29</td>
+<td align="left">frigid</td>
 <td align="right">2</td>
 <td align="right">2</td>
 </tr>
@@ -292,6 +307,7 @@ xlab='Julian Day', ylab='Year')</code></pre>
 <td align="right">NA</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
+<td align="left">NA</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
 </tr>
@@ -301,6 +317,7 @@ xlab='Julian Day', ylab='Year')</code></pre>
 <td align="right">NA</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
+<td align="left">NA</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
 </tr>
@@ -310,6 +327,7 @@ xlab='Julian Day', ylab='Year')</code></pre>
 <td align="right">NA</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
+<td align="left">NA</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
 </tr>
