@@ -114,6 +114,8 @@ echo $contents; } ?>
 
 <p><b>Sample Figures</b></p>
 
+<img src="MO-soils-aqp-demo.png" border="0">
+
 <img src="aggregate-summary-as-profiles.jpg" border="0">
 
 <img src="mineralking-set1-elevation.png" border="0">
