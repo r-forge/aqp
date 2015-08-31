@@ -116,6 +116,8 @@ echo $contents; } ?>
 
 <img src="MO-soils-aqp-demo.png" border="0">
 
+<img src="soil-series-color-signature.png" border="0">
+
 <img src="aggregate-summary-as-profiles.jpg" border="0">
 
 <img src="mineralking-set1-elevation.png" border="0">
