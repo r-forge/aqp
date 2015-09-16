@@ -23,7 +23,7 @@ D.E. Beaudette
 
 
 ## Introduction
-This document demonstrates how to use the [soilDB](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/soilDB-Intro.html?root=aqp) package to download data from the Henry Mount soil climate database. Soil climate data are routinely collected by SSO staff via burried sensor/data-logger devices ("hobos") and now above ground weather stations. The Henry Mount Soil Climate database was established to assist with the management and analysis of these data.
+This document demonstrates how to use the [soilDB](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/soilDB-Intro.html?root=aqp) package to download data from the Henry Mount soil climate database. Soil climate data are routinely collected by SSO staff via buried sensor/data-logger devices ("hobos") and now above ground weather stations. The Henry Mount Soil Climate database was established to assist with the management and analysis of these data.
 
 
 ## Setup R Environment
@@ -70,7 +70,7 @@ x <- fetchHenry(project='CA792', gran = 'day')
 
 Quick listing of essiential site-level data. "Functional years" is the number of years of non-missing data, after grouping data by Julian day. "Complete years" is the number of years that have 365 days of non-missing data. "dslv" is the number of days since the data-logger was last visited.
 ```{r view-data, fig.width=6, fig.height=7}
-head(as.data.frame(x$sites)[, c('user_site_id', 'name', 'serial_number', 'MAST', 'Winter', 'Summer', 'STR', 'functional.yrs', 'complete.yrs', 'dslv')])
+head(as.data.frame(x$sensors)[, c('user_site_id', 'name', 'serial_number', 'MAST', 'Winter', 'Summer', 'STR', 'functional.yrs', 'complete.yrs', 'dslv')])
 ```
 
 
@@ -111,7 +111,7 @@ Soil temperature regime assignment for gelic, cryic, and frigid conditions typic
 
 When daily data are queried, unbiased summaries and indices of data "completeness" are calculated.
 ```{r data-summary, fig.width=6, fig.height=7}
-as.data.frame(x$sites)[, c('user_site_id', 'name', 'MAST', 'Winter', 'Summer', 'STR', 'functional.yrs', 'complete.yrs')]
+as.data.frame(x$sensors)[, c('user_site_id', 'name', 'MAST', 'Winter', 'Summer', 'STR', 'functional.yrs', 'complete.yrs')]
 ```
 
 
@@ -122,15 +122,15 @@ as.data.frame(x$sites)[, c('user_site_id', 'name', 'MAST', 'Winter', 'Summer', '
 1. Save sites as shape file
 ```{r save-as-shp, eval=FALSE}
 library(rgdal)
-writeOGR(x$sites, dsn='foldername', layer='filename', format='ESRI Shapefile')
+writeOGR(x$sensors, dsn='foldername', layer='filename', format='ESRI Shapefile')
 ```
 
 2. Overlay site locations on a Google map
 ```{r map-data, eval=FALSE}
 library(dismo)
-g <- gmap(x$sites)
+g <- gmap(x$sensors)
 plot(g, interpolate=TRUE)
-points(Mercator(x$sites), col='red')
+points(Mercator(x$sensors), col='red')
 ```
 
 

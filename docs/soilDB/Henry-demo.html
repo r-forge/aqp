@@ -63,10 +63,10 @@ img {
 
 <div id="henry-mount-soil-climate-database-tutorial" class="section level1">
 <h1>Henry Mount Soil Climate Database Tutorial</h1>
-<p>D.E. Beaudette <br> 2015-08-31</p>
+<p>D.E. Beaudette <br> 2015-09-16</p>
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
-<p>This document demonstrates how to use the <a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/soilDB-Intro.html?root=aqp">soilDB</a> package to download data from the Henry Mount soil climate database. Soil climate data are routinely collected by SSO staff via burried sensor/data-logger devices (&quot;hobos&quot;) and now above ground weather stations. The Henry Mount Soil Climate database was established to assist with the management and analysis of these data.</p>
+<p>This document demonstrates how to use the <a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/soilDB-Intro.html?root=aqp">soilDB</a> package to download data from the Henry Mount soil climate database. Soil climate data are routinely collected by SSO staff via buried sensor/data-logger devices (&quot;hobos&quot;) and now above ground weather stations. The Henry Mount Soil Climate database was established to assist with the management and analysis of these data.</p>
 </div>
 <div id="setup-r-environment" class="section level2">
 <h2>Setup R Environment</h2>
@@ -106,7 +106,7 @@ library(RColorBrewer)
 
 x &lt;- fetchHenry(project='CA792', gran = 'day')</code></pre>
 <p>Quick listing of essiential site-level data. &quot;Functional years&quot; is the number of years of non-missing data, after grouping data by Julian day. &quot;Complete years&quot; is the number of years that have 365 days of non-missing data. &quot;dslv&quot; is the number of days since the data-logger was last visited.</p>
-<pre class="r"><code>head(as.data.frame(x$sites)[, c('user_site_id', 'name', 'serial_number', 'MAST', 'Winter', 'Summer', 'STR', 'functional.yrs', 'complete.yrs', 'dslv')])</code></pre>
+<pre class="r"><code>head(as.data.frame(x$sensors)[, c('user_site_id', 'name', 'serial_number', 'MAST', 'Winter', 'Summer', 'STR', 'functional.yrs', 'complete.yrs', 'dslv')])</code></pre>
 <table>
 <thead>
 <tr class="header">
@@ -133,7 +133,7 @@ x &lt;- fetchHenry(project='CA792', gran = 'day')</code></pre>
 <td align="left">cryic*</td>
 <td align="right">7</td>
 <td align="right">7</td>
-<td align="right">36</td>
+<td align="right">52</td>
 </tr>
 <tr class="even">
 <td align="left">2012CA7921062</td>
@@ -145,7 +145,7 @@ x &lt;- fetchHenry(project='CA792', gran = 'day')</code></pre>
 <td align="left">frigid*</td>
 <td align="right">1</td>
 <td align="right">0</td>
-<td align="right">692</td>
+<td align="right">708</td>
 </tr>
 <tr class="odd">
 <td align="left">S2012CA019001</td>
@@ -157,7 +157,7 @@ x &lt;- fetchHenry(project='CA792', gran = 'day')</code></pre>
 <td align="left">frigid*</td>
 <td align="right">2</td>
 <td align="right">2</td>
-<td align="right">39</td>
+<td align="right">55</td>
 </tr>
 <tr class="even">
 <td align="left">S2012CA019002</td>
@@ -169,7 +169,7 @@ x &lt;- fetchHenry(project='CA792', gran = 'day')</code></pre>
 <td align="left">frigid*</td>
 <td align="right">2</td>
 <td align="right">2</td>
-<td align="right">39</td>
+<td align="right">55</td>
 </tr>
 <tr class="odd">
 <td align="left">S2012CA019003</td>
@@ -181,7 +181,7 @@ x &lt;- fetchHenry(project='CA792', gran = 'day')</code></pre>
 <td align="left">frigid*</td>
 <td align="right">2</td>
 <td align="right">2</td>
-<td align="right">37</td>
+<td align="right">53</td>
 </tr>
 <tr class="even">
 <td align="left">S2012CA019004</td>
@@ -193,7 +193,7 @@ x &lt;- fetchHenry(project='CA792', gran = 'day')</code></pre>
 <td align="left">frigid*</td>
 <td align="right">2</td>
 <td align="right">2</td>
-<td align="right">37</td>
+<td align="right">53</td>
 </tr>
 </tbody>
 </table>
@@ -226,7 +226,7 @@ xlab='Julian Day', ylab='Year')</code></pre>
 <p>In the presence of missing data, MAST calculations will be biased towards those data that are not missing. For example, a block of missing data in January will result in an estimated MAST that is too high due to the missing data from the middle of winter. It is possible to estimate (mostly) unbiased MAST values in the presence of some missing data by averaging multiple years of data by Julian day. This approach will generate reasonable summaries in the presence of missing data, as long as data gaps are &quot;covered&quot; by corresponding data from another year. The longer the period of record and shorter the data gaps, the better.</p>
 <p>Soil temperature regime assignment for gelic, cryic, and frigid conditions typically require additional information and are marked with an '*'.</p>
 <p>When daily data are queried, unbiased summaries and indices of data &quot;completeness&quot; are calculated.</p>
-<pre class="r"><code>as.data.frame(x$sites)[, c('user_site_id', 'name', 'MAST', 'Winter', 'Summer', 'STR', 'functional.yrs', 'complete.yrs')]</code></pre>
+<pre class="r"><code>as.data.frame(x$sensors)[, c('user_site_id', 'name', 'MAST', 'Winter', 'Summer', 'STR', 'functional.yrs', 'complete.yrs')]</code></pre>
 <table>
 <thead>
 <tr class="header">
@@ -339,14 +339,14 @@ xlab='Julian Day', ylab='Year')</code></pre>
 <li>Save sites as shape file</li>
 </ol>
 <pre class="r"><code>library(rgdal)
-writeOGR(x$sites, dsn='foldername', layer='filename', format='ESRI Shapefile')</code></pre>
+writeOGR(x$sensors, dsn='foldername', layer='filename', format='ESRI Shapefile')</code></pre>
 <ol start="2" style="list-style-type: decimal">
 <li>Overlay site locations on a Google map</li>
 </ol>
 <pre class="r"><code>library(dismo)
-g &lt;- gmap(x$sites)
+g &lt;- gmap(x$sensors)
 plot(g, interpolate=TRUE)
-points(Mercator(x$sites), col='red')</code></pre>
+points(Mercator(x$sensors), col='red')</code></pre>
 <hr />
 <p>This document is based on <code>aqp</code> version 1.9 and <code>soilDB</code> version 1.6.</p>
 </div>
