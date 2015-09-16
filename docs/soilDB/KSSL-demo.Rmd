@@ -91,6 +91,9 @@ chaix$taxonname <- 'chaix'
 # stack datasets into a new SoilProfileCollection
 g <- rbind(chaix, musick, holland)
 
+# compute weighted-mean particle diameter
+g$wmpd <- with(horizons(g), ((vcs * 1.5) + (cs * 0.75) + (ms * 0.375) + (fs * 0.175) + (vfs *0.075) + (silt * 0.026) + (clay * 0.0015)) / (vcs + cs + ms + fs + vfs + silt + clay))
+
 # tabulate number of pedons by normalized series name
 table(g$taxonname)
 
@@ -112,7 +115,7 @@ tapply(g$depth, g$taxonname, summary)
 ### Aggregation
 The `slab()` function is used to aggregate selected variables within collections of soil profiles along depth-slices. In this case, we aggregate clay, pH, and base saturation at pH 8.2 along 1-cm thick slices and within groups defined by the variable 'taxonname'. See `?slab()` for details on how this function can be used.
 ```{r aggregate}
-g.slab <- slab(g, taxonname ~ clay + ph_h2o + bs82)
+g.slab <- slab(g, taxonname ~ clay + ph_h2o + bs82 + wmpd)
 
 # inspect stacked data structure
 str(g.slab)
@@ -131,13 +134,13 @@ g.slab$taxonname <- factor(g.slab$taxonname, levels=new.levels, labels=new.label
 levels(g.slab$variable)
 
 # re-name soil property labels-- order is critical !
-levels(g.slab$variable) <- c('Clay (%)', 'pH 1:1 H2O', 'Base Saturation at pH 8.2 (%)')
+levels(g.slab$variable) <- c('Clay (%)', 'pH 1:1 H2O', 'Base Saturation at pH 8.2 (%)', 'WMPD (mm)')
 ```
 
 
 ## Graphically Compare
 The slice-wise median and 25th/75th percentiles are reasonable estimations of central tendency and spread. "Contributing fraction" values (% of pedons with data at a given depth) are printed along the right-hand side of each panel. These values provide both an indication of how deep the soils are, and, how much confidence can be placed in the aggregate data at any given depth.
-```{r plot, fig.width=9, fig.height=6}
+```{r plot, fig.width=10, fig.height=6}
 # plot grouped, aggregate data
 xyplot(top ~ p.q50 | variable, groups=taxonname, data=g.slab, ylab='Depth',
 			 xlab='median bounded by 25th and 75th percentiles',
@@ -145,8 +148,9 @@ xyplot(top ~ p.q50 | variable, groups=taxonname, data=g.slab, ylab='Depth',
 			 panel=panel.depth_function, alpha=0.25, sync.colors=TRUE,
 			 prepanel=prepanel.depth_function,
 			 cf=g.slab$contributing_fraction,
+       par.strip.text=list(cex=0.8),
 			 strip=strip.custom(bg=grey(0.85)),
-			 layout=c(3,1), scales=list(x=list(alternating=1, relation='free'), y=list(alternating=3)),
+			 layout=c(4,1), scales=list(x=list(alternating=1, relation='free'), y=list(alternating=3)),
 			 par.settings=tps,
 			 auto.key=list(columns=3, lines=TRUE, points=FALSE)
 )
