@@ -1,0 +1,188 @@
+---
+output:
+  html_document:
+    mathjax: null
+    jquery: null
+    smart: no
+---
+
+```{r setup, echo=FALSE, results='hide', warning=FALSE}
+# setup
+library(knitr, quietly=TRUE)
+library(printr, quietly=TRUE)
+opts_chunk$set(message=FALSE, warning=FALSE, background='#F7F7F7', fig.align='center', fig.retina=2, dev='png', tidy=TRUE, verbose=FALSE)
+options(width=100, stringsAsFactors=FALSE)
+```
+
+Computing GIS Summaries from Map Unit Polygons
+==============================================
+D.E. Beaudette
+<br>
+`r format(Sys.time(), "%Y-%m-%d")`
+
+
+
+## Introduction
+
+
+
+## Setup R Environment
+With a recent version of R (>= 2.15), it is possible to get all of the packages that this tutorial depends on via:
+```{r install-deps, eval=FALSE}
+# run these commands in the R console
+install.packages('plyr', dep=TRUE)
+install.packages('rgdal', dep=TRUE)
+install.packages('raster', dep=TRUE)
+install.packages('sharpshootR', dep=TRUE) # stable version from CRAN + dependencies
+install.packages('sharpshootR', repos="http://R-Forge.R-project.org", type='source') # most recent copy from r-forge
+```
+
+
+## Map Unit Data
+```{r get-mu-data, fig.width=6, fig.height=7, results='hide'}
+library(rgdal)
+library(raster)
+library(plyr)
+library(sharpshootR)
+library(lattice)
+
+# adjust to local path of your data
+mu <-  readOGR(dsn='L:/CA630/FG_CA630_OFFICIAL.gdb', layer='ca630_a', encoding='OpenFileGDB', stringsAsFactors = FALSE)
+
+# extract polygons for a single map unit
+mu <- mu[which(mu$MUSYM == '7088'), ]
+
+## TODO: standardize this
+# add a unique polygon ID
+mu$pID <- seq(from=1, to=length(mu))
+```
+
+
+## Raster Data
+```{r load-raster-data, fig.width=6, fig.height=7}
+raster.list <- list(maat=raster('E:/gis_data/prism/tavg_1981_2010.tif'), 
+                    ppt=raster('E:/gis_data/prism/ppt_mm_1981_2010.tif'),
+                    wb=raster('E:/gis_data/prism/annual_waterbudget800.tif'),
+                    elev=raster('E:/gis_data/ca630/ca630_elev/hdr.adf'),
+                    slope=raster('E:/gis_data/ca630/ca630_slope/hdr.adf'),
+                    aspect=raster('E:/gis_data/ca630/aspect_ca630/hdr.adf')
+)
+
+## NOTE: this may not be possible with large rasters
+# read into memory
+raster.list <- lapply(raster.list, readAll)
+```
+
+
+## Generate Sampling Points
+```{r generate-sampling-points, fig.width=6, fig.height=6}
+# get median area of delineations
+ac <- sapply(slot(mu, 'polygons'), slot, 'area') * 2.47e-4
+summary(ac)
+
+# sample each polygon at a constant density
+s <- constantDensitySampling(mu, n.pts.per.ac=0.25, min.samples=1, polygon.id='pID')
+
+# extract a single polygon
+p.example <- mu[which(mu$pID == 2), ]
+s.example <- s[which(s$pID == 2), ]
+
+# graphical check of a single polygon
+par(mar=c(1,1,4,1))
+plot(raster.list[['elev']], ext=extent(p.example), axes=FALSE)
+plot(p.example, add=TRUE)
+points(s.example, cex=0.75, pch=3, col='red')
+box()
+title('Sampling Points, Polygon #2\nElevation Raster')
+```
+
+
+## Extract Raster Data at Sample Points
+```{r extract-at-points, fig.width=6, fig.height=7}
+# iterate over rasters
+l <- list()
+
+## TODO: parallelize this
+for(i in seq_along(raster.list)){
+  i.name <- names(raster.list)[i]
+  l[[i.name]] <- data.frame(value=extract(raster.list[[i]], s), pID=s$pID)
+  }
+
+# convert to DF and fix default name of raster column
+d <- ldply(l)
+names(d)[1] <- 'variable'
+
+# split into ratio-scale and circular stats
+d.circ <- subset(d, subset=variable == 'aspect')
+d <- subset(d, subset=variable != 'aspect')
+```
+
+# Summarize Raster Stats
+```{r summarize-samples, fig.width=6, fig.height=7}
+stats <- ddply(d, 'variable', function(i) {
+  q <- quantile(i$value, probs=c(0.05, 0.5, 0.95), na.rm = TRUE)
+  res <- data.frame(t(q))
+  #     res$n <- length(na.omit(i$value))
+  names(res) <- c('q05', 'q50', 'q95')
+  return(res)
+  })
+
+
+print(stats)
+```
+
+## Summarize Aspect Angle
+```{r summarize-aspect, fig.width=6, fig.height=6}
+par(mar=c(0,0,0,0))
+circ.stats <- aspect.plot(d.circ$value, q=c(0.05, 0.5, 0.95), plot.title='xxx', pch=NA, bg='RoyalBlue', col='black', arrow.col=c('grey', 'red', 'grey'), stack=FALSE, p.bw=90)
+
+print(round(circ.stats))
+```
+
+
+## Advanced
+
+Locate polygons with >15% of samples outside of 5th-95th percentiles
+```{r summarize-by-poly-2, fig.width=7, fig.height=7}
+polygons.to.check <- ddply(d, 'variable', function(i) {
+  
+  # convert to values -> quantiles
+  e.i <- ecdf(i$value)
+  q.i <- e.i(i$value)
+  # locate those samples outside of our 5th-95th range
+  out.idx <- which(q.i < 0.05 | q.i > 0.95)
+  
+  ## TODO: may need to protect against no matching rows?
+  tab <- sort(prop.table(table(i$pID[out.idx])), decreasing = TRUE)
+  df <- data.frame(pID=names(tab), prop.outside.range=round(unlist(tab), 2))
+  # keep only those with > 15% of samples outside of range
+  df <- df[which(df$prop > 0.15), ] 
+
+  return(df)
+})
+
+# graphical check
+plot(mu)
+plot(mu[which(mu$pID %in% unique(polygons.to.check$pID)), ], add=TRUE, border=NA, col='red')
+box()
+```
+
+Some kind of visualization of the ranges... not done
+```{r summarize-by-poly, fig.width=7, fig.height=15, eval=FALSE}
+# plotting style
+tps <- list(box.umbrella=list(col=grey(0.4)), 
+      			box.rectangle=list(col=grey(0.4)), 
+						box.dot=list(col=grey(0.4), cex=0.75), 
+						plot.symbol=list(col=grey(0.4), cex=0.5)
+)
+
+# hmm.. could get messy with too many polygons
+bwplot(factor(pID) ~ value | variable, data=d, par.settings=tps, as.table=TRUE, scales=list(cex=0.55, x=list(relation='free')), layout=c(5,1), panel=function(...) {
+  panel.grid(h=-1, v=-1)
+  panel.bwplot(...)
+})
+```
+
+----------------------------
+This document is based on `sharpshootR` version `r utils::packageDescription("sharpshootR", field="Version")`.
+
