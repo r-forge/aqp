@@ -10,7 +10,7 @@ output:
 # setup
 library(knitr, quietly=TRUE)
 library(printr, quietly=TRUE)
-opts_chunk$set(message=FALSE, warning=FALSE, background='#F7F7F7', fig.align='center', fig.retina=2, dev='png', tidy=TRUE, verbose=FALSE)
+opts_chunk$set(message=FALSE, warning=FALSE, background='#F7F7F7', fig.align='center', fig.retina=2, dev='png', tidy=FALSE, verbose=FALSE)
 options(width=100, stringsAsFactors=FALSE)
 ```
 
@@ -47,12 +47,11 @@ library(sharpshootR)
 library(lattice)
 
 # adjust to local path of your data
-mu <-  readOGR(dsn='L:/CA630/FG_CA630_OFFICIAL.gdb', layer='ca630_a', encoding='OpenFileGDB', stringsAsFactors = FALSE)
+mu <-  readOGR(dsn='E:/gis_data/ca630/FG_CA630_OFFICIAL.gdb', layer='ca630_a', encoding='OpenFileGDB', stringsAsFactors = FALSE)
 
 # extract polygons for a single map unit
 mu <- mu[which(mu$MUSYM == '7088'), ]
 
-## TODO: standardize this
 # add a unique polygon ID
 mu$pID <- seq(from=1, to=length(mu))
 ```
@@ -68,7 +67,7 @@ raster.list <- list(maat=raster('E:/gis_data/prism/tavg_1981_2010.tif'),
                     aspect=raster('E:/gis_data/ca630/aspect_ca630/hdr.adf')
 )
 
-## NOTE: this may not be possible with large rasters
+## NOTE: this may not be possible with very large rasters
 # read into memory
 raster.list <- lapply(raster.list, readAll)
 ```
@@ -76,9 +75,10 @@ raster.list <- lapply(raster.list, readAll)
 
 ## Generate Sampling Points
 ```{r generate-sampling-points, fig.width=6, fig.height=6}
+## TODO: why does this throw an error when using rmarkdown::render() ?
 # get median area of delineations
-ac <- sapply(slot(mu, 'polygons'), slot, 'area') * 2.47e-4
-summary(ac)
+# ac <- sapply(slot(mu, 'polygons'), slot, 'area') * 2.47e-4
+# summary(ac)
 
 # sample each polygon at a constant density
 s <- constantDensitySampling(mu, n.pts.per.ac=0.25, min.samples=1, polygon.id='pID')
@@ -103,7 +103,7 @@ title('Sampling Points, Polygon #2\nElevation Raster')
 l <- list()
 
 ## TODO: parallelize this
-for(i in seq_along(raster.list)){
+for(i in seq_along(raster.list)) {
   i.name <- names(raster.list)[i]
   l[[i.name]] <- data.frame(value=extract(raster.list[[i]], s), pID=s$pID)
   }
@@ -128,7 +128,7 @@ stats <- ddply(d, 'variable', function(i) {
   })
 
 
-print(stats)
+kable(stats)
 ```
 
 ## Summarize Aspect Angle
@@ -161,26 +161,21 @@ polygons.to.check <- ddply(d, 'variable', function(i) {
   return(df)
 })
 
+# make an index to those polygons that require further investigation
+check.idx <- which(mu$pID %in% unique(polygons.to.check$pID))
+
 # graphical check
+par(mar=c(1,1,4,1))
 plot(mu)
-plot(mu[which(mu$pID %in% unique(polygons.to.check$pID)), ], add=TRUE, border=NA, col='red')
+plot(mu[check.idx, ], add=TRUE, border=NA, col='red')
 box()
+title('Polygons with > 15% of samples\noutside of 5th-95th percentile range')
 ```
 
-Some kind of visualization of the ranges... not done
-```{r summarize-by-poly, fig.width=7, fig.height=15, eval=FALSE}
-# plotting style
-tps <- list(box.umbrella=list(col=grey(0.4)), 
-      			box.rectangle=list(col=grey(0.4)), 
-						box.dot=list(col=grey(0.4), cex=0.75), 
-						plot.symbol=list(col=grey(0.4), cex=0.5)
-)
 
-# hmm.. could get messy with too many polygons
-bwplot(factor(pID) ~ value | variable, data=d, par.settings=tps, as.table=TRUE, scales=list(cex=0.55, x=list(relation='free')), layout=c(5,1), panel=function(...) {
-  panel.grid(h=-1, v=-1)
-  panel.bwplot(...)
-})
+Save flagged polygons to SHP file.
+```{r summarize-by-poly-3, eval=FALSE}
+writeOGR(mu[check.idx, ], dsn='.', layer='flagged_polygons.shp', driver='ESRI Shapefile', overwrite_layer=TRUE)
 ```
 
 ----------------------------
