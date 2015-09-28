@@ -9,9 +9,8 @@ output:
 ```{r setup, echo=FALSE, results='hide', warning=FALSE}
 # setup
 library(knitr, quietly=TRUE)
-library(printr, quietly=TRUE)
 opts_chunk$set(message=FALSE, warning=FALSE, background='#F7F7F7', fig.align='center', fig.retina=2, dev='png', tidy=FALSE, verbose=FALSE)
-options(width=100, stringsAsFactors=FALSE)
+options(width=100, stringsAsFactors=FALSE, cache=TRUE)
 ```
 
 Computing GIS Summaries from Map Unit Polygons
@@ -21,15 +20,13 @@ D.E. Beaudette
 `r format(Sys.time(), "%Y-%m-%d")`
 
 
-
 ## Introduction
-
-
+This tutorial decribes one approach to summarizing raster data (e.g. slope, aspect, PRISM data, etc.) according to delineations of a specific map unit. The examples outlined below are a good starting point for a more rigorous examination of map unit variability for the purposes of SDJR, quality control, or DSM project. You will need to adjust file paths to raster and vector data sources below, in order to follow along with your own data. 
 
 ## Setup R Environment
 With a recent version of R (>= 2.15), it is possible to get all of the packages that this tutorial depends on via:
 ```{r install-deps, eval=FALSE}
-# run these commands in the R console
+# run these commands in the R console, only once
 install.packages('plyr', dep=TRUE)
 install.packages('rgdal', dep=TRUE)
 install.packages('raster', dep=TRUE)
@@ -39,7 +36,9 @@ install.packages('sharpshootR', repos="http://R-Forge.R-project.org", type='sour
 
 
 ## Map Unit Data
+Map unit polyons can be loaded from shapefile, "file" geodatabase, or any other OGR-compatible data source. When working with large data sets it can be advantageous to export a subset of polygons using an external GIS application. In this example, the subsetting operations is performed in R. Be sure to adjust the file path below to point to a file containing map unit polygons.
 ```{r get-mu-data, fig.width=6, fig.height=7, results='hide'}
+# load required packages
 library(rgdal)
 library(raster)
 library(plyr)
@@ -50,7 +49,7 @@ library(lattice)
 mu <-  readOGR(dsn='E:/gis_data/ca630/FG_CA630_OFFICIAL.gdb', layer='ca630_a', encoding='OpenFileGDB', stringsAsFactors = FALSE)
 
 # extract polygons for a single map unit
-mu <- mu[which(mu$MUSYM == '7088'), ]
+mu <- mu[which(mu$MUSYM == '7089'), ]
 
 # add a unique polygon ID
 mu$pID <- seq(from=1, to=length(mu))
@@ -58,7 +57,17 @@ mu$pID <- seq(from=1, to=length(mu))
 
 
 ## Raster Data
-```{r load-raster-data, fig.width=6, fig.height=7}
+Raster data sources should be in a file format the can be read by the GDAL library; GeoTiFF, ArcGrid, or ERDAS formats are typically a safe option. Several raster data sources are used in this example:
+ 
+ * "maat": mean annual air temperature (1981--2010 PRISM)
+ * "ppt": mean annual precipitation (1981--2010 PRISM)
+ * "wb": mean of annual monthly differences between precipitation and potential ET (PRISM)
+ * "elev": 10 meter DEM
+ * "slope": 3x3 classic slope map, derived from 10 meter DEM
+ * "aspect": 3x3 classic aspect map, derived from 10 meter DEM
+
+When using your own data, adjust the names (e.g. "maat") and paths (e.g. "E:/gis_data/prism/tavg_1981_2010.tif") accordingly.
+```{r load-raster-data-1}
 raster.list <- list(maat=raster('E:/gis_data/prism/tavg_1981_2010.tif'), 
                     ppt=raster('E:/gis_data/prism/ppt_mm_1981_2010.tif'),
                     wb=raster('E:/gis_data/prism/annual_waterbudget800.tif'),
@@ -66,22 +75,20 @@ raster.list <- list(maat=raster('E:/gis_data/prism/tavg_1981_2010.tif'),
                     slope=raster('E:/gis_data/ca630/ca630_slope/hdr.adf'),
                     aspect=raster('E:/gis_data/ca630/aspect_ca630/hdr.adf')
 )
+```
 
-## NOTE: this may not be possible with very large rasters
-# read into memory
+
+Depending on the number of raster files, resolution, extent, and amount of memory on your workstation, it may be possible to load all of the rasters into RAM. It is worth trying because the performance gain can be significant. If you do not have enough memory, consider closing other applications and trying again.
+```{r load-raster-data-2}
 raster.list <- lapply(raster.list, readAll)
 ```
 
 
 ## Generate Sampling Points
+As long as within-polygon variability (elevation, slope, aspect, etc.) is realitvely low, it is possible to generate reasonable summaries of these values using a subset of those pixels that fall within each polygon. Sampling each polygon at a constant density (e.g. 1 sample per ac.) ensures that summaries of raster data are not biased by polygon size. It is important to select a sampling density based extent and size of map unit delineations relative to raster data resolution. For example, a lower density (1 sample per 10 ac.) would be sufficient for summarizing broad-scale variation in climate, while a higher density (2 samples per ac.) would be required to capture finer-scale variation in slope.
 ```{r generate-sampling-points, fig.width=6, fig.height=6}
-## TODO: why does this throw an error when using rmarkdown::render() ?
-# get median area of delineations
-# ac <- sapply(slot(mu, 'polygons'), slot, 'area') * 2.47e-4
-# summary(ac)
-
 # sample each polygon at a constant density
-s <- constantDensitySampling(mu, n.pts.per.ac=0.25, min.samples=1, polygon.id='pID')
+s <- constantDensitySampling(mu, n.pts.per.ac=1, min.samples=1, polygon.id='pID')
 
 # extract a single polygon
 p.example <- mu[which(mu$pID == 2), ]
@@ -98,17 +105,17 @@ title('Sampling Points, Polygon #2\nElevation Raster')
 
 
 ## Extract Raster Data at Sample Points
+The following code iterates over each raster, extracts values at sample points, and combines into a single object, `d`. Note that samples from "continuous" data sources (elev, slope, etc.) are split from "circular" data sources (aspect).
 ```{r extract-at-points, fig.width=6, fig.height=7}
-# iterate over rasters
+# init a list to store results
 l <- list()
 
-## TODO: parallelize this
 for(i in seq_along(raster.list)) {
   i.name <- names(raster.list)[i]
   l[[i.name]] <- data.frame(value=extract(raster.list[[i]], s), pID=s$pID)
   }
 
-# convert to DF and fix default name of raster column
+# convert to DF and fix default naming of raster column
 d <- ldply(l)
 names(d)[1] <- 'variable'
 
@@ -117,13 +124,18 @@ d.circ <- subset(d, subset=variable == 'aspect')
 d <- subset(d, subset=variable != 'aspect')
 ```
 
-# Summarize Raster Stats
+
+## Summarize Raster Stats Over All Delineations
+[Quantiles](https://en.wikipedia.org/wiki/Quantile) are a convenient and (typically) assumption-free method for generating a range in characteristics. In this tutorial the 5th, 50th, and 95th percentiles are used to represent "low", "RV", and "high" values.
 ```{r summarize-samples, fig.width=6, fig.height=7}
 stats <- ddply(d, 'variable', function(i) {
   q <- quantile(i$value, probs=c(0.05, 0.5, 0.95), na.rm = TRUE)
+  QCD <- IQR(i$value, na.rm=TRUE) / median(i$value, na.rm=TRUE)
   res <- data.frame(t(q))
-  #     res$n <- length(na.omit(i$value))
-  names(res) <- c('q05', 'q50', 'q95')
+  if(nrow(res) > 0)
+    res$QCD <- QCD
+    
+  names(res) <- c('q05', 'q50', 'q95', 'QCD')
   return(res)
   })
 
@@ -131,7 +143,25 @@ stats <- ddply(d, 'variable', function(i) {
 kable(stats)
 ```
 
-## Summarize Aspect Angle
+
+## Summarize Raster Stats by Polygon
+Sometimes it is useful to summarize raster data for *each* polygon, in this case the median value of each raster sampled is retained.
+```{r summarize-by-poly-4, eval=FALSE}
+# compute median values by polygon
+poly.stats <- ddply(d, c('pID', 'variable'), .fun=summarize, m=median(value, na.rm=TRUE))
+# convert to wide format for distance matrix calculation
+poly.stats.wide <- dcast(poly.stats, pID ~ variable, value.var = 'm')
+
+# check
+kable(head(poly.stats.wide))
+
+# save stats to file
+write.csv(poly.stats.wide, file='poly-stats.csv', row.names=FALSE)
+```
+
+
+## Summarize Aspect Angle Over All Delineations
+Aspect angle is a circular value and thus requires a specialized approach to computing quantiles. A graphical depiction helps with interpretation.
 ```{r summarize-aspect, fig.width=6, fig.height=6}
 par(mar=c(0,0,0,0))
 circ.stats <- aspect.plot(d.circ$value, q=c(0.05, 0.5, 0.95), plot.title='xxx', pch=NA, bg='RoyalBlue', col='black', arrow.col=c('grey', 'red', 'grey'), stack=FALSE, p.bw=90)
@@ -140,9 +170,12 @@ print(round(circ.stats))
 ```
 
 
-## Advanced
 
-Locate polygons with >15% of samples outside of 5th-95th percentiles
+## Advanced
+The following code chunks highlight some additional ways in which the sampled raster values can be used to perform quality control or gain additional insight into map unit variability.
+
+
+Locate polygons with >15% of samples outside of 5th-95th percentiles.
 ```{r summarize-by-poly-2, fig.width=7, fig.height=7}
 polygons.to.check <- ddply(d, 'variable', function(i) {
   
@@ -161,6 +194,8 @@ polygons.to.check <- ddply(d, 'variable', function(i) {
   return(df)
 })
 
+kable(polygons.to.check)
+
 # make an index to those polygons that require further investigation
 check.idx <- which(mu$pID %in% unique(polygons.to.check$pID))
 
@@ -173,9 +208,31 @@ title('Polygons with > 15% of samples\noutside of 5th-95th percentile range')
 ```
 
 
-Save flagged polygons to SHP file.
+Save flagged polygons to SHP file; be sure to adjust file paths.
 ```{r summarize-by-poly-3, eval=FALSE}
 writeOGR(mu[check.idx, ], dsn='.', layer='flagged_polygons.shp', driver='ESRI Shapefile', overwrite_layer=TRUE)
+```
+
+
+
+
+Sort polygons based on similarity of sampled raster values.
+```{r summarize-by-poly-5, eval=FALSE}
+# additional libraries
+library(reshape2)
+library(cluster)
+library(MASS)
+
+# eval numerical distance
+p.dist <- daisy(poly.stats.wide[, -1], stand=TRUE)
+# map to 2D space via Sammon Mapping
+p.sammon <- sammon(p.dist)
+
+# plot
+par(mar=c(1,1,1,1))
+plot(p.sammon$points, type='n', axes=FALSE, asp=1)
+text(p.sammon$points, labels = poly.stats.wide$pID, cex=0.5)
+box()
 ```
 
 ----------------------------
