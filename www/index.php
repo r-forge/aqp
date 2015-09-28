@@ -97,7 +97,13 @@ echo $contents; } ?>
 <li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/example-reports/dunstone.html?root=aqp">Dunstone Pedon Summary</a></li>
 <li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/example-reports/loafercreek.html?root=aqp">Loafercreek Pedon Summary</a></li>
 <li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/example-reports/amador.html?root=aqp">Amador Pedon Summary</a></li>
-</ul></li>
+</ol></li>
+
+<li>Spatial Data Aggregation<ol>
+<li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/sharpshootR/GIS-summary-by-MU.html?root=aqp">Sampling Raster Data Sources</a></li>
+</ol></li>
+
+
 </ol></li>
 
 </ol>
