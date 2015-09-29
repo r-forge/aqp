@@ -9,6 +9,7 @@ output:
 ```{r setup, echo=FALSE, results='hide', warning=FALSE}
 # setup
 library(knitr, quietly=TRUE)
+library(printr, quietly=TRUE)
 opts_chunk$set(message=FALSE, warning=FALSE, background='#F7F7F7', fig.align='center', fig.retina=2, dev='png', tidy=FALSE, verbose=FALSE)
 options(width=100, stringsAsFactors=FALSE, cache=TRUE)
 ```
@@ -41,15 +42,17 @@ Map unit polyons can be loaded from shapefile, "file" geodatabase, or any other 
 
 Specifying paths in R must be done with either a single forward slash (/) or two backslashes (\\\\) between directories. Specifying the path to a shapefile or other data source also requires specialised syntax:
 
- * file geodatabase (E:/gis_data/FG_CA630.gdb)
+ * **file geodatabase** (E:/gis_data/FG_CA630.gdb)
     + dsn="path_to_file/file.gdb"
     + layer="feature_class_name"
     + example: `readOGR(dsn='E:/gis_data/FG_CA630.gdb', layer='ca630_a', encoding='OpenFileGDB', stringsAsFactors = FALSE)`
- * shapefile (E:/gis_data/ca630_a.shp)
+ * **shapefile** (E:/gis_data/ca630_a.shp)
     + dsn='path_to_parent_directory' (note trailing "/" is omitted)
     + layer='filename' (note trailing ".shp" is omitted)
     + example: `readOGR(dsn='E:/gis_data', layer='ca630_a', stringsAsFactors = FALSE)`
- 
+
+After loading and optionally filtering-out a single map unit, a unique ID is assigned to each polygon. This ID can later be used to reference polygons are associatiated with raster values outside of some ideal range.
+
 ```{r get-mu-data, fig.width=6, fig.height=7, results='hide'}
 # load required packages
 library(rgdal)
@@ -58,10 +61,14 @@ library(plyr)
 library(reshape2)
 library(sharpshootR)
 
-# adjust to local path of your data
+# load map unit polygons
+# Shapefile Example
+# mu <-  readOGR(dsn='E:/gis_data/ca630', layer='ca630_a', stringsAsFactors = FALSE)
+
+# File Geodatabase Example
 mu <-  readOGR(dsn='E:/gis_data/ca630/FG_CA630_OFFICIAL.gdb', layer='ca630_a', encoding='OpenFileGDB', stringsAsFactors = FALSE)
 
-# extract polygons for a single map unit
+# extract polygons for a single map unit, map unit symbol "7089" in this case
 mu <- mu[which(mu$MUSYM == '7089'), ]
 
 # add a unique polygon ID
@@ -72,14 +79,14 @@ mu$pID <- seq(from=1, to=length(mu))
 ## Raster Data
 Raster data sources should be in a file format the can be read by the GDAL library; GeoTiFF, ArcGrid, or ERDAS formats are typically a safe option. Several raster data sources are used in this example:
  
- * "maat": mean annual air temperature (1981--2010 PRISM)
- * "ppt": mean annual precipitation (1981--2010 PRISM)
- * "wb": mean of annual monthly differences between precipitation and potential ET (PRISM)
- * "elev": 10 meter DEM
- * "slope": 3x3 classic slope map, derived from 10 meter DEM
- * "aspect": 3x3 classic aspect map, derived from 10 meter DEM
+ * "maat": 4 km resolution, mean annual air temperature (1981--2010 PRISM)
+ * "ppt": 4 km resolution, mean annual precipitation (1981--2010 PRISM)
+ * "wb": 800 meter resolution, mean of annual monthly differences between precipitation and potential ET (PRISM)
+ * "elev": 10 meter resolution, USGS DEM
+ * "slope": 10 meter resolution, 3x3 classic slope map derived from "elev"
+ * "aspect": 10 meter resolution, 3x3 classic aspect map derived from 10 meter "elev"
 
-When using your own data, adjust the names (e.g. "maat") and paths (e.g. "E:/gis_data/prism/tavg_1981_2010.tif") accordingly.
+When using your own data, adjust the names (e.g. "maat") and paths (e.g. "E:/gis_data/prism/tavg_1981_2010.tif") accordingly. The use of a single forward slash (/) to separate directories is suggested.
 ```{r load-raster-data-1}
 raster.list <- list(maat=raster('E:/gis_data/prism/tavg_1981_2010.tif'), 
                     ppt=raster('E:/gis_data/prism/ppt_mm_1981_2010.tif'),
@@ -93,17 +100,29 @@ raster.list <- list(maat=raster('E:/gis_data/prism/tavg_1981_2010.tif'),
 
 Depending on the number of raster files, resolution, extent, and amount of memory on your workstation, it may be possible to load all of the rasters into RAM. It is worth trying because the performance gain can be significant. If you do not have enough memory, consider closing other applications and trying again.
 ```{r load-raster-data-2}
-raster.list <- lapply(raster.list, readAll)
+# estimate required RAM
+est <- sum(sapply(raster.list, ncell) * 1.1) / 1000 / 1000
+# load into RAM, if the estimates size of all rasters is small than available memory
+if(est < memory.size())
+  raster.list <- lapply(raster.list, readAll)
 ```
 
 
 ## Generate Sampling Points
 As long as within-polygon variability (elevation, slope, aspect, etc.) is realitvely low, it is possible to generate reasonable summaries of these values using a subset of those pixels that fall within each polygon. Sampling each polygon at a constant density (e.g. 1 sample per ac.) ensures that summaries of raster data are not biased by polygon size. It is important to select a sampling density based extent and size of map unit delineations relative to raster data resolution. For example, a lower density (1 sample per 10 ac.) would be sufficient for summarizing broad-scale variation in climate, while a higher density (2 samples per ac.) would be required to capture finer-scale variation in slope.
+
+Sampling of map unit polygons is performed with the `constantDensitySampling()` function from the sharpshootR package. Relevant arguments to this function include:
+
+ * `n.pts.per.ac`: sampling density expressed as points / ac.
+ * `min.samples`: minimum number of samples required per polygon
+ * `polygon.id`: column containing a unique polygon ID
+ 
+
 ```{r generate-sampling-points, fig.width=6, fig.height=6}
-# sample each polygon at a constant density
+# sample each polygon at a constant density, 1 point per acre
 s <- constantDensitySampling(mu, n.pts.per.ac=1, min.samples=1, polygon.id='pID')
 
-# extract a single polygon
+# extract a single polygon and associated samples
 p.example <- mu[which(mu$pID == 2), ]
 s.example <- s[which(s$pID == 2), ]
 
@@ -142,18 +161,21 @@ d <- subset(d, subset=variable != 'aspect')
 [Quantiles](https://en.wikipedia.org/wiki/Quantile) are a convenient and (typically) assumption-free method for generating a range in characteristics. In this tutorial the 5th, 50th, and 95th percentiles are used to represent "low", "RV", and "high" values.
 ```{r summarize-samples, fig.width=6, fig.height=7}
 stats <- ddply(d, 'variable', function(i) {
+  # compute 5th, 50th, and 95th percentiles
   q <- quantile(i$value, probs=c(0.05, 0.5, 0.95), na.rm = TRUE)
+  # round
+  q <- round(q)
   QCD <- IQR(i$value, na.rm=TRUE) / median(i$value, na.rm=TRUE)
   res <- data.frame(t(q))
   if(nrow(res) > 0)
     res$QCD <- QCD
-    
+  # assign reasonable names (quantiles)
   names(res) <- c('q05', 'q50', 'q95', 'QCD')
   return(res)
   })
 
-
-kable(stats)
+# print stats to screen
+stats
 ```
 
 
@@ -161,12 +183,12 @@ kable(stats)
 Sometimes it is useful to summarize raster data for *each* polygon, in this case the median value of each raster sampled is retained.
 ```{r summarize-by-poly-4}
 # compute median values by polygon
-poly.stats <- ddply(d, c('pID', 'variable'), .fun=summarize, m=median(value, na.rm=TRUE))
+poly.stats <- ddply(d, c('pID', 'variable'), .fun=summarize, m=round(median(value, na.rm=TRUE)))
 # convert to wide format for distance matrix calculation
 poly.stats.wide <- dcast(poly.stats, pID ~ variable, value.var = 'm')
 
-# check
-kable(head(poly.stats.wide, 10))
+# check first 10 rows
+head(poly.stats.wide, 10)
 ```
 
 Save to CSV file for later use.
@@ -208,7 +230,8 @@ polygons.to.check <- ddply(d, 'variable', function(i) {
   return(df)
 })
 
-kable(polygons.to.check)
+# print details on flagged polygons
+polygons.to.check
 
 # make an index to those polygons that require further investigation
 check.idx <- which(mu$pID %in% unique(polygons.to.check$pID))
@@ -216,15 +239,16 @@ check.idx <- which(mu$pID %in% unique(polygons.to.check$pID))
 # graphical check
 par(mar=c(1,1,4,1))
 plot(mu)
-plot(mu[check.idx, ], add=TRUE, border=NA, col='red')
+if(length(check.idx) > 0)
+  plot(mu[check.idx, ], add=TRUE, border=NA, col='red')
 box()
 title('Polygons with > 15% of samples\noutside of 5th-95th percentile range')
 ```
 
 
-Save flagged polygons to SHP file; be sure to adjust file paths.
+Save flagged polygons to SHP file; be sure to adjust file paths. Note: `dsn` is the path to parent directory ("." means current working directory), and `layer` is the name of the shape file components--no need to specify ".shp".
 ```{r summarize-by-poly-3, eval=FALSE}
-writeOGR(mu[check.idx, ], dsn='.', layer='flagged_polygons.shp', driver='ESRI Shapefile', overwrite_layer=TRUE)
+writeOGR(mu[check.idx, ], dsn='.', layer='flagged_polygons', driver='ESRI Shapefile', overwrite_layer=TRUE)
 ```
 
 
