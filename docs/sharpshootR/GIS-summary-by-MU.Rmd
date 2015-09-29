@@ -28,6 +28,7 @@ With a recent version of R (>= 2.15), it is possible to get all of the packages 
 ```{r install-deps, eval=FALSE}
 # run these commands in the R console, only once
 install.packages('plyr', dep=TRUE)
+install.packages('reshape2', dep=TRUE)
 install.packages('rgdal', dep=TRUE)
 install.packages('raster', dep=TRUE)
 install.packages('sharpshootR', dep=TRUE) # stable version from CRAN + dependencies
@@ -37,13 +38,25 @@ install.packages('sharpshootR', repos="http://R-Forge.R-project.org", type='sour
 
 ## Map Unit Data
 Map unit polyons can be loaded from shapefile, "file" geodatabase, or any other OGR-compatible data source. When working with large data sets it can be advantageous to export a subset of polygons using an external GIS application. In this example, the subsetting operations is performed in R. Be sure to adjust the file path below to point to a file containing map unit polygons.
+
+Specifying paths in R must be done with either a single forward slash (/) or two backslashes (\\\\) between directories. Specifying the path to a shapefile or other data source also requires specialised syntax:
+
+ * file geodatabase (E:/gis_data/FG_CA630.gdb)
+    + dsn="path_to_file/file.gdb"
+    + layer="feature_class_name"
+    + example: `readOGR(dsn='E:/gis_data/FG_CA630.gdb', layer='ca630_a', encoding='OpenFileGDB', stringsAsFactors = FALSE)`
+ * shapefile (E:/gis_data/ca630_a.shp)
+    + dsn='path_to_parent_directory' (note trailing "/" is omitted)
+    + layer='filename' (note trailing ".shp" is omitted)
+    + example: `readOGR(dsn='E:/gis_data', layer='ca630_a', stringsAsFactors = FALSE)`
+ 
 ```{r get-mu-data, fig.width=6, fig.height=7, results='hide'}
 # load required packages
 library(rgdal)
 library(raster)
 library(plyr)
+library(reshape2)
 library(sharpshootR)
-library(lattice)
 
 # adjust to local path of your data
 mu <-  readOGR(dsn='E:/gis_data/ca630/FG_CA630_OFFICIAL.gdb', layer='ca630_a', encoding='OpenFileGDB', stringsAsFactors = FALSE)
@@ -146,19 +159,20 @@ kable(stats)
 
 ## Summarize Raster Stats by Polygon
 Sometimes it is useful to summarize raster data for *each* polygon, in this case the median value of each raster sampled is retained.
-```{r summarize-by-poly-4, eval=FALSE}
+```{r summarize-by-poly-4}
 # compute median values by polygon
 poly.stats <- ddply(d, c('pID', 'variable'), .fun=summarize, m=median(value, na.rm=TRUE))
 # convert to wide format for distance matrix calculation
 poly.stats.wide <- dcast(poly.stats, pID ~ variable, value.var = 'm')
 
 # check
-kable(head(poly.stats.wide))
-
-# save stats to file
-write.csv(poly.stats.wide, file='poly-stats.csv', row.names=FALSE)
+kable(head(poly.stats.wide, 10))
 ```
 
+Save to CSV file for later use.
+```{r save-poly-stats, eval=FALSE}
+write.csv(poly.stats.wide, file='poly-stats.csv', row.names=FALSE)
+```
 
 ## Summarize Aspect Angle Over All Delineations
 Aspect angle is a circular value and thus requires a specialized approach to computing quantiles. A graphical depiction helps with interpretation.
@@ -219,7 +233,6 @@ writeOGR(mu[check.idx, ], dsn='.', layer='flagged_polygons.shp', driver='ESRI Sh
 Sort polygons based on similarity of sampled raster values.
 ```{r summarize-by-poly-5, eval=FALSE}
 # additional libraries
-library(reshape2)
 library(cluster)
 library(MASS)
 
@@ -234,6 +247,11 @@ plot(p.sammon$points, type='n', axes=FALSE, asp=1)
 text(p.sammon$points, labels = poly.stats.wide$pID, cex=0.5)
 box()
 ```
+
+
+## Future Additions
+1. use  gdalUtils to extract specific map unit polygons from large geodatabases (requires working GDAL installation)
+2. generalize to perform comparisons
 
 ----------------------------
 This document is based on `sharpshootR` version `r utils::packageDescription("sharpshootR", field="Version")`.
