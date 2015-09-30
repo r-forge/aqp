@@ -74,7 +74,8 @@ library(sharpshootR)
 # File Geodatabase Example
 mu <-  readOGR(dsn='E:/gis_data/ca630/FG_CA630_OFFICIAL.gdb', layer='ca630_a', encoding='OpenFileGDB', stringsAsFactors = FALSE)
 
-# extract polygons for a single map unit (7089 -- )
+# extract polygons for a single map unit ("MUSYM" attribute = "7089")
+# note that column names in your data may be different
 mu <- mu[which(mu$MUSYM == '7089'), ]
 
 # add a unique polygon ID
@@ -306,9 +307,9 @@ box()
 
 
 ## Next Time...
-1. use of QCD to eval delineations
+1. scoring polygon bases on deviation from slope class limits
 2. use gdalUtils to extract specific map unit polygons from large geodatabases (requires working GDAL installation)
-3. generalize to perform comparisons between map units
+3. generalized approach for comparing map units
 4. use polygon data from SDA
 
 ----------------------------
