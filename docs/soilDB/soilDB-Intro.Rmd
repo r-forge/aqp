@@ -25,7 +25,7 @@ This package provides methods for extracting soils information from local PedonP
 
 ### Installation
 You only need to do this once. With a recent version of R, it should be possible to get all of the packages that `soilDB` depends on via:
-```{r ssoap-deps, eval=FALSE}
+```{r install packages, eval=FALSE}
 # run these commands in the R console
 # stable version from CRAN + dependencies
 install.packages("RODBC", dep=TRUE)

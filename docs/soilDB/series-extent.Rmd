@@ -15,7 +15,8 @@ opts_chunk$set(message=FALSE, warning=FALSE, background='#F7F7F7', fig.align='ce
 options(width=100, stringsAsFactors=FALSE)
 ```
 
-## Getting, Plotting, and Saving Soil Series Extent Data from SoilWeb
+Getting, Plotting, and Saving Soil Series Extent Data from SoilWeb
+===============================================================
 `r format(Sys.time(), "%Y-%m-%d")`
 <br>Dylan Beaudette
 
@@ -27,7 +28,7 @@ With a recent version of R, it should be possible to get all of the packages tha
 ```{r install-deps, eval=FALSE}
 # run these commands in the R console
 install.packages('soilDB', dep=TRUE) # stable version from CRAN + dependencies
-install.packages('soilDB', repos="http://R-Forge.R-project.org") # most recent copy from r-forge
+install.packages('soilDB', repos="http://R-Forge.R-project.org", type="source") # most recent copy from r-forge
 install.packages('dismo', dep=TRUE)
 install.packages('RColorBrewer', dep=TRUE)
 install.packages('maps', dep=TRUE)
