@@ -79,9 +79,9 @@ img {
 <h3>Install R Packages</h3>
 <p>With a recent version of R, it should be possible to get all of the packages that this tutorial depends on with the following commands. Note that you only have to do this once.</p>
 <pre class="r"><code># run these commands in the R console
-install.packages(&quot;soilDB&quot;, dep = TRUE)  # stable version from CRAN + dependencies
-install.packages(&quot;rgdal&quot;, dep = TRUE)
-install.packages(&quot;rgeos&quot;, dep = TRUE)
+install.packages('soilDB', dep=TRUE) # stable version from CRAN + dependencies
+install.packages('rgdal', dep=TRUE)
+install.packages('rgeos', dep=TRUE)
 # latest version from r-forge
 install.packages(&quot;aqp&quot;, repos = &quot;http://R-Forge.R-project.org&quot;, type = &quot;source&quot;)
 install.packages(&quot;soilDB&quot;, repos = &quot;http://R-Forge.R-project.org&quot;, type = &quot;source&quot;)</code></pre>
@@ -94,50 +94,53 @@ require(rgdal)
 require(rgeos)
 
 
-# Load a suitable boundary for spatial subset of NASIS pedons CRS: UTM z10 NAD83
-b &lt;- readOGR(dsn = &quot;L:/CA630/FG_CA630_OFFICIAL.gdb&quot;, layer = &quot;ca630_b&quot;, encoding = &quot;encoding&quot;, stringsAsFactors = FALSE)
+# Load a suitable boundary for spatial subset of NASIS pedons
+# CRS: UTM z10 NAD83
+b &lt;-  readOGR(dsn='L:/CA630/FG_CA630_OFFICIAL.gdb', layer='ca630_b', encoding='encoding', stringsAsFactors=FALSE)
 
-# extend boundary with 10km buffer the coordinate reference system should have units of meters
-b &lt;- gBuffer(b, byid = FALSE, width = 10000)
+# extend boundary with 10km buffer
+# the coordinate reference system should have units of meters
+b &lt;- gBuffer(b, byid=FALSE, width=10000)
 
 # graphical check
-par(mar = c(1, 1, 1, 1))
+par(mar=c(1,1,1,1))
 plot(b)
 
-# load entire contents of local database (pedon data) CRS: GCS NAD83
+# load entire contents of local database (pedon data)
+# CRS: GCS WGS84
 f &lt;- fetchNASIS()
 
-# some pedons are missing coordinates in NASIS keep only those pedons with real coordinates
+# some pedons are missing coordinates in NASIS
+# keep only those pedons with real coordinates
 good.idx &lt;- which(!is.na(f$x_std) &amp; !is.na(f$y_std))
 f &lt;- f[good.idx, ]
 
-# init coordinates from WGS84 DD values
-coordinates(f) &lt;- ~x_std + y_std
-proj4string(f) &lt;- &quot;+proj=longlat +datum=WGS84&quot;
+# init coordinates from WGS84 decimal degrees
+coordinates(f) &lt;- ~ x_std + y_std
+proj4string(f) &lt;- '+proj=longlat +datum=WGS84'
 
 # extract only site data
-s &lt;- as(f, &quot;SpatialPointsDataFrame&quot;)
+s &lt;- as(f, 'SpatialPointsDataFrame')
 
 # project CRS of boundary polygon
 s &lt;- spTransform(s, CRS(proj4string(b)))
 
 # add points to plot
-points(s, col = &quot;black&quot;, cex = 0.5)
+points(s, col='black', cex=0.5)
 
 # perform subset
 idx &lt;- gIntersects(s, b, byid = TRUE)
 ids &lt;- which(apply(idx, 2, any))
-s &lt;- s[ids, ]
+s &lt;- s[ids,]
 
 # check subset
-points(s, col = &quot;red&quot;, cex = 1, pch = 0)
+points(s, col='red', cex=1, pch=0)
 
 # subsetting the columns useful for analysis
-s &lt;- s[, c(&quot;pedlabsampnum&quot;, &quot;pedon_id&quot;, &quot;taxonname&quot;, &quot;hillslope_pos&quot;, &quot;elev_field&quot;, &quot;slope_field&quot;, &quot;aspect_field&quot;, 
-    &quot;plantassocnm&quot;, &quot;bedrckdepth&quot;, &quot;bedrock_kind&quot;, &quot;pmkind&quot;, &quot;pmorigin&quot;)]
+s &lt;- s[, c(&quot;pedlabsampnum&quot;, &quot;pedon_id&quot;,&quot;taxonname&quot;, &quot;hillslope_pos&quot;, &quot;elev_field&quot;, &quot;slope_field&quot;, &quot;aspect_field&quot;, &quot;plantassocnm&quot;, &quot;bedrckdepth&quot;, &quot;bedrock_kind&quot;, 'pmkind', 'pmorigin')]
 
 # write to SHP
-writeOGR(s, dsn = &quot;.&quot;, layer = &quot;NASIS-pedons&quot;, driver = &quot;ESRI Shapefile&quot;, overwrite_layer = TRUE)</code></pre>
+writeOGR(s, dsn='.', layer='NASIS-pedons', driver='ESRI Shapefile', overwrite_layer=TRUE)</code></pre>
 <hr />
 <p>This document is based on <code>aqp</code> version 1.9 and <code>soilDB</code> version 1.6-2.</p>
 </div>
