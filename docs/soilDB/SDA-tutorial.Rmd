@@ -1,0 +1,117 @@
+---
+output:
+  html_document:
+    fig_caption: yes
+    jquery: null
+    mathjax: null
+    smart: no
+---
+
+```{r setup, echo=FALSE, results='hide', warning=FALSE}
+# setup
+library(knitr, quietly=TRUE)
+# library(printr, quietly=TRUE)
+opts_chunk$set(message=FALSE, warning=FALSE, background='#F7F7F7', fig.align='center', fig.retina=1, dev='png', tidy=FALSE, verbose=FALSE)
+options(width=100, stringsAsFactors=FALSE)
+```
+
+Soil Data Access (SDA2) Tutorial
+================================
+`r format(Sys.time(), "%Y-%m-%d")`
+<br>Dylan Beaudette
+
+## Introduction
+The `SDA_query()` function submits a query ([T-SQL](https://technet.microsoft.com/en-us/library/bb264565(v=sql.90).aspx)) to the [SDA web-service](http://sdmdataaccess.nrcs.usda.gov/), parses the result, and returns a `data.frame` (rectangular table) object. [This page](http://sdmdataaccess.nrcs.usda.gov/QueryHelp.aspx) contains links to SSURGO metadata and many example SQL queries. 
+
+### Installation
+You only need to do this once. With a recent version of R, it should be possible to get all of the packages that this tutorial depends on via:
+```{r install-deps, eval=FALSE}
+# run these commands in the R console
+# stable version from CRAN + dependencies
+install.packages("raster", dep = TRUE)
+install.packages("rgeos", dep = TRUE)
+install.packages("aqp", dep = TRUE)
+install.packages("soilDB", dep=TRUE)
+# latest versions from r-forge
+install.packages("aqp", repos = "http://R-Forge.R-project.org", type = "source")
+install.packages("soilDB", repos = "http://R-Forge.R-project.org", type = "source")
+```
+
+
+### Finish this...
+
+Load libraries.
+```{r load-libs}
+library(soilDB)
+library(raster) # suggested by soilDB
+library(rgeos)  # additional
+```
+
+
+Example.
+```{r basic-SDA-1}
+q <- "SELECT 
+mukey, cokey, comppct_r, compname, taxclname
+FROM component
+WHERE mukey = '461958'"
+
+# run the query
+res <- SDA_query(q)
+
+# check
+head(res)
+```
+
+Example.
+```{r basic-SDA-2}
+q <- "SELECT 
+mukey, cokey, comppct_r, compname, taxclname
+FROM component
+WHERE compname LIKE '%amador%' "
+
+# run the query
+res <- SDA_query(q)
+
+# check
+head(res)
+```
+
+Another example.
+```{r basic-SDA-3}
+q <- "SELECT 
+component.mukey, cokey, comppct_r, compname, taxclname, 
+taxorder, taxsuborder, taxgrtgroup, taxsubgrp
+FROM legend
+INNER JOIN mapunit ON mapunit.lkey = legend.lkey
+LEFT OUTER JOIN component ON component.mukey = mapunit.mukey
+WHERE legend.areasymbol = 'CA113'"
+
+# run the query
+res <- SDA_query(q)
+
+# check
+head(res)
+```
+
+
+Spatial query example. text -> bbox -> WKT
+```{r sda-spatial-query-basics}
+# define a bounding box: xmin, xmax, ymin, ymax
+b <- c(-120.9, -120.8, 37.7, 37.8)
+# convert bounding box to WKT
+p <- writeWKT(as(extent(b), 'SpatialPolygons'))
+# compose query, using WKT BBOX as filtering critera
+q <- paste0("SELECT mukey, cokey, compname, comppct_r
+            FROM component 
+            WHERE mukey IN (SELECT DISTINCT mukey FROM SDA_Get_Mukey_from_intersection_with_WktWgs84('", p, "') )
+            ORDER BY mukey, cokey, comppct_r DESC")
+
+res <- SDA_query(q)
+
+# check
+head(res)
+```
+
+
+More elaborate examples.
+
