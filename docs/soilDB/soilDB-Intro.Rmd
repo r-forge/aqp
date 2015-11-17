@@ -8,25 +8,32 @@ output:
 
 ```{r setup, echo=FALSE, results='hide', warning=FALSE}
 library(knitr, quietly=TRUE)
-library(printr, quietly=TRUE)
+# library(printr, quietly=TRUE)
 opts_chunk$set(message=FALSE, warning=FALSE, background='#F7F7F7', fig.align='center', fig.retina=1, dev='png', tidy=FALSE, verbose=FALSE)
 options(width=100, stringsAsFactors=FALSE)
 ```
 
-<title>Soil Database Interface: the soilDB package</title>
-# Soil Database Interface: the <tt>soilDB</tt> package
+Soil Database Interface: the <tt>soilDB</tt> package
+===============================================================
+`r format(Sys.time(), "%Y-%m-%d")`
+<br>Dylan Beaudette
+
 
 ## Introduction
 This package provides methods for extracting soils information from local PedonPC and AK Site databases (MS Access format), local NASIS databases (MS SQL Server), and the SDA web-service. Currently USDA-NCSS data sources are supported, however, there are plans to develop interfaces to outside systems such as the Global Soil Mapping project.
 
 
 ### Installation
-With a recent version of R, it should be possible to get all of the packages that `soilDB` depends on via:
+You only need to do this once. With a recent version of R, it should be possible to get all of the packages that `soilDB` depends on via:
 ```{r ssoap-deps, eval=FALSE}
 # run these commands in the R console
-install.packages("RODBC", dep=TRUE) # stable version from CRAN + dependencies
-install.packages("soilDB", dep=TRUE) # stable version from CRAN + dependencies
-install.packages("SSOAP", repos = "http://www.omegahat.org/R", type="source") # SSOAP and XMLSchema
+# stable version from CRAN + dependencies
+install.packages("RODBC", dep=TRUE)
+install.packages("aqp", dep = TRUE)
+install.packages("soilDB", dep=TRUE)
+# latest versions from r-forge
+install.packages("aqp", repos = "http://R-Forge.R-project.org", type = "source")
+install.packages("soilDB", repos = "http://R-Forge.R-project.org", type = "source")
 ```
 
 ### ODBC Connection to the Local NASIS database
@@ -94,7 +101,7 @@ When loading pedons with the `fetchNASIS()` or `fetchPedonPC()` functions, check
 
 **Fetch Pedons or DMU data from Local NASIS**
 
-The `fetchNASIS()` function will load pedons from the "selected set" in your local NASIS database. An ODBC connection named 'nasis_local' must **first** be [established](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/setup_local_nasis.html?root=aqp).
+The `fetchNASIS()` function will load pedons from the "selected set" in your local NASIS database. An ODBC connection named 'nasis_local' must **first** be [established](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/setup_local_nasis.html?root=aqp). Details on the `fetchNASIS()` function can be found [in this related tutorial](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/fetchNASIS-mini-tutorial.html?root=aqp).
 
 ```{r local-nasis-demo, eval=FALSE}
 library(soilDB)
@@ -121,19 +128,23 @@ f <- fetchPedonPC(dsn)
 
 **Fetch data from Soil Data Access (SDA) Web-Service**
 
-The `SDA_query()` function submits a query (ANSI SQL) to the SDA web-service using the `SSOAP` package, parses the result, and returns a `data.frame` (rectangular table) object.
+The `SDA_query()` function submits a query ([T-SQL](https://technet.microsoft.com/en-us/library/bb264565(v=sql.90).aspx)) to the [SDA web-service](http://sdmdataaccess.nrcs.usda.gov/), parses the result, and returns a `data.frame` (rectangular table) object. [This page](http://sdmdataaccess.nrcs.usda.gov/QueryHelp.aspx) contains links to SSURGO metadata and many example SQL queries. 
 ```{r sda-example-1, eval=FALSE}
-# setup a query
-q <- "select cokey, compname, comppct_r 
-from component 
-where compname = 'yolo' and majcompflag = 'Yes' "
+# get component-level data for a specific soil survey area (Yolo county, CA)
+q <- "SELECT 
+component.mukey, cokey, comppct_r, compname, taxclname, 
+taxorder, taxsuborder, taxgrtgroup, taxsubgrp
+FROM legend
+INNER JOIN mapunit ON mapunit.lkey = legend.lkey
+LEFT OUTER JOIN component ON component.mukey = mapunit.mukey
+WHERE legend.areasymbol = 'CA113'"
 
 # run the query
 res <- SDA_query(q)
 ```
 
 
-**Get map unit keys for a geographic area**
+**Get map unit keys for a geographic area** (updates pending for new SDA2 spatial query features)
 
 The `MUKEYS_by_ll_bbox()` function accepts a bounding box defined in GCS (longitude, latitude) NAD83 coordinates, and returns a vector of map unit keys. This vector can be used to generate a filtering criteria for queries submitted via `SDA_query()`.
 ```{r sda-example-2, eval=FALSE}
@@ -145,7 +156,7 @@ m <- MUKEYS_by_ll_bbox(b)
 ```
 
 
-**Get map unit geometry for a geographic area**
+**Get map unit geometry for a geographic area** (updates pending for new SDA2 spatial query features)
 
 The `mapunit_geom_by_ll_bbox()` function accepts a bounding box defined in GCS (longitude, latitude) NAD83 coordinates, and returns a `SpatialPolygonsDataFrame` class object of map unit polygons. Note that map unit polygons that *overlap* with the bounding box are returned, rather than the *intersection* of bounding box and polygons.
 ```{r sda-example-3, eval=FALSE}
@@ -160,7 +171,7 @@ x <- mapunit_geom_by_ll_bbox(b)
 
 **Get basic horizon morphology and taxonomic data from Official Series Descriptions**
 
-The `fetchOSD()` function accepts a character vector of soil series names, and returns a `SpatialPolygonsDataFrame` class object of basic data from those series. Note that this service is provided by the [CA Soil Resource Lab](http://casoilresource.lawr.ucdavis.edu) as an experimental prototype. The **official** [series descriptions](http://soils.usda.gov/technical/classification/osd/index.html) should still be used to verify series information.
+The `fetchOSD()` function accepts a character vector of soil series names, and returns a `SpatialPolygonsDataFrame` class object of basic data from those series. Note that this service is provided by the [CA Soil Resource Lab](http://casoilresource.lawr.ucdavis.edu) as an experimental prototype. The **official** [series descriptions](https://soilseries.sc.egov.usda.gov/osdname.asp) should still be used to verify series information.
 ```{r OSD-example, eval=FALSE}
 # soils of interest
 s.list <- c('musick', 'cecil', 'drummer', 'amador', 'pentz', 'reiff')
@@ -176,14 +187,14 @@ plot(s, name='hzname', cex.names=0.85, axis.line.offset=-4)
 
 **Get the most commonly used data from the Kellog Soil Science Lab database** (formerly NSSL database)
 
-The `fetchKSSL()` function accepts either a soil series name or bounding box in WGS84 geographic coordinates, and returns a `SpatialPolygonsDataFrame` class object containing the matching records. Note that this service is provided by the [CA Soil Resource Lab](http://casoilresource.lawr.ucdavis.edu) as an experimental prototype, based on the June 2012 KSSL snapshot. If newer data are needed, it is best to consult the **official** [KSSL data](http://ncsslabdatamart.sc.egov.usda.gov/).
+The `fetchKSSL()` function accepts either a soil series name or bounding box in WGS84 geographic coordinates, and returns a `SpatialPolygonsDataFrame` class object containing the matching records. Note that this service is provided by the [CA Soil Resource Lab](http://casoilresource.lawr.ucdavis.edu) as an experimental prototype, based on the June 2015 KSSL snapshot. If newer data are needed, it is best to consult the **official** [KSSL data](http://ncsslabdatamart.sc.egov.usda.gov/).
 ```{r KSSL-example, eval=FALSE}
 # fetch and convert data into an SPC
 s <- fetchKSSL(series='Pardee')
 
 # plot profiles
 par(mar=c(0,0,0,0))
-plot(s, name='hzn_desgn', cex.names=0.85, axis.line.offset=-4)
+plot(s, name='hzn_desgn', cex.names=0.85, axis.line.offset=-4, color='clay')
 ```
 
 
@@ -193,6 +204,7 @@ plot(s, name='hzn_desgn', cex.names=0.85, axis.line.offset=-4)
 These functions can be used to extract only subsets of the data available in a PedonPC database, but are generally only useful for advanced users.
 
 ```{r pedonPC-low-level-functions, eval=FALSE}
+dsn <- 'path-to-pedon-database.accdb'
 # fetch only site data
 site_data <- get_site_data_from_pedon_db(dsn)
 # fetch only horizon data
@@ -205,7 +217,7 @@ extended_data <- get_extended_data_from_pedon_db(dsn)
 ```
 
 **Fetch Data from a Local NASIS Database**
-These functions can be used to extract only subsets of the data available in the local NASIS database, but are generally only useful for advanced users.
+These functions can be used to extract only subsets of the data available in the local NASIS database (selected set), but are generally only useful for advanced users.
 
 ```{r local-nasis-low-level-functions, eval=FALSE}
 # fetch only site data

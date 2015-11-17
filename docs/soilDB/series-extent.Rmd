@@ -7,17 +7,17 @@ output:
     smart: no
 ---
 
-```{r setup, echo=FALSE, results='hide'}
+```{r setup, echo=FALSE, results='hide', warning=FALSE}
 # setup
 library(knitr, quietly=TRUE)
-library(printr, quietly=TRUE)
+# library(printr, quietly=TRUE)
 opts_chunk$set(message=FALSE, warning=FALSE, background='#F7F7F7', fig.align='center', fig.retina=1, dev='png', tidy=FALSE, verbose=FALSE)
 options(width=100, stringsAsFactors=FALSE)
 ```
 
 ## Getting, Plotting, and Saving Soil Series Extent Data from SoilWeb
 `r format(Sys.time(), "%Y-%m-%d")`
-Dylan Beaudette
+<br>Dylan Beaudette
 
 ### Introduction
 This document demonstrates how to use the [soilDB](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/soilDB-Intro.html?root=aqp) package to access detailed soil series extent maps via SoilWeb. These maps can be directly displayed in **R**, overlayed on Google Maps, or saved as local files (e.g. shapefiles). Data returned from SoilWeb represent bounding-boxes that enclose SSURGO polygons associated with map units containing the search criteria. Bounding-boxes are snapped to 0.01 degree precision in order to reduce processing time and file size. Note that these files are cached server-side after the first request, and the cache is purged when SoilWeb is periodically synced to the official data.
@@ -85,6 +85,11 @@ str(amador, 2)
 
 # coordinate reference system in PROJ4 notation
 proj4string(amador)
+
+# extract acreage, details: http://casoilresource.lawr.ucdavis.edu/see/
+amador$acres
+pardee$acres
+san.joaquin$acres
 ```
 
 **Save soil series extent data as a shapefile.**
