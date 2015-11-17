@@ -9,7 +9,7 @@ output:
 ```{r setup, echo=FALSE, results='hide', warning=FALSE}
 # setup
 library(knitr, quietly=TRUE)
-opts_chunk$set(message=FALSE, warning=FALSE, background='#F7F7F7', fig.align='center', fig.retina=2, dev='png', tidy=TRUE, verbose=FALSE)
+opts_chunk$set(message=FALSE, warning=FALSE, background='#F7F7F7', fig.align='center', fig.retina=2, dev='png', tidy=FALSE, verbose=FALSE)
 options(width=100, stringsAsFactors=FALSE)
 ```
 
@@ -62,7 +62,7 @@ par(mar=c(1,1,1,1))
 plot(b)
 
 # load entire contents of local database (pedon data)
-# CRS: GCS NAD83
+# CRS: GCS WGS84
 f <- fetchNASIS()
 
 # some pedons are missing coordinates in NASIS
@@ -70,7 +70,7 @@ f <- fetchNASIS()
 good.idx <- which(!is.na(f$x_std) & !is.na(f$y_std))
 f <- f[good.idx, ]
 
-# init coordinates from WGS84 DD values
+# init coordinates from WGS84 decimal degrees
 coordinates(f) <- ~ x_std + y_std
 proj4string(f) <- '+proj=longlat +datum=WGS84'
 
