@@ -85,6 +85,8 @@ echo $contents; } ?>
 
 <li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/fetchNASIS-mini-tutorial.html?root=aqp">Tips on getting data from NASIS into R</a></li>
 
+<li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/export-points-from-NASIS.html?root=aqp">Export NASIS pedon data to SHP file</a></li>
+
 <li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/gSSURGO-SDA.html?root=aqp">gridded SSURRGO (gSSURGO) and SDA</a></li>
 </ol></li>
 
