@@ -1,0 +1,66 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Fetch lab data used site/horizon data from a PedonPC...</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/styles/github.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/languages/r.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</head><body>
+
+<table width="100%" summary="page for fetchNASISLabData {soilDB}"><tr><td>fetchNASISLabData {soilDB}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Fetch lab data used site/horizon data from a PedonPC database.</h2>
+
+<h3>Description</h3>
+
+<p>Fetch KSSL laboratory pedon/horizon layer data from a local NASIS database, return as a SoilProfileCollection object.</p>
+
+
+<h3>Usage</h3>
+
+<pre>fetchNASISLabData()</pre>
+
+
+<h3>Details</h3>
+
+<p>This function currently works only on Windows, and requires a 'nasis_local' ODBC connection.</p>
+
+
+<h3>Value</h3>
+
+<p>a SoilProfileCollection class object</p>
+
+
+<h3>Note</h3>
+
+<p>This fuction attempts to do most of the boilerplate work when extracting KSSL laboratory site/horizon data from a local NASIS database. Lab pedons that have errors in their horizonation are excluded from the returned object, however, their IDs are printed on the console. See <code><a href="fetchNASIS.html">getHzErrorsNASIS</a></code> for a simple approach to identifying pedons with problematic horizonation.</p>
+
+
+<h3>Author(s)</h3>
+
+<p>J.M. Skovlin and D.E. Beaudette</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="get_labpedon_data_from_NASIS_db.html">get_labpedon_data_from_NASIS_db</a></code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="r">## Not run: 
+##D # query depends on some lab data, queried against the national database
+##D # note that you must setup this connection ahead of time
+##D # see inst/doc/setup_ODBC_local_NASIS.pdf
+##D f &lt;- fetchNASISLabData()
+##D 
+##D # plot only those profiles with densic contact
+##D #plot(f[which(f$densic.contact), ], name=&#39;hzname&#39;)
+##D 
+## End(Not run)
+</code></pre>
+
+
+<hr /><div style="text-align: center;">[Package <em>soilDB</em> version 1.6.3 <a href="00Index.html">Index</a>]</div>
+</body></html>

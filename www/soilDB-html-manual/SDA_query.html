@@ -1,15 +1,14 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html><head><title>R: Soil Data Access Query</title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link rel="stylesheet" type="text/css" href="R.css">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Soil Data Access Query</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
 
-<link rel="stylesheet" href="http://yandex.st/highlightjs/7.3/styles/github.min.css">
-<script src="http://yandex.st/highlightjs/7.3/highlight.min.js"></script>
-<script src="http://yandex.st/highlightjs/7.3/languages/r.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/styles/github.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/languages/r.min.js"></script>
 <script>hljs.initHighlightingOnLoad();</script>
 </head><body>
 
-<table width="100%" summary="page for SDA_query {soilDB}"><tr><td>SDA_query {soilDB}</td><td align="right">R Documentation</td></tr></table>
+<table width="100%" summary="page for SDA_query {soilDB}"><tr><td>SDA_query {soilDB}</td><td style="text-align: right;">R Documentation</td></tr></table>
 
 <h2>Soil Data Access Query</h2>
 
@@ -28,7 +27,7 @@
 <table summary="R argblock">
 <tr valign="top"><td><code>q</code></td>
 <td>
-<p>a text string containing valid SQL</p>
+<p>a valid T-SQL query surrounded by double quotes</p>
 </td></tr>
 </table>
 
@@ -40,40 +39,27 @@
 
 <h3>Value</h3>
 
-<p>A dataframe containing the results.</p>
+<p>A dataframe containing the results. NULL is retutned when queries result in 0 matches rows.</p>
 
 
 <h3>Note</h3>
 
-<p>This function requires the 'SSOAP' (<a href="http://www.omegahat.org/SSOAP/">http://www.omegahat.org/SSOAP/</a>), 'RCurl' (<a href="http://www.omegahat.org/RCurl/">http://www.omegahat.org/RCurl/</a>), 'XML' (<a href="http://www.omegahat.org/RSXML/">http://www.omegahat.org/RSXML/</a>), and 'XMLSchema' (<a href="http://www.omegahat.org/XMLSchema/">http://www.omegahat.org/XMLSchema/</a>) packages. Some Windows binary packages can be found here <a href="http://www.stats.ox.ac.uk/pub/RWin/bin/windows/contrib/2.15/">http://www.stats.ox.ac.uk/pub/RWin/bin/windows/contrib/2.15/</a>. This function has been successfully tested on all Windows, MacOS, and Linux using SSOAP 0.8-1, XMLSchema 0.6-0, and XML 3.7-1.</p>
+<p>This function requires the 'httr', 'jsonlite', and 'XML' packages</p>
 
 
 <h3>Author(s)</h3>
 
-<p>Dylan E. Beaudette</p>
-
-
-<h3>References</h3>
-
-<p>http://casoilresource.lawr.ucdavis.edu/</p>
+<p>D.E. Beaudette</p>
 
 
 <h3>See Also</h3>
 
-<p><code><a href="MUKEYS_by_ll_bbox.html">MUKEYS_by_ll_bbox</a></code>, <code><a href="mapunit_geom_by_ll_bbox.html">mapunit_geom_by_ll_bbox</a></code></p>
+<p><code><a href="mapunit_geom_by_ll_bbox.html">mapunit_geom_by_ll_bbox</a></code></p>
 
 
 <h3>Examples</h3>
 
-<pre><code class="r"># install the required packages
-## Not run: 
-##D install.packages(&#39;RCurl&#39;, dep=TRUE)
-##D install.packages(&#39;XML&#39;, dep=TRUE)
-##D install.packages(&quot;SSOAP&quot;, repos = &quot;http://www.omegahat.org/R&quot;, type=&quot;source&quot;)
-##D install.packages(&quot;XMLSchema&quot;, repos = &quot;http://www.omegahat.org/R&quot;, type=&quot;source&quot;)
-## End(Not run)
-
-# SSURGO export metadata:
+<pre><code class="r"># SSURGO export metadata:
 ## Not run: 
 ##D q &lt;- &quot;SELECT areasymbol, saverest FROM sacatalog WHERE areasymbol LIKE &#39;CA%&#39;;&quot;
 ##D x &lt;- SDA_query(q)
@@ -88,25 +74,6 @@
 ##D where compname = &#39;yolo&#39; and majcompflag = &#39;Yes&#39; &quot;)
 ## End(Not run)
 
-# get tabular data based on result from spatial query:
-## Not run: 
-##D # bbox
-##D b &lt;- c(-120.9,37.7,-120.8,37.8)
-##D # get map unit keys for this bbox
-##D m &lt;- MUKEYS_by_ll_bbox(b)
-##D # make an SQL-compliant &quot;in&quot; statment
-##D in.statement &lt;- format_SQL_in_statement(m)
-##D # format query:
-##D q &lt;- paste(&quot;
-##D SELECT component.cokey, compname, comppct_r, hzdept_r, hzdepb_r, 
-##D hzname, sandtotal_r, silttotal_r, claytotal_r
-##D FROM component JOIN chorizon ON component.cokey = chorizon.cokey
-##D WHERE majcompflag = &#39;Yes&#39; AND mukey IN &quot;, in.statement, 
-##D &quot;ORDER BY cokey, comppct_r DESC, hzdept_r ASC&quot;, sep=&quot;&quot;)
-##D # now get component and horizon-level data for these map unit keys
-##D res &lt;- SDA_query(q)
-## End(Not run)
-
 # get component-level data for a specific soil survey area (Yolo county, CA)
 ## Not run: 
 ##D q &lt;- &quot;SELECT 
@@ -119,8 +86,29 @@
 ##D 
 ##D res &lt;- SDA_query(q)
 ## End(Not run)
+
+# get tabular data based on result from spatial query:
+# requires raster and rgeos packages
+## Not run: 
+##D library(raster) # suggested by soilDB
+##D library(rgeos)  # additional
+##D 
+##D # text -&gt; bbox -&gt; WKT
+##D # xmin, xmax, ymin, ymax
+##D b &lt;- c(-120.9, -120.8, 37.7, 37.8)
+##D p &lt;- writeWKT(as(extent(b), &#39;SpatialPolygons&#39;))
+##D q &lt;- paste0(&quot;SELECT mukey, cokey, compname, comppct_r
+##D             FROM component 
+##D             WHERE mukey IN (
+##D             SELECT DISTINCT mukey 
+##D             FROM SDA_Get_Mukey_from_intersection_with_WktWgs84(&#39;&quot;, p, &quot;&#39;) 
+##D             )
+##D             ORDER BY mukey, cokey, comppct_r DESC&quot;)
+##D 
+##D x &lt;- SDA_query(q)
+## End(Not run)
 </code></pre>
 
 
-<hr><div align="center">[Package <em>soilDB</em> version 1.4-6 <a href="00Index.html">Index</a>]</div>
+<hr /><div style="text-align: center;">[Package <em>soilDB</em> version 1.6.3 <a href="00Index.html">Index</a>]</div>
 </body></html>
