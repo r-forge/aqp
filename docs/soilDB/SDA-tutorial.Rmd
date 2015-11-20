@@ -21,34 +21,39 @@ Soil Data Access (SDA2) Tutorial
 <br>Dylan Beaudette
 
 ## Introduction
-The `SDA_query()` function submits a query ([T-SQL](https://technet.microsoft.com/en-us/library/bb264565(v=sql.90).aspx)) to the [SDA web-service](http://sdmdataaccess.nrcs.usda.gov/), parses the result, and returns a `data.frame` (rectangular table) object. [This page](http://sdmdataaccess.nrcs.usda.gov/QueryHelp.aspx) contains links to SSURGO metadata and many example SQL queries. 
+This is a short tutorial on how to interact with the Soil Data Access (SDA) web-service](http://sdmdataaccess.nrcs.usda.gov/) using R. Queries are written using [a dialect of SQL](https://technet.microsoft.com/en-us/library/bb264565(v=sql.90).aspx) and is similar to the language used to write NASIS queries or reports. Soil Data Access is a "window" into the tabular data associated with the current SSURGO snapshot. Queries can contain spatial and tabular filters. If you are new to SDA or SQL, have a look at [this page](http://sdmdataaccess.nrcs.usda.gov/QueryHelp.aspx).
 
-### Installation
-You only need to do this once. With a recent version of R, it should be possible to get all of the packages that this tutorial depends on via:
+The `soilDB` library for R provides a helper function (`SDA_query()`) for submitting queries to SDA, processing the result, and reformatting the results into a rectangular table (a `data.frame`). Most of the work required to use the `SDA_query()` function will be writing SQL to describe the columns you would like returned and how the data should be filtered and possibly grouped.
+
+
+### Install Required R Packages
+You only need to do this once. If you haven't installed these packages, then copy the code below and paste into the RStudio "console" pane.
 ```{r install-deps, eval=FALSE}
 # run these commands in the R console
 # stable version from CRAN + dependencies
+install.packages("soilDB", dep=TRUE)
+install.packages("rgdal", dep = TRUE)
 install.packages("raster", dep = TRUE)
 install.packages("rgeos", dep = TRUE)
-install.packages("aqp", dep = TRUE)
-install.packages("soilDB", dep=TRUE)
 # latest versions from r-forge
-install.packages("aqp", repos = "http://R-Forge.R-project.org", type = "source")
 install.packages("soilDB", repos = "http://R-Forge.R-project.org", type = "source")
 ```
 
 
-### Finish this...
+### Tutorial
 
-Load libraries.
+Now that you have the required packages, load them into the current R session.
 ```{r load-libs}
 library(soilDB)
-library(raster) # suggested by soilDB
-library(rgeos)  # additional
+library(sp)
+library(rgdal)
+library(plyr)
+library(raster)
+library(rgeos)
 ```
 
 
-Example.
+A simple query from the component table, for a single map unit: `mukey = '461958'`.
 ```{r basic-SDA-1}
 q <- "SELECT 
 mukey, cokey, comppct_r, compname, taxclname
@@ -62,21 +67,25 @@ res <- SDA_query(q)
 head(res)
 ```
 
-Example.
+Get a list of map units that contain "Amador" as minor component.
 ```{r basic-SDA-2}
 q <- "SELECT 
-mukey, cokey, comppct_r, compname, taxclname
-FROM component
-WHERE compname LIKE '%amador%' "
+muname, mapunit.mukey, cokey, compname, comppct_r
+FROM mapunit INNER JOIN component on mapunit.mukey = component.mukey
+WHERE compname LIKE '%amador%'
+AND majcompflag = 'No'"
 
 # run the query
 res <- SDA_query(q)
 
 # check
 head(res)
+
+# optionally save the results to CSV file
+# write.csv(res, file='path-to-file.csv', row.names=FALSE)
 ```
 
-Another example.
+Get basic map unit and component data for a single survey area, Yolo County (ca113).
 ```{r basic-SDA-3}
 q <- "SELECT 
 component.mukey, cokey, comppct_r, compname, taxclname, 
@@ -84,7 +93,7 @@ taxorder, taxsuborder, taxgrtgroup, taxsubgrp
 FROM legend
 INNER JOIN mapunit ON mapunit.lkey = legend.lkey
 LEFT OUTER JOIN component ON component.mukey = mapunit.mukey
-WHERE legend.areasymbol = 'CA113'"
+WHERE legend.areasymbol = 'ca113'"
 
 # run the query
 res <- SDA_query(q)
@@ -94,8 +103,20 @@ head(res)
 ```
 
 
-Spatial query example. text -> bbox -> WKT
-```{r sda-spatial-query-basics}
+Get the map unit key and name at a single, manually-defined point: (-121.77100 37.368402).
+```{r sda-spatial-query-basics-1}
+q <- "SELECT mukey, muname
+FROM mapunit
+WHERE mukey IN (
+SELECT * from SDA_Get_Mukey_from_intersection_with_WktWgs84('point(-121.77100 37.368402)')
+)"
+
+SDA_query(q)
+```
+
+
+Get some component data for a manually-defined bounding box, defined in WGS84 GCS.
+```{r sda-spatial-query-basics-2}
 # define a bounding box: xmin, xmax, ymin, ymax
 b <- c(-120.9, -120.8, 37.7, 37.8)
 # convert bounding box to WKT
@@ -113,5 +134,147 @@ head(res)
 ```
 
 
-More elaborate examples.
+Get the map unit name and mukey that intersect from several points randomly located within MLRA 17. These points could also come from a SHP file of point locations.
+```{r sda-spatial-query-basics-3}
+# MLRA boundaries, GCS NAD83
+mlra <- readOGR('L:/Geodata/Boundaries', layer='mlra_v42', stringsAsFactors = FALSE)
 
+# subset to MLRA 17
+mlra <- mlra[which(mlra$MLRARSYM == '17'), ]
+# generate 10 randomly located sample points
+s <- spsample(mlra, n = 10, type = 'stratified')
+
+# check
+plot(mlra)
+points(s, col='red')
+
+# define a function for fetching basic map unit data from a coordinate
+# "i" is a SpatialPoints object
+f <- function(i) {
+  # transform to GCS WGS84
+  i <- spTransform(i, CRS('+proj=longlat +datum=WGS84'))
+  i.wkt <- writeWKT(i)
+  
+  # programatically generate query
+  q <- paste0("SELECT muname, mukey
+FROM mapunit
+WHERE mukey IN (SELECT * from SDA_Get_Mukey_from_intersection_with_WktWgs84('", i.wkt,"'))")
+  
+  # send query
+  res <- SDA_query(q)
+  
+  # check for no data
+  if(is.null(res))
+    res <- NA
+  
+  # done
+  return(res)
+}
+
+# iterate over points and save to list
+l <- list()
+for(i in seq_along(s)) {
+  l[[i]] <- f(s[i, ])
+}
+
+# convert to data.frame
+# results are in the same order as original points
+d <- ldply(l)
+
+# check
+head(d)
+
+# optionally combine with sample point geometry
+# s.new <- SpatialPointsDataFrame(s, data=d)
+
+# optionally save to SHP
+# writeOGR(s.new, dsn='.', layer='sample-points', driver='ESRI Shapefile', overwrite_layer = TRUE)
+```
+
+
+Get the man unit name and mukey for a set of KSSL pedons. (Details pending.)
+```{r sda-spatial-query-basics-4, fig.width=12, fig.height=5}
+# get KSSL pedons with taxonname = Auburn
+# coordinates will be NAD83 GCS
+auburn <- fetchKSSL('auburn')
+# keep only those pedons with valid coordinates
+auburn <- subsetProfiles(auburn, s='!is.na(x) & !is.na(y)')
+# init spatial information
+coordinates(auburn) <- ~ x + y
+proj4string(auburn) <- '+proj=longlat +datum=NAD83'
+
+## use the custom function from previous example to query map unit name and mukey
+
+# iterate over points and save to list
+l <- list()
+for(i in seq_along(auburn)) {
+  l[[i]] <- f(as(auburn[i, ], 'SpatialPointsDataFrame'))
+}
+
+# convert to data.frame
+# results are in the same order as original points
+d <- ldply(l)
+
+# copy results to original SoilProfileCollection
+# ordering is preserved, so copying is safe
+auburn$mukey <- d$mukey
+auburn$muname <- d$muname
+
+# group profiles by mukey
+# color horizons with clay content
+par(mar=c(0,0,4,0))
+groupedProfilePlot(auburn, groups='mukey', group.name.cex=0.65, color='clay', name='hzn_desgn', id.style='side', label='site_id', max.depth=100)
+
+```
+
+
+
+```{r sda-spatial-query-via-raster, eval=FALSE, echo=FALSE}
+##
+## this is getting rather convoluted... 
+##
+
+
+# mean frost-free-days: NAD83 GCS
+r <- raster('E:/gis_data/prism/ffd_mean_800m.tif')
+# MLRA boundaries, NAD83 GCS 
+mlra <- readOGR('L:/Geodata/Boundaries', layer='mlra_v42', stringsAsFactors = FALSE)
+# subset to MLRA 15
+mlra <- mlra[which(mlra$MLRARSYM == '15'), ]
+# crop FFD to mlra 15 extent
+r <- crop(r, mlra)
+# extract 250 FFD contour
+# ffd.250 <- rasterToPolygons(r, fun=function(i) {i > 250}, dissolve=TRUE)
+
+# check: ok
+plot(r)
+plot(mlra, add=TRUE)
+plot(ffd.250, add=TRUE, col='red')
+
+# ... now what?
+
+# rasterize MLRA 15 using same grid as FFD
+mlra.r <- rasterize(mlra, r)
+# convert all non-NA values to 1
+mlra.r[!is.na(mlra.r)] <- 1
+
+# overlay FFD > 200 and MLRA 15 rasters
+x <- r + mlra.r
+# check: OK
+plot(x)
+
+# convert to points
+s <- rasterToPoints(x, spatial = TRUE)
+
+# query ?
+
+
+
+```
+
+
+More elaborate examples pending.
+
+
+----------------------------
+This document is based on `soilDB` version `r utils::packageDescription("soilDB", field="Version")`.
