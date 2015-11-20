@@ -1,0 +1,94 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Get Indices to Unique Soil Profiles Within a Collection</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/styles/github.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/languages/r.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</head><body>
+
+<table width="100%" summary="page for unique-methods {aqp}"><tr><td>unique-methods {aqp}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Get Indices to Unique Soil Profiles Within a Collection</h2>
+
+<h3>Description</h3>
+
+<p>This function returns a set of indices to a subset of profiles within a <code>SoilProfileCollection</code> object that are uniquely defined by a named set of horizon and site level attributes.</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+uniqueSPC(x, vars)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+<p>a SoilProfileCollection</p>
+</td></tr>
+<tr valign="top"><td><code>vars</code></td>
+<td>
+<p>a character vector naming those horizon and site level attributes that will be used to test for duplication</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>Duplicates are identified via MD5 hash of select horizon and site level attributes.</p>
+
+
+<h3>Value</h3>
+
+<p>A vector of integer indices that can be used to subset unique profiles from the original <code>SoilProfileCollection</code> object.</p>
+
+
+<h3>Methods</h3>
+
+
+<dl>
+<dt><code>signature(x = "SoilProfileCollection")</code></dt><dd>
+</dd>
+</dl>
+
+
+<h3>Author(s)</h3>
+
+<p>D.E. Beaudette</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="r">## use the digest library to detect duplicate data
+data(sp1)
+
+# make a copy, make new IDs, and stack
+s.1 &lt;- sp1 
+s.2 &lt;- sp1
+s.2$id &lt;- paste(s.2$id, &#39;-copy&#39;, sep=&#39;&#39;)
+s &lt;- rbind(s.1, s.2)
+depths(s) &lt;- id ~ top + bottom
+
+# digests are computed from horizon-level data only
+# horizon boundaries and &#39;prop&#39;
+# result is an index of unqique profiles
+
+u &lt;- unique(s, vars=c(&#39;top&#39;, &#39;bottom&#39;, &#39;prop&#39;))
+
+# compare with and without dupes:
+# note subsetting of SoilProfileCollection
+cbind(dupes=length(s), no.dupes=length(s[u, ]))
+</code></pre>
+
+<pre><code>##      dupes no.dupes
+## [1,]    18        9
+</code></pre>
+
+
+<hr /><div style="text-align: center;">[Package <em>aqp</em> version 1.9.1 <a href="00Index.html">Index</a>]</div>
+</body></html>

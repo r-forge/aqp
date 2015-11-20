@@ -1,15 +1,14 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html><head><title>R: Evaluate Spatial Adjacency of SpaitialPolygonsDataFrame...</title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link rel="stylesheet" type="text/css" href="R.css">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Evaluate Spatial Adjacency of SpaitialPolygonsDataFrame...</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
 
-<link rel="stylesheet" href="http://yandex.st/highlightjs/7.3/styles/github.min.css">
-<script src="http://yandex.st/highlightjs/7.3/highlight.min.js"></script>
-<script src="http://yandex.st/highlightjs/7.3/languages/r.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/styles/github.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/languages/r.min.js"></script>
 <script>hljs.initHighlightingOnLoad();</script>
 </head><body>
 
-<table width="100%" summary="page for polygonAdjacency {sharpshootR}"><tr><td>polygonAdjacency {sharpshootR}</td><td align="right">R Documentation</td></tr></table>
+<table width="100%" summary="page for polygonAdjacency {sharpshootR}"><tr><td>polygonAdjacency {sharpshootR}</td><td style="text-align: right;">R Documentation</td></tr></table>
 
 <h2>Evaluate Spatial Adjacency of SpaitialPolygonsDataFrame Objects</h2>
 
@@ -21,7 +20,7 @@
 <h3>Usage</h3>
 
 <pre>
-polygonAdjacency(x, v = "MUSYM")
+polygonAdjacency(x, v='MUSYM', ...)
 </pre>
 
 
@@ -35,6 +34,10 @@ polygonAdjacency(x, v = "MUSYM")
 <tr valign="top"><td><code>v</code></td>
 <td>
 <p>name of the field in the attribute table to use when searching for 'common lines', see details</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>additional arguments passed to <code>spdep::poly2nb</code></p>
 </td></tr>
 </table>
 
@@ -50,7 +53,7 @@ polygonAdjacency(x, v = "MUSYM")
 </p>
 
 <dl>
-<dt>commonLines</dt><dd><p>An integer vector of feature IDs, that share a common boundary and attribute <code>v</code>. Sometimes referred to as &quot;common soil lines&quot;.</p>
+<dt>commonLines</dt><dd><p>An integer vector of feature IDs, that share a common boundary and attribute <code>v.commonLines</code>. Sometimes referred to as &quot;common soil lines&quot;.</p>
 </dd>
 <dt>adjMat</dt><dd><p>A weighted adjacency matrix</p>
 </dd>
@@ -72,10 +75,13 @@ polygonAdjacency(x, v = "MUSYM")
 ##D library(sharpshootR)
 ##D 
 ##D # load some data
-##D x &lt;- readOGR(dsn=&#39;FG_CA630_OFFICIAL.gdb&#39;, layer=&#39;ca630_a&#39;, stringsAsFactors=FALSE)
+##D x &lt;- readOGR(dsn=&#39;L:/CA630/FG_CA630_OFFICIAL.gdb&#39;, layer=&#39;ca630_a&#39;, stringsAsFactors=FALSE)
+##D 
+##D # remove NOTCOM, DA, and empty (non-NA) symbols
+##D x &lt;- x[which(! x$MUSYM ##D 
 ##D 
 ##D # compute spatial adjacency summary
-##D res &lt;- polygonAdjacency(x)
+##D res &lt;- polygonAdjacency(x, v=&#39;MUSYM&#39;)
 ##D 
 ##D # graphical check: slow for large number of features
 ##D plot(x)
@@ -96,5 +102,5 @@ polygonAdjacency(x, v = "MUSYM")
 </code></pre>
 
 
-<hr><div align="center">[Package <em>sharpshootR</em> version 0.7 <a href="00Index.html">Index</a>]</div>
+<hr /><div style="text-align: center;">[Package <em>sharpshootR</em> version 0.8-4 <a href="00Index.html">Index</a>]</div>
 </body></html>
