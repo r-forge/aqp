@@ -1,0 +1,60 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Generate a unique ID for line segments</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for generateLineHash {sharpshootR}"><tr><td>generateLineHash {sharpshootR}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Generate a unique ID for line segments</h2>
+
+<h3>Description</h3>
+
+<p>Generate a unique ID for a line segment, based on the non-cryptographic murmur32 hash.</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+generateLineHash(x, precision=-1, algo='murmur32')
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+<p>a <code>SpatialLinesDataFrame</code> object, with 1 line segment per feature (e.g. simple features)</p>
+</td></tr>
+<tr valign="top"><td><code>precision</code></td>
+<td>
+<p>digits are rounded to this many places to the right (negative) or left (positive) of the decimal place</p>
+</td></tr>
+<tr valign="top"><td><code>algo</code></td>
+<td>
+<p>hash function algorithm</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>The input <code>SpatialLinesDataFrame</code> object must NOT contain multi-part features. The precision specified should be tailored to the coordinate system in use and the snapping tolerance used to create join decision line segments. A <code>precision</code> of 4 is reasonable for geographic coordinates (snapping tolerance of 0.0001 degrees or ~ 10 meters). A <code>precision</code> of -1 (snapping tolerance of 10 meters) is reasonable for projected coordinate systems with units in meters.</p>
+
+
+<h3>Value</h3>
+
+<p>A vector of unique IDs created from the hash of line segment start and end vertex coordinates. Unique IDs are returned in the order of records of <code>x</code> and can therefore be saved into a new column of the associated attribute table.</p>
+
+
+<h3>Note</h3>
+
+<p>An error is issued if any non-unique IDs are generated. This could be casued by using coordiantes that do not contain enough precision for unique hashing.</p>
+
+
+<h3>Author(s)</h3>
+
+<p>D.E. Beaudette</p>
+
+<hr /><div style="text-align: center;">[Package <em>sharpshootR</em> version 0.8-4 <a href="00Index.html">Index</a>]</div>
+</body></html>

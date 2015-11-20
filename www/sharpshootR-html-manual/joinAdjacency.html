@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Join Document Adjacency</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for joinAdjacency {sharpshootR}"><tr><td>joinAdjacency {sharpshootR}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Join Document Adjacency</h2>
+
+<h3>Description</h3>
+
+<p>Convert a set of line segment &quot;join decisions&quot; into a weighted adjacency matrix describing which map unit symbols touch.</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+joinAdjacency(x, vars = c("l_musym", "r_musym"))
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+<p>a <code>SpatialLinesDataFrame</code> object, with 1 line segment per feature (e.g. simple features)</p>
+</td></tr>
+<tr valign="top"><td><code>vars</code></td>
+<td>
+<p>a vector of two characters naming columns containing &quot;left&quot;, and &quot;right&quot; map unit symbols</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>A weighted adjacency matrix is returned, suitable for plotting directly with <code>plotSoilRelationGraph</code>.</p>
+
+
+<h3>Author(s)</h3>
+
+<p>D.E. Beaudette</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="plotSoilRelationGraph.html">plotSoilRelationGraph</a></code></p>
+
+<hr /><div style="text-align: center;">[Package <em>sharpshootR</em> version 0.8-4 <a href="00Index.html">Index</a>]</div>
+</body></html>

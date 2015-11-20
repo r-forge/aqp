@@ -1,15 +1,14 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html><head><title>R: Diagnostic Property Plot</title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link rel="stylesheet" type="text/css" href="R.css">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Diagnostic Property Plot</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
 
-<link rel="stylesheet" href="http://yandex.st/highlightjs/7.3/styles/github.min.css">
-<script src="http://yandex.st/highlightjs/7.3/highlight.min.js"></script>
-<script src="http://yandex.st/highlightjs/7.3/languages/r.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/styles/github.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/languages/r.min.js"></script>
 <script>hljs.initHighlightingOnLoad();</script>
 </head><body>
 
-<table width="100%" summary="page for diagnosticPropertyPlot {sharpshootR}"><tr><td>diagnosticPropertyPlot {sharpshootR}</td><td align="right">R Documentation</td></tr></table>
+<table width="100%" summary="page for diagnosticPropertyPlot {sharpshootR}"><tr><td>diagnosticPropertyPlot {sharpshootR}</td><td style="text-align: right;">R Documentation</td></tr></table>
 
 <h2>Diagnostic Property Plot</h2>
 
@@ -21,8 +20,8 @@
 <h3>Usage</h3>
 
 <pre>
-diagnosticPropertyPlot(f, v, k, id = "pedon_id")
-diagnosticPropertyPlot2(f, v, k, id = "pedon_id")
+diagnosticPropertyPlot(f, v, k, grid.label='pedon_id', dend.label='pedon_id')
+diagnosticPropertyPlot2(f, v, k, grid.label='pedon_id')
 </pre>
 
 
@@ -35,22 +34,26 @@ diagnosticPropertyPlot2(f, v, k, id = "pedon_id")
 </td></tr>
 <tr valign="top"><td><code>v</code></td>
 <td>
-<p>a character vector of site-level attributes that are boolean (e.g. TRUE/FALSE) data</p>
+<p>a character vector of site-level attribute names that are boolean (e.g. TRUE/FALSE) data</p>
 </td></tr>
 <tr valign="top"><td><code>k</code></td>
 <td>
 <p>an integer, number of groups to highlight</p>
 </td></tr>
-<tr valign="top"><td><code>id</code></td>
+<tr valign="top"><td><code>grid.label</code></td>
 <td>
-<p>the name of the site-level attribute containing an ID to include next next to leave of the diagnostic property dendrogram</p>
+<p>the name of a site-level attribute (usually unique) annotating the y-axis of the grid</p>
+</td></tr>
+<tr valign="top"><td><code>dend.label</code></td>
+<td>
+<p>the name of a site-level attribute (usually unique) annotating dendrogram terminal leaves</p>
 </td></tr>
 </table>
 
 
 <h3>Details</h3>
 
-<p>This function attempts to display several pieces of information within a single figure. First, soil profiles are sorted according to the presence/absence of diagnostic features named in <code>v</code>. Second, these diagnostic features are sorted according to their distribution among soil profiles. Third, a binary grid is established with row-ordering of profiles based on step 1 and column-ordering based on step 2. Blue cell represent the presence of a diagnostic feature. Soils with similar diagnostic features should 'clump' together. See examples below.</p>
+<p>This function attempts to display several pieces of information within a single figure. First, soil profiles are sorted according to the presence/absence of diagnostic features named in <code>v</code>. Second, these diagnostic features are sorted according to their distribution among soil profiles. Third, a binary grid is established with row-ordering of profiles based on step 1 and column-ordering based on step 2. Blue cells represent the presence of a diagnostic feature. Soils with similar diagnostic features should 'clump' together. See examples below.</p>
 
 
 <h3>Value</h3>
@@ -69,14 +72,14 @@ diagnosticPropertyPlot2(f, v, k, id = "pedon_id")
 
 
 
-<h3>Note</h3>
-
-<p><code>diagnosticPropertyPlot2</code> is a lattice-based version, and requires a unique value passed to <code>id</code>.</p>
-
-
 <h3>Author(s)</h3>
 
 <p>D.E. Beaudette and J.M. Skovlin</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="multinominal2logical.html">multinominal2logical</a></code></p>
 
 
 <h3>Examples</h3>
@@ -106,5 +109,5 @@ diagnosticPropertyPlot2(f, v, k, id = "pedon_id")
 </code></pre>
 
 
-<hr><div align="center">[Package <em>sharpshootR</em> version 0.7 <a href="00Index.html">Index</a>]</div>
+<hr /><div style="text-align: center;">[Package <em>sharpshootR</em> version 0.8-4 <a href="00Index.html">Index</a>]</div>
 </body></html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Guess Appropriate Ordering for Generalized Horizon Labels</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/styles/github.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/languages/r.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</head><body>
+
+<table width="100%" summary="page for guessGenHzLevels {aqp}"><tr><td>guessGenHzLevels {aqp}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Guess Appropriate Ordering for Generalized Horizon Labels</h2>
+
+<h3>Description</h3>
+
+<p>This function makes an (educated) guess at an appropriate set of levels for generalized horizon labels using the median of horizon depth mid-points.</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+guessGenHzLevels(x, hz = "genhz")
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+<p>a <code>SoilProfileCollection</code> object</p>
+</td></tr>
+<tr valign="top"><td><code>hz</code></td>
+<td>
+<p>name of horizon-level attribute containing generalized horizon labels, see details</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>This function is useful when groups of horizons have been generalized via some method other than <code>generalize.hz</code>. For example, it may be useful to generalize horizons using labels derived from slice depths. The default sorting of these labels will not follow a logicial depth-wise sorting when converted to a factor. <code>guessGenHzLevels</code> does a good job of &quot;guessing&quot; the proper ordering of these labels based on median horizon depth mid-point.</p>
+
+
+<h3>Value</h3>
+
+<p>a list:
+</p>
+<table summary="R valueblock">
+<tr valign="top"><td><code>levels</code></td>
+<td>
+<p>a vector of levels sorted by median horizon depth mid-point</p>
+</td></tr>
+<tr valign="top"><td><code>median.depths</code></td>
+<td>
+<p>a vector of median horizon mid-points</p>
+</td></tr>
+</table>
+
+
+<h3>Author(s)</h3>
+
+<p>D.E. Beaudette</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="generalize.hz.html">generalize.hz</a></code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="r"># load some example data
+data(sp1, package=&#39;aqp&#39;)
+
+# upgrade to SoilProfileCollection
+depths(sp1) &lt;- id ~ top + bottom
+
+# generalize horizon names
+n &lt;- c(&#39;O&#39;, &#39;A&#39;, &#39;B&#39;, &#39;C&#39;)
+p &lt;- c(&#39;O&#39;, &#39;A&#39;, &#39;B&#39;, &#39;C&#39;)
+sp1$genhz &lt;- generalize.hz(sp1$name, n, p)
+
+# note: levels are in the order in which originally defined:
+levels(sp1$genhz)
+</code></pre>
+
+<pre><code>## [1] &quot;O&quot;        &quot;A&quot;        &quot;B&quot;        &quot;C&quot;        &quot;not-used&quot;
+</code></pre>
+
+<pre><code class="r"># generalize horizons by depth slice
+s &lt;- slice(sp1, c(5, 10, 15, 25, 50, 100, 150) ~ .)
+s$slice &lt;- paste0(s$top, &#39; cm&#39;)
+# not a factor
+levels(s$slice)
+</code></pre>
+
+<pre><code>## NULL
+</code></pre>
+
+<pre><code class="r"># the proper ordering of these new labels can be guessed from horizon depths
+guessGenHzLevels(s, &#39;slice&#39;)
+</code></pre>
+
+<pre><code>## $levels
+## [1] &quot;5 cm&quot;   &quot;10 cm&quot;  &quot;15 cm&quot;  &quot;25 cm&quot;  &quot;50 cm&quot;  &quot;100 cm&quot; &quot;150 cm&quot;
+## 
+## $median.depths
+##   5 cm  10 cm  15 cm  25 cm  50 cm 100 cm 150 cm 
+##    5.5   10.5   15.5   25.5   50.5  100.5  150.5
+</code></pre>
+
+<pre><code class="r"># convert to factor, and set proper order
+s$slice &lt;- factor(s$slice, levels=guessGenHzLevels(s, &#39;slice&#39;)$levels)
+
+# that is better
+levels(s$slice)
+</code></pre>
+
+<pre><code>## [1] &quot;5 cm&quot;   &quot;10 cm&quot;  &quot;15 cm&quot;  &quot;25 cm&quot;  &quot;50 cm&quot;  &quot;100 cm&quot; &quot;150 cm&quot;
+</code></pre>
+
+
+<hr /><div style="text-align: center;">[Package <em>aqp</em> version 1.9.1 <a href="00Index.html">Index</a>]</div>
+</body></html>

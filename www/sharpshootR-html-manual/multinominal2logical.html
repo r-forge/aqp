@@ -1,0 +1,85 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Convert multinominal to logical matrix</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/styles/github.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/languages/r.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</head><body>
+
+<table width="100%" summary="page for multinominal2logical {sharpshootR}"><tr><td>multinominal2logical {sharpshootR}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Convert multinominal to logical matrix</h2>
+
+<h3>Description</h3>
+
+<p>Convert a single multinominal, site-level attribute from a SoilProfileCollection into a matrix of corresponding logical values. The result contains IDs from the SoilProfileCollection and can easily be joined to the original site-level data.</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+multinominal2logical(x, v)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+<p>a <code>SoilProfileCollection</code> object</p>
+</td></tr>
+<tr valign="top"><td><code>v</code></td>
+<td>
+<p>the name of a site-level attribute that is a factor with more than 2 levels</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>A <code>data.frame</code> with IDs in the first column, and as many columns of logical vectors as there were levels in <code>v</code>. See examples.</p>
+
+
+<h3>Author(s)</h3>
+
+<p>D.E. Beaudette</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="diagnosticPropertyPlot.html">diagnosticPropertyPlot</a></code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="r">## Not run: 
+##D # sample data, an SPC
+##D data(loafercreek, package=&#39;soilDB&#39;)
+##D 
+##D # convert to factor
+##D loafercreek$hillslope_pos &lt;- factor(loafercreek$hillslope_pos, 
+##D levels=c(&#39;Toeslope&#39;, &#39;Footslope&#39;, &#39;Backslope&#39;, &#39;Shoulder&#39;, &#39;Summit&#39;))
+##D 
+##D # convert to logical matrix
+##D hp &lt;- multinominal2logical(loafercreek, &#39;hillslope_pos&#39;)
+##D 
+##D # join-in to site data
+##D site(loafercreek) &lt;- hp
+##D 
+##D # variable names
+##D v &lt;- c(&#39;lithic.contact&#39;, &#39;paralithic.contact&#39;, 
+##D &#39;argillic.horizon&#39;, &#39;Toeslope&#39;, &#39;Footslope&#39;, 
+##D &#39;Backslope&#39;, &#39;Shoulder&#39;, &#39;Summit&#39;)
+##D 
+##D # visualize with some other diagnostic features
+##D x &lt;- diagnosticPropertyPlot(loafercreek, v, k=5, 
+##D grid.label=&#39;bedrock_kind&#39;, dend.label=&#39;pedon_id&#39;)
+## End(Not run)
+</code></pre>
+
+
+<hr /><div style="text-align: center;">[Package <em>sharpshootR</em> version 0.8-4 <a href="00Index.html">Index</a>]</div>
+</body></html>
