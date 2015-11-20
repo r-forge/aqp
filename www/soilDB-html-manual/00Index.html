@@ -1,16 +1,17 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html><head><title>R: Soil Database Interface</title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link rel="stylesheet" type="text/css" href="R.css">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><title>R: Soil Database Interface</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
 </head><body>
 <h1> Soil Database Interface
-<img class="toplogo" src="http://stat.ethz.ch/R-manual/R-devel/doc/html/logo.jpg" alt="[R logo]">
+<img class="toplogo" src="http://stat.ethz.ch/R-manual/R-devel/doc/html/logo.jpg" alt="[R logo]" />
 </h1>
-<hr>
-<div align="center">
-<a href="http://stat.ethz.ch/R-manual/R-devel/doc/html/packages.html"><img src="http://stat.ethz.ch/R-manual/R-devel/doc/html/left.jpg" alt="[Up]" width="30" height="30" border="0"></a>
-<a href="http://stat.ethz.ch/R-manual/R-devel/doc/html/index.html"><img src="http://stat.ethz.ch/R-manual/R-devel/doc/html/up.jpg" alt="[Top]" width="30" height="30" border="0"></a>
-</div><h2>Documentation for package &lsquo;soilDB&rsquo; version 1.4-6</h2>
+<hr/>
+<div style="text-align: center;">
+<a href="http://stat.ethz.ch/R-manual/R-devel/doc/html/packages.html"><img class="arrow" src="http://stat.ethz.ch/R-manual/R-devel/doc/html/left.jpg" alt="[Up]" /></a>
+<a href="http://stat.ethz.ch/R-manual/R-devel/doc/html/index.html"><img class="arrow" src="http://stat.ethz.ch/R-manual/R-devel/doc/html/up.jpg" alt="[Top]" /></a>
+</div><h2>Documentation for package &lsquo;soilDB&rsquo; version 1.6.3</h2>
 
 <ul><li><a href="../DESCRIPTION">DESCRIPTION file</a>.</li>
 <li><a href="../NEWS">Package NEWS</a>.</li>
@@ -20,97 +21,101 @@
 
 
 <table width="100%">
-<tr><td width="25%"><a href="soilDB-package.html">soilDB-package</a></td>
+<tr><td style="width: 25%;"><a href="soilDB-package.html">soilDB-package</a></td>
 <td>Soil Database Interface</td></tr>
-<tr><td width="25%"><a href="loafercreek.html">andic.subset</a></td>
+<tr><td style="width: 25%;"><a href="loafercreek.html">andic.subset</a></td>
 <td>LoaferCreek Soils</td></tr>
-<tr><td width="25%"><a href="loafercreek.html">cisne</a></td>
+<tr><td style="width: 25%;"><a href="loafercreek.html">cisne</a></td>
 <td>LoaferCreek Soils</td></tr>
-<tr><td width="25%"><a href="SDA_query.html">cleanSDA</a></td>
-<td>Soil Data Access Query</td></tr>
-<tr><td width="25%"><a href="fetchKSSL.html">fetchKSSL</a></td>
+<tr><td style="width: 25%;"><a href="fetchHenry.html">fetchHenry</a></td>
+<td>Download Data from the Henry Mount Soil Climate Database (experimental)</td></tr>
+<tr><td style="width: 25%;"><a href="fetchKSSL.html">fetchKSSL</a></td>
 <td>Fetch KSSL Data (EXPERIMENTAL)</td></tr>
-<tr><td width="25%"><a href="fetchNASIS.html">fetchNASIS</a></td>
-<td>Fetch commonly used site/horizon data from a PedonPC database.</td></tr>
-<tr><td width="25%"><a href="fetchNASISLabData.html">fetchNASISLabData</a></td>
+<tr><td style="width: 25%;"><a href="fetchNASIS.html">fetchNASIS</a></td>
+<td>Fetch commonly used site/pedon/horizon data from a PedonPC database.</td></tr>
+<tr><td style="width: 25%;"><a href="fetchNASISLabData.html">fetchNASISLabData</a></td>
 <td>Fetch lab data used site/horizon data from a PedonPC database.</td></tr>
-<tr><td width="25%"><a href="fetchNASIS.html">fetchNASIS_component_data</a></td>
-<td>Fetch commonly used site/horizon data from a PedonPC database.</td></tr>
-<tr><td width="25%"><a href="fetchOSD.html">fetchOSD</a></td>
+<tr><td style="width: 25%;"><a href="fetchNASIS.html">fetchNASIS_component_data</a></td>
+<td>Fetch commonly used site/pedon/horizon data from a PedonPC database.</td></tr>
+<tr><td style="width: 25%;"><a href="fetchOSD.html">fetchOSD</a></td>
 <td>Fetch Official Series Description (OSD) Data</td></tr>
-<tr><td width="25%"><a href="fetchPedonPC.html">fetchPedonPC</a></td>
+<tr><td style="width: 25%;"><a href="fetchPedonPC.html">fetchPedonPC</a></td>
 <td>Fetch commonly used site/horizon data from a PedonPC v.5 database.</td></tr>
-<tr><td width="25%"><a href="fetchRaCA.html">fetchRaCA</a></td>
+<tr><td style="width: 25%;"><a href="fetchRaCA.html">fetchRaCA</a></td>
 <td>Fetch KSSL Data (EXPERIMENTAL)</td></tr>
-<tr><td width="25%"><a href="fetchSCAN.html">fetchSCAN</a></td>
+<tr><td style="width: 25%;"><a href="fetchSCAN.html">fetchSCAN</a></td>
 <td>Fetch SCAN Data</td></tr>
-<tr><td width="25%"><a href="SDA_query.html">format_SQL_in_statement</a></td>
+<tr><td style="width: 25%;"><a href="SDA_query.html">format_SQL_in_statement</a></td>
 <td>Soil Data Access Query</td></tr>
-<tr><td width="25%"><a href="fetchNASIS.html">getHzErrorsNASIS</a></td>
-<td>Fetch commonly used site/horizon data from a PedonPC database.</td></tr>
-<tr><td width="25%"><a href="fetchPedonPC.html">getHzErrorsPedonPC</a></td>
+<tr><td style="width: 25%;"><a href="fetchNASIS.html">getHzErrorsNASIS</a></td>
+<td>Fetch commonly used site/pedon/horizon data from a PedonPC database.</td></tr>
+<tr><td style="width: 25%;"><a href="fetchPedonPC.html">getHzErrorsPedonPC</a></td>
 <td>Fetch commonly used site/horizon data from a PedonPC v.5 database.</td></tr>
-<tr><td width="25%"><a href="get_colors_from_NASIS_db.html">get_colors_from_NASIS_db</a></td>
+<tr><td style="width: 25%;"><a href="get_colors_from_NASIS_db.html">get_colors_from_NASIS_db</a></td>
 <td>Extract Soil Color Data from a local NASIS Database</td></tr>
-<tr><td width="25%"><a href="get_colors_from_pedon_db.html">get_colors_from_pedon_db</a></td>
+<tr><td style="width: 25%;"><a href="get_colors_from_pedon_db.html">get_colors_from_pedon_db</a></td>
 <td>Extract Soil Color Data from a PedonPC Database</td></tr>
-<tr><td width="25%"><a href="fetchNASIS.html">get_component_data_from_NASIS_db</a></td>
-<td>Fetch commonly used site/horizon data from a PedonPC database.</td></tr>
-<tr><td width="25%"><a href="fetchNASIS.html">get_component_horizon_data_from_NASIS_db</a></td>
-<td>Fetch commonly used site/horizon data from a PedonPC database.</td></tr>
-<tr><td width="25%"><a href="fetchNASIS.html">get_copedon_from_NASIS_db</a></td>
-<td>Fetch commonly used site/horizon data from a PedonPC database.</td></tr>
-<tr><td width="25%"><a href="get_extended_data_from_NASIS_db.html">get_extended_data_from_NASIS_db</a></td>
+<tr><td style="width: 25%;"><a href="fetchNASIS.html">get_component_data_from_NASIS_db</a></td>
+<td>Fetch commonly used site/pedon/horizon data from a PedonPC database.</td></tr>
+<tr><td style="width: 25%;"><a href="fetchNASIS.html">get_component_horizon_data_from_NASIS_db</a></td>
+<td>Fetch commonly used site/pedon/horizon data from a PedonPC database.</td></tr>
+<tr><td style="width: 25%;"><a href="fetchNASIS.html">get_copedon_from_NASIS_db</a></td>
+<td>Fetch commonly used site/pedon/horizon data from a PedonPC database.</td></tr>
+<tr><td style="width: 25%;"><a href="get_extended_data_from_NASIS_db.html">get_extended_data_from_NASIS_db</a></td>
 <td>Extract accessory tables and summaries from a local NASIS Database</td></tr>
-<tr><td width="25%"><a href="get_extended_data_from_pedon_db.html">get_extended_data_from_pedon_db</a></td>
+<tr><td style="width: 25%;"><a href="get_extended_data_from_pedon_db.html">get_extended_data_from_pedon_db</a></td>
 <td>Extract accessory tables and summaries from a local pedonPC Database</td></tr>
-<tr><td width="25%"><a href="get_hz_data_from_NASIS_db.html">get_hz_data_from_NASIS_db</a></td>
+<tr><td style="width: 25%;"><a href="get_hz_data_from_NASIS_db.html">get_hz_data_from_NASIS_db</a></td>
 <td>Extract Horizon Data from a local NASIS Database</td></tr>
-<tr><td width="25%"><a href="get_hz_data_from_pedon_db.html">get_hz_data_from_pedon_db</a></td>
+<tr><td style="width: 25%;"><a href="get_hz_data_from_pedon_db.html">get_hz_data_from_pedon_db</a></td>
 <td>Extract Horizon Data from a PedonPC Database</td></tr>
-<tr><td width="25%"><a href="get_lablayer_data_from_NASIS_db.html">get_lablayer_data_from_NASIS_db</a></td>
+<tr><td style="width: 25%;"><a href="get_lablayer_data_from_NASIS_db.html">get_lablayer_data_from_NASIS_db</a></td>
 <td>Extract lab pedon layer data from a local NASIS Database</td></tr>
-<tr><td width="25%"><a href="get_labpedon_data_from_NASIS_db.html">get_labpedon_data_from_NASIS_db</a></td>
+<tr><td style="width: 25%;"><a href="get_labpedon_data_from_NASIS_db.html">get_labpedon_data_from_NASIS_db</a></td>
 <td>Extract lab pedon data from a local NASIS Database</td></tr>
-<tr><td width="25%"><a href="get_site_data_from_NASIS_db.html">get_site_data_from_NASIS_db</a></td>
+<tr><td style="width: 25%;"><a href="get_site_data_from_NASIS_db.html">get_site_data_from_NASIS_db</a></td>
 <td>Extract Site Data from a local NASIS Database</td></tr>
-<tr><td width="25%"><a href="get_site_data_from_pedon_db.html">get_site_data_from_pedon_db</a></td>
+<tr><td style="width: 25%;"><a href="get_site_data_from_pedon_db.html">get_site_data_from_pedon_db</a></td>
 <td>Extract Site Data from a PedonPC Database</td></tr>
-<tr><td width="25%"><a href="fetchNASIS.html">get_text_notes_from_NASIS_db</a></td>
-<td>Fetch commonly used site/horizon data from a PedonPC database.</td></tr>
-<tr><td width="25%"><a href="get_veg_from_AK_Site.html">get_veg_from_AK_Site</a></td>
+<tr><td style="width: 25%;"><a href="fetchNASIS.html">get_text_notes_from_NASIS_db</a></td>
+<td>Fetch commonly used site/pedon/horizon data from a PedonPC database.</td></tr>
+<tr><td style="width: 25%;"><a href="fetchNASIS.html">get_vegplot_from_NASIS_db</a></td>
+<td>Fetch commonly used site/pedon/horizon data from a PedonPC database.</td></tr>
+<tr><td style="width: 25%;"><a href="get_veg_from_AK_Site.html">get_veg_from_AK_Site</a></td>
 <td>Retrieve Vegetation Data from an AK Site Database</td></tr>
-<tr><td width="25%"><a href="get_veg_from_MT_veg_db.html">get_veg_from_MT_veg_db</a></td>
+<tr><td style="width: 25%;"><a href="get_veg_from_MT_veg_db.html">get_veg_from_MT_veg_db</a></td>
 <td>Extract Site and Plot-level Data from a Montana RangeDB database</td></tr>
-<tr><td width="25%"><a href="get_veg_from_NPS_PLOTS_db.html">get_veg_from_NPS_PLOTS_db</a></td>
+<tr><td style="width: 25%;"><a href="get_veg_from_NPS_PLOTS_db.html">get_veg_from_NPS_PLOTS_db</a></td>
 <td>Retrieve Vegetation Data from an NPS PLOTS Database</td></tr>
-<tr><td width="25%"><a href="get_veg_other_from_MT_veg_db.html">get_veg_other_from_MT_veg_db</a></td>
+<tr><td style="width: 25%;"><a href="get_veg_other_from_MT_veg_db.html">get_veg_other_from_MT_veg_db</a></td>
 <td>Extract cover composition data from a Montana RangeDB database</td></tr>
-<tr><td width="25%"><a href="get_veg_species_from_MT_veg_db.html">get_veg_species_from_MT_veg_db</a></td>
+<tr><td style="width: 25%;"><a href="get_veg_species_from_MT_veg_db.html">get_veg_species_from_MT_veg_db</a></td>
 <td>Extract species-level Data from a Montana RangeDB database</td></tr>
-<tr><td width="25%"><a href="loafercreek.html">gopheridge</a></td>
+<tr><td style="width: 25%;"><a href="loafercreek.html">gopheridge</a></td>
 <td>LoaferCreek Soils</td></tr>
-<tr><td width="25%"><a href="gSSURGO.chunk.html">gSSURGO.chunk</a></td>
+<tr><td style="width: 25%;"><a href="gSSURGO.chunk.html">gSSURGO.chunk</a></td>
 <td>Gridded SSURGO Chunk</td></tr>
-<tr><td width="25%"><a href="loafercreek.html">loafercreek</a></td>
+<tr><td style="width: 25%;"><a href="loafercreek.html">loafercreek</a></td>
 <td>LoaferCreek Soils</td></tr>
-<tr><td width="25%"><a href="mapunit_geom_by_ll_bbox.html">mapunit_geom_by_ll_bbox</a></td>
+<tr><td style="width: 25%;"><a href="mapunit_geom_by_ll_bbox.html">mapunit_geom_by_ll_bbox</a></td>
 <td>Fetch Map Unit Geometry from SDA</td></tr>
-<tr><td width="25%"><a href="get_colors_from_pedon_db.html">mix_and_clean_colors</a></td>
+<tr><td style="width: 25%;"><a href="get_colors_from_pedon_db.html">mix_and_clean_colors</a></td>
 <td>Extract Soil Color Data from a PedonPC Database</td></tr>
-<tr><td width="25%"><a href="MUKEYS_by_ll_bbox.html">MUKEYS_by_ll_bbox</a></td>
-<td>Fetch Map Unit Keys by Bounding Box</td></tr>
-<tr><td width="25%"><a href="SDA_query.html">SDA_query</a></td>
+<tr><td style="width: 25%;"><a href="SDA_query_features.html">SDA_make_spatial_query</a></td>
+<td>Soil Data Access Spatial Query</td></tr>
+<tr><td style="width: 25%;"><a href="SDA_query.html">SDA_query</a></td>
 <td>Soil Data Access Query</td></tr>
-<tr><td width="25%"><a href="seriesExtent.html">seriesExtent</a></td>
+<tr><td style="width: 25%;"><a href="SDA_query_features.html">SDA_query_features</a></td>
+<td>Soil Data Access Spatial Query</td></tr>
+<tr><td style="width: 25%;"><a href="seriesExtent.html">seriesExtent</a></td>
 <td>Get/Display Soil Series Extent</td></tr>
-<tr><td width="25%"><a href="seriesExtent.html">seriesExtentAsGmap</a></td>
+<tr><td style="width: 25%;"><a href="seriesExtent.html">seriesExtentAsGmap</a></td>
 <td>Get/Display Soil Series Extent</td></tr>
-<tr><td width="25%"><a href="soilDB-package.html">soilDB</a></td>
+<tr><td style="width: 25%;"><a href="soilDB-package.html">soilDB</a></td>
 <td>Soil Database Interface</td></tr>
-<tr><td width="25%"><a href="soilDB-package.html">soilDB.env</a></td>
+<tr><td style="width: 25%;"><a href="soilDB-package.html">soilDB.env</a></td>
 <td>Soil Database Interface</td></tr>
-<tr><td width="25%"><a href="SSURGO_spatial_query.html">SSURGO_spatial_query</a></td>
+<tr><td style="width: 25%;"><a href="SSURGO_spatial_query.html">SoilWeb_spatial_query</a></td>
 <td>Get SSURGO Data via Spatial Query</td></tr>
 </table>
 </body></html>
