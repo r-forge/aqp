@@ -186,80 +186,24 @@ head(res)
 
 
 ### Queries Using Complex Spatial Filters
-The examples above illustrate how to perform SDA queries using a single spatial filter. Typically we need to perform these queries over a collection of points, lines or polygons. The following examples make use of a special helper function that iterates over a collection of features (usually points) and queries SDA for the intersecting map unit keys and map unit names.
+The examples above illustrate how to perform SDA queries using a single spatial filter. Typically we need to perform these queries over a collection of points, lines or polygons. The `soilDB` package provides some helper functions for iterating over a collection of features (usually points). Note that spatial queries for more than 1000 features should probably be done using a local copy of the map unit polygons.
 
-Let's define two custom functions. Copy and paste the entire block of code below into your R script and then run it. 
-```{r sda-spatial-query-helper-functions}
-# i is a Spatial* object with CRS: WGS84 GCS
-make.query <- function(i) {
-  # convert single feature to WKT
-  i.wkt <- writeWKT(i)
-  
-  # programatically generate query
-  q <- paste0("SELECT mukey, muname
-FROM mapunit
-WHERE mukey IN (
-SELECT * from SDA_Get_Mukey_from_intersection_with_WktWgs84('", i.wkt, "')
-)")
-  
-  # send query
-  res <- SDA_query(q)
-  
-  # check for no data
-  if(is.null(res))
-    res <- NA
-  
-  # done
-  return(res)
-}
-
-# x is a collection of Spatial* objects
-# id is the name of an attribute that contains a unique ID for each feature
-query.features <- function(x, id='pedon_id') {
-  # transform to GCS WGS84
-  x <- spTransform(x, CRS('+proj=longlat +datum=WGS84'))
-  
-  # iterate over features and save to list
-  l <- list()
-  n <- length(x)
-  # setup a progress bar for timing
-  pb <- txtProgressBar(max=n, style=3)
-  for(i in 1:n) {
-    # make query
-    res <- make.query(x[i, ])
-    # save results along with an ID
-    res <- cbind(id=x[[id]][i], res, stringsAsFactors = FALSE)
-    names(res) <- c(id, 'mukey', 'muname')
-    l[[i]] <- res
-    setTxtProgressBar(pb, i)
-  }
-  close(pb)
-  
-  # convert to data.frame, there may be > 1 row / feature when using lines / polygons
-  d <- ldply(l)
-  return(d)
-}
-
-
-```
-
-
-The first function `make.query()` will convert a single `Spatial*` (Points, Lines, Polygons) object to WKT and submit a spatial query to SDA, returning intersecting map unit keys. Let's try it using a `SpatialPoints` object.
+The first function `SDA_make_spatial_query()` will convert a single `Spatial*` (Points, Lines, Polygons) object to WKT and submit a spatial query to SDA, returning intersecting map unit keys and names. Let's try it using a `SpatialPoints` object with 1 feature.
 ```{r sda-spatial-query-helper-functions-examples-1, results='hide'}
 # the query point is in geographic coordinates with WGS84 datum
 p <- SpatialPoints(cbind(-121.77100, 37.368402), proj4string = CRS('+proj=longlat +datum=WGS84'))
-make.query(p)
+SDA_make_spatial_query(p)
 ```
 
-The second function `query.features()` will iterate over a set of `Spatial*` (Points, Lines, Polygons) objects, send a query to SDA, and return the results as a `data.frame` object. This time, our example set of 2 points will also have some fake pedons IDs.
+The second function `SDA_query_features()` will iterate over the features of a `Spatial*` (Points, Lines, Polygons) object, send a query to SDA, and set of return the results as a `data.frame` object. This time, our example set of 2 points will also have some fake pedons IDs.
 ```{r sda-spatial-query-helper-functions-examples-2, results='hide'}
 # the query points are in geographic coordinates with WGS84 datum
 p <- SpatialPointsDataFrame(cbind(c(-121, -122), c(37, 37)), data=data.frame(pedon_id=1:2), proj4string = CRS('+proj=longlat +datum=WGS84'))
-query.features(p, id='pedon_id')
+SDA_query_features(p, id='pedon_id')
 ```
 
 
-Let's apply the `query.features()` function to some real data; KSSL pedons correlated to "Auburn". Not all of these pedons have coordinates, so we will have to do some filtering first.
+Let's apply the `SDA_query_features()` function to some real data; KSSL pedons correlated to "Auburn". Not all of these pedons have coordinates, so we will have to do some filtering first. See the in-line comments for details on each line of code.
 ```{r sda-spatial-kssl, results='hide'}
 # get KSSL pedons with taxonname = Auburn
 # coordinates will be NAD83 GCS
@@ -273,7 +217,7 @@ proj4string(auburn) <- '+proj=longlat +datum=NAD83'
 # extract "site data"
 auburn.sp <- as(auburn, 'SpatialPointsDataFrame')
 # perform SDA query on each "site", result is a data.frame
-mu.data <- query.features(auburn.sp, id='pedlabsampnum')
+mu.data <- SDA_query_features(auburn.sp, id='pedlabsampnum')
 
 # join results to original SoilProfileCollection using 'pedlabsamnum'
 site(auburn) <- mu.data
@@ -293,12 +237,6 @@ groupedProfilePlot(auburn, groups='mukey', group.name.cex=0.65, color='clay', na
 mtext('user site ID', side=2, line=-1.5)
 mtext('mukey', side=3, line=-1, at = c(0,0), adj = 0)
 ```
-
-
-
-
-
-
 
 
 More examples pending...
@@ -374,10 +312,6 @@ s <- rasterToPoints(x, spatial = TRUE)
 
 
 ```
-
-
-More elaborate examples pending.
-
 
 ----------------------------
 This document is based on `soilDB` version `r utils::packageDescription("soilDB", field="Version")`.
