@@ -56,6 +56,21 @@ library(rgeos)
 ```
 
 
+When was the CA653 survey area last exported to SSURGO?
+```{r SDA-one-liner-1}
+SDA_query("SELECT areasymbol, saverest FROM sacatalog WHERE areasymbol = 'CA653'")
+```
+
+Are there any survey areas that haven't been updated since Jan 1, 2010?
+```{r SDA-one-liner-2}
+SDA_query("SELECT areasymbol, saverest FROM sacatalog WHERE saverest < '01/01/2010'")
+```
+
+What is the most recently updates survey in CA?
+```{r SDA-one-liner-3}
+SDA_query("SELECT areasymbol, saverest FROM sacatalog WHERE areasymbol LIKE 'CA%' ORDER BY saverest DESC")[1, ]
+```
+
 A simple query from the component table, for a single map unit: `mukey = '461958'`.
 ```{r basic-SDA-1}
 q <- "SELECT 

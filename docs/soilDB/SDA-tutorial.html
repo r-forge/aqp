@@ -91,6 +91,19 @@ library(rgdal)
 library(plyr)
 library(raster)
 library(rgeos)</code></pre>
+<p>When was the CA653 survey area last exported to SSURGO?</p>
+<pre class="r"><code>SDA_query(&quot;SELECT areasymbol, saverest FROM sacatalog WHERE areasymbol = 'CA653'&quot;)</code></pre>
+<pre><code>##   areasymbol             saverest
+## 1      CA653 10/1/2015 1:41:01 PM</code></pre>
+<p>Are there any survey areas that haven't been updated since Jan 1, 2010?</p>
+<pre class="r"><code>SDA_query(&quot;SELECT areasymbol, saverest FROM sacatalog WHERE saverest &lt; '01/01/2010'&quot;)</code></pre>
+<pre><code>##   areasymbol              saverest
+## 1    MXNL001 11/27/2009 9:36:38 AM
+## 2         US   7/6/2006 8:49:17 AM</code></pre>
+<p>What is the most recently updates survey in CA?</p>
+<pre class="r"><code>SDA_query(&quot;SELECT areasymbol, saverest FROM sacatalog WHERE areasymbol LIKE 'CA%' ORDER BY saverest DESC&quot;)[1, ]</code></pre>
+<pre><code>##   areasymbol             saverest
+## 1      CA653 10/1/2015 1:41:01 PM</code></pre>
 <p>A simple query from the component table, for a single map unit: <code>mukey = '461958'</code>.</p>
 <pre class="r"><code>q &lt;- &quot;SELECT 
 mukey, cokey, comppct_r, compname, taxclname
