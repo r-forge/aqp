@@ -128,6 +128,8 @@ f <- fetchPedonPC(dsn)
 
 **Fetch data from Soil Data Access (SDA) Web-Service**
 
+A more [recent tutorial](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/SDA-tutorial.html?root=aqp) on this topic is available
+
 The `SDA_query()` function submits a query ([T-SQL](https://technet.microsoft.com/en-us/library/bb264565(v=sql.90).aspx)) to the [SDA web-service](http://sdmdataaccess.nrcs.usda.gov/), parses the result, and returns a `data.frame` (rectangular table) object. [This page](http://sdmdataaccess.nrcs.usda.gov/QueryHelp.aspx) contains links to SSURGO metadata and many example SQL queries. 
 ```{r sda-example-1, eval=FALSE}
 # get component-level data for a specific soil survey area (Yolo county, CA)
@@ -143,17 +145,6 @@ WHERE legend.areasymbol = 'CA113'"
 res <- SDA_query(q)
 ```
 
-
-**Get map unit keys for a geographic area** (updates pending for new SDA2 spatial query features)
-
-The `MUKEYS_by_ll_bbox()` function accepts a bounding box defined in GCS (longitude, latitude) NAD83 coordinates, and returns a vector of map unit keys. This vector can be used to generate a filtering criteria for queries submitted via `SDA_query()`.
-```{r sda-example-2, eval=FALSE}
-# define bounding box
-b <- c(-120.9, 37.7, -120.8, 37.8)
-
-# get map unit keys for this bbox
-m <- MUKEYS_by_ll_bbox(b)
-```
 
 
 **Get map unit geometry for a geographic area** (updates pending for new SDA2 spatial query features)
