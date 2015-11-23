@@ -20,7 +20,7 @@ Getting and Comparing KSSL Data
 Dylan Beaudette
 
 ## Introduction
-This document demonstrates how to use the [soilDB](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/soilDB-Intro.html?root=aqp) package to download [KSSL](http://ncsslabdatamart.sc.egov.usda.gov/) data from SoilWeb. These data are from the August 2014 snapshot, and will be updated as future snapshots are released. Comparisons are made via graphical summaries of key soil properties with depth, using [data structures and functions](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/aqp/aqp-intro.html?root=aqp) from the [aqp](http://aqp.r-forge.r-project.org/) package.
+This document demonstrates how to use the [soilDB](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/soilDB-Intro.html?root=aqp) package to download [KSSL](http://ncsslabdatamart.sc.egov.usda.gov/) data from SoilWeb. These data are from the June 2015 snapshot, and will be updated as future snapshots are released. Comparisons are made via graphical summaries of key soil properties with depth, using [data structures and functions](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/aqp/aqp-intro.html?root=aqp) from the [aqp](http://aqp.r-forge.r-project.org/) package.
 
 ### Installation
 With a recent version of R (>= 2.15), it is possible to get all of the packages that this tutorial depends on via:
