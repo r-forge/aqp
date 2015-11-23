@@ -34,6 +34,7 @@ You only need to do this once. If you haven't installed these packages, then cop
 ```{r install-deps, eval=FALSE}
 # run these commands in the R console
 # stable version from CRAN + dependencies
+install.packages("httr", dep=TRUE)
 install.packages("soilDB", dep=TRUE)
 install.packages("rgdal", dep = TRUE)
 install.packages("raster", dep = TRUE)
@@ -158,7 +159,7 @@ head(res)
 ```
 
 
-It is possible to download small collections of SSURGO map unit polygons from SDA using a bounding-box in WGS84 geographic coordinates. SDA will requrn polygons and their map unit keys that **overlap** with the BBOX query.
+It is possible to download small collections of SSURGO map unit polygons from SDA using a bounding-box in WGS84 geographic coordinates. SDA will return polygons and their map unit keys that **overlap** with the BBOX query.
 ```{r sda-spatial-query-basics-1.2, results='hide'}
 # extract bounding-box from out last point
 # coordinates are in WGS84 GCS
@@ -247,9 +248,9 @@ print(mu.data)
 # plot profiles, grouped by mukey
 # color horizons with clay content
 par(mar=c(0,0,4,0))
-groupedProfilePlot(auburn, groups='mukey', group.name.cex=0.65, color='clay', name='hzn_desgn', id.style='side', label='site_id', max.depth=100)
+groupedProfilePlot(auburn, groups='mukey', group.name.cex=0.65, color='clay', name='hzn_desgn', id.style='side', label='pedon_id', max.depth=100)
 # describe IDs
-mtext('user site ID', side=2, line=-1.5)
+mtext('user pedon ID', side=2, line=-1.5)
 mtext('mukey', side=3, line=-1, at = c(0,0), adj = 0)
 ```
 
