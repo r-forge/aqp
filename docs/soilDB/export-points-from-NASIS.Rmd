@@ -48,18 +48,18 @@ require(soilDB)
 require(rgdal)
 require(rgeos)
 
-
 # Load a suitable boundary for spatial subset of NASIS pedons
 # CRS: UTM z10 NAD83
 b <-  readOGR(dsn='L:/CA630/FG_CA630_OFFICIAL.gdb', layer='ca630_b', encoding='encoding', stringsAsFactors=FALSE)
 
-# extend boundary with 10km buffer
-# the coordinate reference system should have units of meters
-b <- gBuffer(b, byid=FALSE, width=10000)
+# just in case, check that the "boundary" coordinate system is projected
+proj4string(b)
+if(! is.projected(b))
+  stop('boundary geometry must be in a projected coordinate system with units of meters', call. = FALSE)
 
-# graphical check
-par(mar=c(1,1,1,1))
-plot(b)
+# extend boundary with 10km buffer
+# the coordinate reference system MUST have units of meters
+b <- gBuffer(b, byid=FALSE, width=10000)
 
 # load entire contents of local database (pedon data)
 # CRS: GCS WGS84
@@ -77,8 +77,12 @@ proj4string(f) <- '+proj=longlat +datum=WGS84'
 # extract only site data
 s <- as(f, 'SpatialPointsDataFrame')
 
-# project CRS of boundary polygon
-s <- spTransform(s, CRS(proj4string(b)))
+# project boundary to CRS of points
+b <- spTransform(b, CRS(proj4string(s)))
+
+# graphical check
+par(mar=c(1,1,1,1))
+plot(b)
 
 # add points to plot
 points(s, col='black', cex=0.5)
@@ -95,6 +99,7 @@ points(s, col='red', cex=1, pch=0)
 s <- s[, c("pedlabsampnum", "pedon_id","taxonname", "hillslope_pos", "elev_field", "slope_field", "aspect_field", "plantassocnm", "bedrckdepth", "bedrock_kind", 'pmkind', 'pmorigin')]
 
 # write to SHP
+# output CRS is CGS NAD83
 writeOGR(s, dsn='.', layer='NASIS-pedons', driver='ESRI Shapefile', overwrite_layer=TRUE)
 ```
 

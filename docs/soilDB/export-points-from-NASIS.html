@@ -63,7 +63,7 @@ img {
 
 <div id="export-pedon-spatial-data-from-nasis" class="section level1">
 <h1>Export Pedon Spatial Data from NASIS</h1>
-<p>2015-11-16 Dylan Beaudette</p>
+<p>2015-12-01 Dylan Beaudette</p>
 <p>This document demonstrates how to use the <a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/soilDB-Intro.html?root=aqp">soilDB</a> package to export pedon locations from the local NASIS database to shapefile.</p>
 <div id="setup-local-nasis-db" class="section level3">
 <h3>Setup Local NASIS DB</h3>
@@ -93,18 +93,18 @@ install.packages(&quot;soilDB&quot;, repos = &quot;http://R-Forge.R-project.org&
 require(rgdal)
 require(rgeos)
 
-
 # Load a suitable boundary for spatial subset of NASIS pedons
 # CRS: UTM z10 NAD83
 b &lt;-  readOGR(dsn='L:/CA630/FG_CA630_OFFICIAL.gdb', layer='ca630_b', encoding='encoding', stringsAsFactors=FALSE)
 
-# extend boundary with 10km buffer
-# the coordinate reference system should have units of meters
-b &lt;- gBuffer(b, byid=FALSE, width=10000)
+# just in case, check that the &quot;boundary&quot; coordinate system is projected
+proj4string(b)
+if(! is.projected(b))
+  stop('boundary geometry must be in a projected coordinate system with units of meters', call. = FALSE)
 
-# graphical check
-par(mar=c(1,1,1,1))
-plot(b)
+# extend boundary with 10km buffer
+# the coordinate reference system MUST have units of meters
+b &lt;- gBuffer(b, byid=FALSE, width=10000)
 
 # load entire contents of local database (pedon data)
 # CRS: GCS WGS84
@@ -122,8 +122,12 @@ proj4string(f) &lt;- '+proj=longlat +datum=WGS84'
 # extract only site data
 s &lt;- as(f, 'SpatialPointsDataFrame')
 
-# project CRS of boundary polygon
-s &lt;- spTransform(s, CRS(proj4string(b)))
+# project boundary to CRS of points
+b &lt;- spTransform(b, CRS(proj4string(s)))
+
+# graphical check
+par(mar=c(1,1,1,1))
+plot(b)
 
 # add points to plot
 points(s, col='black', cex=0.5)
@@ -140,9 +144,10 @@ points(s, col='red', cex=1, pch=0)
 s &lt;- s[, c(&quot;pedlabsampnum&quot;, &quot;pedon_id&quot;,&quot;taxonname&quot;, &quot;hillslope_pos&quot;, &quot;elev_field&quot;, &quot;slope_field&quot;, &quot;aspect_field&quot;, &quot;plantassocnm&quot;, &quot;bedrckdepth&quot;, &quot;bedrock_kind&quot;, 'pmkind', 'pmorigin')]
 
 # write to SHP
+# output CRS is CGS NAD83
 writeOGR(s, dsn='.', layer='NASIS-pedons', driver='ESRI Shapefile', overwrite_layer=TRUE)</code></pre>
 <hr />
-<p>This document is based on <code>aqp</code> version 1.9 and <code>soilDB</code> version 1.6-2.</p>
+<p>This document is based on <code>aqp</code> version 1.9.1 and <code>soilDB</code> version 1.6.5.</p>
 </div>
 </div>
 
