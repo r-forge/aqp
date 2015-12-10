@@ -39,6 +39,7 @@ install.packages('maps', dep=TRUE)
 ```{r libraries, results='hide'}
 # load required libraries
 library(soilDB)
+library(rgdal)
 library(dismo)
 library(maps)
 library(RColorBrewer)
@@ -93,10 +94,13 @@ pardee$acres
 san.joaquin$acres
 ```
 
-**Save soil series extent data as a shapefile.**
+**Save soil series extent data in multiple formats.**
 ```{r example-4, eval=FALSE}
 # save using the coordinate reference system associated with this object (GCS WGS84)
 writeOGR(amador, dsn='.', layer='amador-extent', driver='ESRI Shapefile')
+
+# save as KML for use in Google Earth
+writeOGR(amador, dsn='amador-extent.kml', layer='amador', driver='KML')
 
 # project to UTM zone 10 NAD83 and save
 amador.utm <- spTransform(amador, CRS('+proj=utm +zone=10 +datum=NAD83'))
