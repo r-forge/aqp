@@ -113,9 +113,9 @@ tapply(g$depth, g$taxonname, summary)
 
 
 ### Aggregation
-The `slab()` function is used to aggregate selected variables within collections of soil profiles along depth-slices. In this case, we aggregate clay, pH, and base saturation at pH 8.2 along 1-cm thick slices and within groups defined by the variable 'taxonname'. See `?slab()` for details on how this function can be used.
+The `slab()` function is used to aggregate selected variables within collections of soil profiles along depth-slices. In this case, we aggregate clay, pH (1:1 H2O, estimated from saturated paste pH when missing), and base saturation at pH 8.2 along 1-cm thick slices and within groups defined by the variable 'taxonname'. See `?slab()` for details on how this function can be used.
 ```{r aggregate}
-g.slab <- slab(g, taxonname ~ clay + ph_h2o + bs82 + wmpd)
+g.slab <- slab(g, taxonname ~ clay + estimated_ph_h2o + bs82 + wmpd)
 
 # inspect stacked data structure
 str(g.slab)
@@ -123,7 +123,7 @@ str(g.slab)
 
 
 ### Refine Labels
-It is convenient to know how many pedons there are within each collection-- therefore, we append this value to the series name. Using the same approach, we can rename the soil properties with more useful descriptions and units of measure.
+It is convenient to know how many pedons there are within each collection--therefore, we append this value to the series name. Using the same approach, we can rename the soil properties with more useful descriptions and units of measure.
 ```{r rename}
 # re-name soils with series name + number of pedons-- order is critical !
 new.levels <- c('musick', 'holland', 'chaix')
