@@ -7,7 +7,7 @@ output:
     smart: no
 ---
 
-```{r setup, echo=FALSE, results='hide'}
+```{r setup, echo=FALSE, results='hide', warning=FALSE}
 library(knitr, quietly=TRUE)
 library(printr, quietly=TRUE)
 opts_chunk$set(message=FALSE, warning=FALSE, background='#F7F7F7', fig.align='center', fig.retina=1, dev='png', tidy=FALSE, verbose=FALSE)
@@ -28,16 +28,19 @@ Pedon data are extracted from the selected set using the `fetchNASIS()` convenie
 
 Load up your local database and selected set with some pedons and follow along with the code blocks below.
 
-```{r get-pedon-data, results='hide', eval=FALSE}
+```{r get-pedon-data, results='hide'}
 # load required libraries
 library(soilDB)
 
-# get data, using default assumptions
+# get data, using defaults
 p <- fetchNASIS()
 ```
 
 ### Status and QC Messages ###
 As part of the quality control process, a number of possible messages are printed to the console when running `fetchNASIS()`. These messages and their meaning are described below:
+
+* `NOTICE: multiple labsampnum values / horizons; see pedon IDs: 94CA039005`
+This notice describes a rare situation where there are >1 lab samples per genetic horizon. Horizons with more than one `labsampnum` will be replicated in the returned object, but only if the argument `rmHzErrors` is set to FALSE. See below for details.
 
 * `mixing dry colors ... [17 of 2250 horizons]`
 In this case, 17 of the 2250 horizons loaded into the selected set have more than 1 dry color described. Multiple colors are mixed via weighted average in order to simplify analysis.
@@ -50,6 +53,9 @@ In this case, 68 horizons have no lower depth defined. A missing lower horizon d
 
 * `-> QC: sites without pedons ...`
 As the message suggests, there are sites with no associated pedons. While this isn't necessarily a quality control issue, it should be investigated. The associated user site ID values can be extracted interactively with `get('sites.missing.pedons', envir=soilDB.env)`.
+
+* `-> QC: duplicate pedons ...`
+As this messages suggests, there are multiple pedons that share the same user pedon ID. This may indicate data entry errors, or pedons that have been copied from the "KSSL" group for local modification. The associated user pedon IDs can be extracted interactively with `get('dup.pedon.ids', envir=soilDB.env)`.
 
 * `-> QC: horizon errors detected ...`
 Horizon depths are checked for gaps, overlap, or bottom depths than are shallower than top depths. In most cases pedons flagged as having errors suggests a quality control issue. However, combination horizons (e.g. B/C) that have been entered as two distinct horizons sharing the same horizon depths will trigger this warning.
@@ -99,6 +105,52 @@ ddply(s.long, c('variable', 'null.frags'), function(i) {
 ```
 
 An increased level of verbosity in the quality control messages can be enabled by setting the option: `options(soilDB.verbose=TRUE)`. This is not generally suggested, but may be useful if you are having difficulty loading data from NASIS.
+
+
+### Filtering / Extracting Data ###
+There are several approaches to filtering pedon data that have been loaded via `fetchNASIS()`. Filtering by pattern matching ([regular expression](https://en.wikipedia.org/wiki/Regular_expression)) is the most common. The `grep()` function in R performs pattern matching using regular expression. These examples assume that you have been following along with code examples from the top of this document. Note that each of these examples ignore letter case.
+
+1. Extract those pedons with a taxonname containing the pattern "amador":
+```{r, fig.width=8.5, fig.height=3.5}
+# generate a numerical index to matching pedons
+idx <- grep('amador', p$taxonname, ignore.case = TRUE)
+# extract using the index
+amador <- p[idx, ]
+# try plotting, hide IDs
+par(mar=c(0,0,2,0))
+plot(amador, print.id=FALSE)
+title("Pedons with taxonname matching regular expression 'amador'", cex.main=0.85)
+```
+
+2. Extract those pedons with a landform string containing the pattern "glacial":
+```{r, fig.width=8.5, fig.height=3.5}
+# generate a numerical index to matching pedons
+idx <- grep('glacial', p$landform.string, ignore.case = TRUE)
+# extract using the index
+g <- p[idx, ]
+# try plotting, hide horizon designation and IDs
+par(mar=c(0,0,2,0))
+plot(g, print.id=FALSE, name='')
+title("Pedons with landform.string matching regular expression 'glacial'", cex.main=0.85)
+```
+
+3. Extract those pedons with a parent material kind containing the pattern "till", but not those pedons with "unspecified" till:
+```{r, fig.width=8.5, fig.height=3.5}
+# locate pedons with "till" in the parent material kind field
+idx <- grep('till', p$pmkind, ignore.case = TRUE)
+till <- p[idx, ]
+# remove those pedons with "unspecified" in the parent material kind field
+# note the use of invert=TRUE
+idx <- grep('unspecified', till$pmkind, ignore.case = TRUE, invert = TRUE)
+till <- till[idx, ]
+
+# try plotting, hide horizon designation and IDs
+par(mar=c(0,0,2,0))
+plot(till, print.id=FALSE)
+title("Pedons with pmkind matching regular expression 'till'\nand not matching 'unspecified'", cex.main=0.85)
+```
+
+Please see the [SoilProfileCollection tutorial](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/aqp/aqp-intro.html?root=aqp) for additional ideas on how to manipulate the data returned by `fetchNASIS()`.
 
 
 ## Component Data ##
