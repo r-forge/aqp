@@ -7,11 +7,11 @@ output:
     smart: false
 ---
 
-```{r setup, echo=FALSE, results='hide'}
+```{r setup, echo=FALSE, results='hide', warning=FALSE}
 # setup
 library(knitr, quietly=TRUE)
 library(printr, quietly=TRUE)
-opts_chunk$set(message=FALSE, warning=FALSE, background='#F7F7F7', fig.align='center', fig.retina=1, dev='png', tidy=TRUE, verbose=FALSE)
+opts_chunk$set(message=FALSE, warning=FALSE, background='#F7F7F7', fig.align='center', fig.retina=1, dev='png', dev.args=list(antialias='cleartype'), tidy=TRUE, verbose=FALSE)
 options(width=100, stringsAsFactors=FALSE)
 
 knit_hooks$set(htmlcap = function(before, options, envir) {

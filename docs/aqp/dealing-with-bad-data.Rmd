@@ -1,11 +1,5 @@
-<!--
-	manually process like this:
-	library(knitr); library(markdown)
-knit('aqp-intro.Rmd')
-markdownToHTML('aqp-intro.md', 'aqp-intro.html')
--->
-	
-	```{r setup, echo=FALSE, results='hide'}
+```{r setup, echo=FALSE, results='hide', warning=FALSE}
+library(knitr, quietly = TRUE)
 opts_chunk$set(message=FALSE, warning=FALSE, background='#F7F7F7', dpi=100, fig.align='center', dev='CairoPNG', tidy=FALSE)
 options(width=100, stringsAsFactors=FALSE)
 ```

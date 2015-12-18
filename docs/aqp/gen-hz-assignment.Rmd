@@ -9,7 +9,7 @@ output:
 ```{r setup, echo=FALSE, results='hide', warning=FALSE}
 library(knitr, quietly = TRUE)
 library(printr, quietly = TRUE)
-opts_chunk$set(message=FALSE, warning=FALSE, dpi=120, fig.align='center', dev='CairoPNG', dev.args=list(pointsize=10), tidy=FALSE)
+opts_chunk$set(message=FALSE, warning=FALSE, out.width="100%", fig.retina = 2, fig.align='center', dev='png', dev.args=list(pointsize=10, antialias='cleartype'), tidy=FALSE)
 options(width=100, stringsAsFactors=FALSE)
 
 knit_hooks$set(htmlcap = function(before, options, envir) {
@@ -71,8 +71,8 @@ install.packages('plyr', dep=TRUE)
 install.packages('aqp', dep=TRUE) 
 install.packages('soilDB', dep=TRUE)
 # latest versions from R-Forge:
-install.packages('aqp', repos="http://R-Forge.R-project.org")
-install.packages('soilDB', repos="http://R-Forge.R-project.org")
+install.packages('aqp', repos="http://R-Forge.R-project.org", type='source')
+install.packages('soilDB', repos="http://R-Forge.R-project.org", type='source')
 ```
 
 Once you have all of the R packages on which  this document depends, it is a good idea to load them. R packages must be **installed** anytime you change versions of R (e.g., after an upgrade) and **loaded** anytime you want to access functions from within those packages.
@@ -91,14 +91,14 @@ library(MASS)
 # Sample Data
 While the methods outlined in this document can be applied to any collection of pedons, it is convenient to work with a standardized set of data. You can follow along with the analysis by copying code from the following blocks and running it in your **R** session. The sample data used in this document is based on 15 soil profiles that have been correlated to the [Loafercreek](https://soilseries.sc.egov.usda.gov/OSD_Docs/L/LOAFERCREEK.html) soil series from the Sierra Nevada Foothill Region of California. Note that the internal structure of the `loafercreek` data is identical to the structure returned by [`fetchNASIS()` from the soilDB package](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/soilDB-Intro.html?root=aqp). All horizon-level values are pulled from the pedon horizon table of the pedons being analyzed.
 
-```{r load-data, fig.width=12, fig.height=5, htmlcap='15 pedons correlated to the Loafercreek soil series.'}
+```{r load-data, fig.width=9, fig.height=4, htmlcap='15 pedons correlated to the Loafercreek soil series.'}
 # load sample data from the soilDB package
 data(loafercreek, package = 'soilDB')
 # keep only the first 15 pedons
 pedons <- loafercreek[1:15, ]
 # plot profile sketches
 par(mar=c(0,0,0,0))
-plot(pedons, name='hzname', print.id=FALSE, cex.names=0.8, axis.line.offset=-4)
+plot(pedons, name='hzname', print.id=FALSE, cex.names=0.75, axis.line.offset=-4)
 ```
 
 
@@ -129,7 +129,7 @@ In this case, [`r names(sort(table(pedons$hzname), decreasing=TRUE))[1:4]`] hori
 A quick summary of horizon depth mid-points (e.g., average depth of horizon) can help in organizing the various designations and possibly give some clues as to how they can be grouped. The following plot is called a [box and whisker plot](http://en.wikipedia.org/wiki/Box_plot).
 
 
-```{r horizonation-mid-point, fig.width=10, fig.height=4, htmlcap='Range in horizon depth mid-point for original horizon designations.'}
+```{r horizonation-mid-point, fig.width=9, fig.height=4, htmlcap='Range in horizon depth mid-point for original horizon designations.'}
 # compute horizon mid-points
 pedons$mid <- with(horizons(pedons), (hzdept + hzdepb) / 2)
 
@@ -149,7 +149,7 @@ bwplot(mid ~ factor(hzname, levels=hz.designation.by.median.depths),
 
 Next, a similar summary of soil properties (clay content and total rock fragment volume) is presented. The goal is to determine which horizons designations can be grouped and which generalized horizon labels to assign to each group.
 
-```{r univariate-eval-clay, fig.width=10, fig.height=4, htmlcap='Range in clay content for original horizon designations.'}
+```{r univariate-eval-clay, fig.width=9, fig.height=4, htmlcap='Range in clay content for original horizon designations.'}
 # box and wisker plot by clay content
 bwplot(clay ~ factor(hzname, levels=hz.designation.by.median.depths), 
        data=horizons(pedons), 
@@ -161,7 +161,7 @@ bwplot(clay ~ factor(hzname, levels=hz.designation.by.median.depths),
 })
 ```
 
-```{r univariate-eval-rf, fig.width=10, fig.height=4, htmlcap='Range in total rock fragment content for original horizon designations.'}
+```{r univariate-eval-rf, fig.width=9, fig.height=4, htmlcap='Range in total rock fragment content for original horizon designations.'}
 # box and wisker plot by total rock fragment volume
 bwplot(total_frags_pct ~ factor(hzname, levels=hz.designation.by.median.depths), 
        data=horizons(pedons), 
@@ -175,10 +175,10 @@ bwplot(total_frags_pct ~ factor(hzname, levels=hz.designation.by.median.depths),
 
 
 Sometimes looking at thematic soil profile sketches can be informative.
-```{r thematic-profile-sketch, fig.width=12, fig.height=5, htmlcap='Horizon colors are based on clay content.'}
+```{r thematic-profile-sketch, fig.width=9, fig.height=4, htmlcap='Horizon colors are based on clay content.'}
 # color horizons by clay content
-par(mar=c(0,0,3,3))
-plot(pedons, name='hzname', print.id=FALSE, cex.names=0.8, axis.line.offset=-4, color='clay')
+par(mar=c(0,0,3,0))
+plot(pedons, name='hzname', print.id=FALSE, cex.names=0.75, axis.line.offset=-4, color='clay')
 ```
 
 ## Assignment of Generalized Horizon Labels
@@ -212,7 +212,7 @@ In the above cross-tabulation, we can see that a couple of original designations
 ## Evaluation of Generalized Horizon Labels
 
 An initial evaluation of our GHL assignment can be accomplished by plotting profile sketches with horizons colored by GHL. The result looks correct, but further investigation may be warranted.
-```{r plot-ghl-1, fig.width=12, fig.height=5, htmlcap='Horizon colors are based on assigned GHL.'}
+```{r plot-ghl-1, fig.width=9, fig.height=4, htmlcap='Horizon colors are based on assigned GHL.'}
 # make a palette of colors, last color is for not-used class
 cols <- c(grey(0.33), 'orange', 'orangered', 'chocolate', 'green', 'blue', 'yellow')
 # assign a color to each generalized horizon label
@@ -220,8 +220,8 @@ hz.names <- levels(pedons$genhz)
 pedons$genhz.soil_color <- cols[match(pedons$genhz, hz.names)]
 # plot generalized horizons via color and add a legend
 par(mar=c(4,0,0,0))
-plot(pedons, name='hzname', print.id=FALSE, cex.names=0.8, axis.line.offset=-4, color='genhz.soil_color')
-legend('bottomleft', legend=hz.names, pt.bg=c(cols), pch=22, bty='n', cex=2)
+plot(pedons, name='hzname', print.id=FALSE, cex.names=0.75, axis.line.offset=-4, color='genhz.soil_color')
+legend('bottomleft', legend=hz.names, pt.bg=c(cols), pch=22, bty='n', cex=1)
 ```
 
 
@@ -264,7 +264,7 @@ pedons$neighbor <- hz.eval$horizons$neighbor
 
 
 In the following figure, generalized horizon labels are plotted at nMDS coordinates as colored circles, along with original horizon designations and pedon IDs. Ideally, groupings of GHL should form relatively homogeneous clusters in this figure; however, there will always be some overlap at the edges. Heterogeneous regions should be inspected in cases where the assigned GHL may not make sense. In this example, the original designation of "Bt3" for pedon ID 09CKS036 does not seem to fit into the "Bt3" generalized horizon. According to the soil properties used (clay content, total rock fragments, horizon mid-point), the horizon may  better fit the "Bt2" generalized horizon. In addition, it appears that "Bw" and "BA" horizons can be included into the "A" generalized horizon. Decisions on issues such as this can only be made based on field experience or at least some level of expert knowledge about the soils in question. Once a decision has been made, additions to the GLH rules (e.g. adding "Bw" and "BA" to the "A" GHL) and possibly manual adjustment can be used to accomodate the changes.
-```{r mds-plot, fig.width=10, fig.height=10, htmlcap='Horizon designations and GHL as plotted along nMDS axes.'}
+```{r mds-plot, fig.width=9, fig.height=9, htmlcap='Horizon designations and GHL as plotted along nMDS axes.'}
 # convert pedons to a data.frame
 pedons.df <- as(pedons, 'data.frame')
 # plot generalized horizon labels at MDS coordinates
@@ -286,10 +286,10 @@ mdsplot +
 
 
 The [silhouette width](http://www.sciencedirect.com/science/article/pii/0377042787901257) metric is a useful indicator of how consistently group labels partition observations in a dissimilarity matrix. Silhouette widths closer to 1 indicate excellent partitioning, while values closer to 0 indicate less effective partitioning. Silhouette widths less than 0 are often associated with inappropriate label assignment. A sketch of profiles with horizons colored by silhouette width can indicate possible horizons with inappropriate GHL assignment or a pedon that does not fit within the concept of Loafercreek. For example, many of the horizons associated with pedon ID 09CKS036 do not appear to fit within the collection of soil properties associated with generalized horizon labels "Bt1", "Bt2", and "Bt3". Keep in mind that this evaluation is only based on three soil properties-- expert judgement will be required for a final assignment of GHL.
-```{r silhouette-sketch, fig.width=12, fig.height=5, htmlcap='Blue and green colors warrant further investigation.'}
+```{r silhouette-sketch, fig.width=9, fig.height=4, htmlcap='Blue and green colors warrant further investigation.'}
 # plot silhouette width metric
-par(mar=c(0,0,3,3))
-plot(pedons, name='hzname', label='pedon_id', cex.names=0.8, axis.line.offset=-4, color='sil.width')
+par(mar=c(0,0,3,0))
+plot(pedons, name='hzname', label='pedon_id', cex.names=0.75, axis.line.offset=-4, color='sil.width')
 ```
 
 
@@ -309,11 +309,11 @@ hz.eval$stats
 ```
 
 Plot profiles with only those horizons with silhouette widths less than 0 flagged.
-```{r silhouette-sketch-flagged, fig.width=12, fig.height=5, htmlcap='Horizons with red colors warrant further investigation.'}
+```{r silhouette-sketch-flagged, fig.width=9, fig.height=4, htmlcap='Horizons with red colors warrant further investigation.'}
 # add a column containing a color (red) that flags horizons with silhouette width less than 0
 pedons$sil.flag <- ifelse(pedons$sil.width < 0, 'red', 'white')
-par(mar=c(0,0,3,3))
-plot(pedons, name='hzname', label='pedon_id', cex.names=0.8, axis.line.offset=-4, color='sil.flag')
+par(mar=c(0,0,3,0))
+plot(pedons, name='hzname', label='pedon_id', cex.names=0.75, axis.line.offset=-4, color='sil.flag')
 ```
 
 ## Saving GHL to NASIS

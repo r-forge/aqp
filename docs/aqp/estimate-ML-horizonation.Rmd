@@ -2,9 +2,9 @@
 output: html_document
 ---
 
-```{r setup, echo=FALSE, results='hide'}
-library(knitr)
-opts_chunk$set(message=FALSE, warning=FALSE, dpi=120, fig.align='center', dev='CairoPNG', dev.args=list(pointsize=10), tidy=FALSE)
+```{r setup, echo=FALSE, results='hide', warning=FALSE}
+library(knitr, quietly = TRUE)
+opts_chunk$set(message=FALSE, warning=FALSE, dpi=120, fig.align='center', dev='png', dev.args=list(pointsize=10), tidy=FALSE)
 options(width=100, stringsAsFactors=FALSE)
 
 knit_hooks$set(htmlcap = function(before, options, envir) {
