@@ -7,7 +7,7 @@ output:
     smart: false
 ---
 
-```{r setup, echo=FALSE, results='hide'}
+```{r setup, echo=FALSE, results='hide', warning=FALSE}
 # setup
 library(knitr, quietly=TRUE)
 library(printr, quietly=TRUE)

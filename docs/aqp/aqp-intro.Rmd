@@ -233,7 +233,7 @@ subsetProfiles(sp4, h='clay < 20', s='group == "A"')
 
 
 ### Concatenation of SoilProfileCollection Objects
-If the internal structures of several `SoilProfileCollection` objects are identical (e.g. same ID name, horizon, site, diagnostic horizon, and spatial attributes) they can be safely combined into a new object. This is typically only possible when re-combining subsets of the same original object. Note that concatenation will re-order all input `SoilProfileCollection` objects such that the resulting IDs are in alpha-numeric order.
+If the internal structures of several `SoilProfileCollection` objects are identical (e.g. same ID name, horizon, site, diagnostic horizon, and spatial attributes) they can be safely combined into a new object. Note that concatenation will re-order all input `SoilProfileCollection` objects such that the resulting IDs are in alpha-numeric order.
 ```{r concatenation, eval=FALSE}
 # subset data into chunks
 s1 <- sp4[1:2, ]
@@ -242,6 +242,9 @@ s3 <- sp4[c(6, 8, 9), ]
 
 # re-combine: think "row-bind"
 s <- rbind(s1, s2, s3)
+
+# double-check object
+all.equal(profile_id(s), site(s)[[idname(s)]])
 ```
 
 
