@@ -97,11 +97,14 @@ s <- rbind(s.1, s.2)
 s.long <- melt(s, id.vars='null.frags')
 
 # tabular comparison, using 5th, 50th, and 95th percentiles as low-rv-high
-ddply(s.long, c('variable', 'null.frags'), function(i) {
+res <- ddply(s.long, c('variable', 'null.frags'), function(i) {
   q <- quantile(i$value, na.rm=TRUE, probs=c(0.05, 0.5, 0.95))
   n <- length(na.omit(i$value))
   data.frame(stats=paste0(round(q), collapse='-'), horizons.with.data=n)
 })
+
+# re-cast to "wide" format to compare:
+dcast(res, variable ~ null.frags, value.var = 'stats')
 ```
 
 An increased level of verbosity in the quality control messages can be enabled by setting the option: `options(soilDB.verbose=TRUE)`. This is not generally suggested, but may be useful if you are having difficulty loading data from NASIS.
@@ -155,6 +158,63 @@ Please see the [SoilProfileCollection tutorial](https://r-forge.r-project.org/sc
 
 ## Component Data ##
 
+
+This is still a work in progress...
+```{r, fig.width=9, fig.height=9}
+library(igraph)
+
+# Pangea query "ES - Load Mapunits by Ecosite not additional": R028BY029NV
+
+# DMU + component tables
+# there should be no duplicate coiids in this
+d.c <- get_component_data_from_NASIS_db()
+
+# map unit + correlation + legend map unit
+# there may be duplication:
+# 1. "not representative"
+# 2. "additional"
+# 3. old-style joins
+d.m <- get_component_correlation_data_from_NASIS_db()
+
+# ESD data, possibly > 1 / coiid
+d.esd <- get_component_esd_data_from_NASIS_db()
+
+# component pedons, possibly > 1 / coiid
+d.copedon <- get_copedon_from_NASIS_db()
+
+# component horizon data
+d.hz <- get_component_horizon_data_from_NASIS_db()
+
+# horizon + component data
+d <- fetchNASIS_component_data()
+
+
+
+### check DMU -- MU relationship ###
+
+
+# extract edges of graph DMU -- MU
+e <- d.m[, c('dmuiid', 'nationalmusym')]
+
+# create vertex attributes
+v <- rbind(cbind(name=e[, 1], color='RoyalBlue', label.font=1, label.cex=0.75), cbind(name=e[, 2], color='Orange', label.font=2, label.cex=0.85))
+v <- as.data.frame(v, stringsAsFactors = FALSE)
+v$label.font <- as.integer(v$label.font)
+v$label.cex <- as.numeric(v$label.cex)
+
+# flag DMUs that connect to multiple MU
+dupe.dmu <- names(which(table(d.m$dmuiid) > 1))
+v$color[which(v$name %in% dupe.dmu)] <- 'Yellow'
+
+# create graph
+g <- graph.data.frame(e, directed=FALSE, vertices = unique(v))
+V(g)$size <- 5 * sqrt(degree(g))
+
+# check
+par(mar=c(0,0,0,0))
+set.seed(10101)
+plot(g, vertex.label.color='black')
+```
 
 ----------------------------
 This document is based on `aqp` version `r utils::packageDescription("aqp", field="Version")` and `soilDB` version `r utils::packageDescription("soilDB", field="Version")`.

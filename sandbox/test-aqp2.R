@@ -1,10 +1,10 @@
 library(devtools)
 
 # old version
-load_all('pkg/aqp/')
+load_all('../pkg/aqp/')
 
 # new version
-load_all('sandbox/aqp2/')
+load_all('../sandbox/aqp2/')
 
 
 # Munsell to RGB triplets: 
@@ -13,7 +13,7 @@ color <- munsell2rgb(the_hue=c('10YR', '2.5YR'), the_value=c(3, 5), the_chroma=c
 
 # RGB triplets to closest Munsell color (in RGB space)
 # function is vectorized
-rg`b2munsell(color)
+rgb2munsell(color)
 
 
 data(sp1)
@@ -34,12 +34,10 @@ par(mar=c(0, 0, 3, 0))
 plot(sp1, color='prop', plot.order=sample(1:length(sp1)))
 addVolumeFraction(sp1, 'prop', pch=1)
 
-
-
 # re-sample each profile into 1 cm (thick) depth slices
 # for the variables 'prop', 'name', 'soil_color'
 # result is a SoilProfileCollection object
-s <- slice(sp1, 0:25 ~ prop + name + soil_color, just.the.data = TRUE)
+s <- slice(sp1, 0:25 ~ prop + name + soil_color)
 
 # plot, note slices
 plot(s)
