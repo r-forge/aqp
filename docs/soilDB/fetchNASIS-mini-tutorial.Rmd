@@ -175,12 +175,21 @@ d.c <- get_component_data_from_NASIS_db()
 # 2. "additional"
 # 3. old-style joins
 d.m <- get_component_correlation_data_from_NASIS_db()
+# check:
+if(exists('multiple.mu.per.dmu', envir=soilDB.env))
+  d.m[d.m$dmuiid %in% get('multiple.mu.per.dmu', envir=soilDB.env), ]
+
 
 # ESD data, possibly > 1 / coiid
 d.esd <- get_component_esd_data_from_NASIS_db()
+# check
+if(exists('multiple.ecosite.per.coiid', envir=soilDB.env))
+  d.esd[d.esd$coiid %in% get('multiple.ecosite.per.coiid', envir=soilDB.env), ]
 
-# component pedons, possibly > 1 / coiid
+# component pedons, possibly > 1 / coiid, pedons may be used more than once
 d.copedon <- get_copedon_from_NASIS_db()
+# check for pedons used in more than 1 component
+d.copedon$pedon_id[which(table(d.copedon$peiid) > 1)]
 
 # component horizon data
 d.hz <- get_component_horizon_data_from_NASIS_db()
@@ -202,9 +211,12 @@ v <- as.data.frame(v, stringsAsFactors = FALSE)
 v$label.font <- as.integer(v$label.font)
 v$label.cex <- as.numeric(v$label.cex)
 
-# flag DMUs that connect to multiple MU
-dupe.dmu <- names(which(table(d.m$dmuiid) > 1))
-v$color[which(v$name %in% dupe.dmu)] <- 'Yellow'
+# optionally flag DMUs that connect to multiple MU
+if(exists('multiple.mu.per.dmu', envir=soilDB.env)) {
+  dupe.dmu <- get('multiple.mu.per.dmu', envir=soilDB.env)
+  v$color[which(v$name %in% dupe.dmu)] <- 'Yellow' 
+}
+
 
 # create graph
 g <- graph.data.frame(e, directed=FALSE, vertices = unique(v))
@@ -214,6 +226,9 @@ V(g)$size <- 5 * sqrt(degree(g))
 par(mar=c(0,0,0,0))
 set.seed(10101)
 plot(g, vertex.label.color='black')
+legend('topright', legend = c('Natl. musym', 'DMU', 'flagged DMU'), pt.bg=c('Orange', 'RoyalBlue', 'Yellow'), pch=21, pt.cex=2)
+
+
 ```
 
 ----------------------------
