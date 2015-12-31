@@ -124,6 +124,8 @@ echo $contents; } ?>
 
 <p><b>Sample Figures</b></p>
 
+<img src="tp-example.png" border="0">
+
 <img src="MO-soils-aqp-demo.png" border="0">
 
 <img src="soil-series-color-signature.png" border="0">
