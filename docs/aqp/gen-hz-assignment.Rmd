@@ -70,9 +70,11 @@ install.packages('latticeExtra', dep=TRUE)
 install.packages('plyr', dep=TRUE) 
 install.packages('aqp', dep=TRUE) 
 install.packages('soilDB', dep=TRUE)
+install.packages('sharpshootR', dep=TRUE)
 # latest versions from R-Forge:
 install.packages('aqp', repos="http://R-Forge.R-project.org", type='source')
 install.packages('soilDB', repos="http://R-Forge.R-project.org", type='source')
+install.packages('sharpshootR', repos="http://R-Forge.R-project.org", type='source')
 ```
 
 Once you have all of the R packages on which  this document depends, it is a good idea to load them. R packages must be **installed** anytime you change versions of R (e.g., after an upgrade) and **loaded** anytime you want to access functions from within those packages.
@@ -80,6 +82,8 @@ Once you have all of the R packages on which  this document depends, it is a goo
 ```{r load-packages}
 library(aqp)
 library(soilDB)
+library(sharpshootR)
+library(igraph)
 library(ape)
 library(latticeExtra)
 library(plyr)
@@ -125,6 +129,14 @@ sort(table(pedons$hzname), decreasing=TRUE)
 ```
 
 In this case, [`r names(sort(table(pedons$hzname), decreasing=TRUE))[1:4]`] horizon designations appear to be a good starting point. However, relying on field experience and expert knowledge of these soils, cross-checking against the [OSD](https://soilseries.sc.egov.usda.gov/OSD_Docs/L/LOAFERCREEK.html), and talking with other soil scientists may be more important than the previous tabulation. 
+
+Constructing a graph of transitions from one horizon to the next ("transition probabilities") can highlight those horizon designations that are most commonly used together. A follow-up tutorial on transition probability matrix interpretation is planned.
+```{r transition-probabilities, fig.width=6, fig.height=6, out.width="80%", htmlcap='Graph constructed from transition probabilities.'}
+tp <- hzTransitionProbabilities(pedons, 'hzname')
+par(mar=c(1,1,1,1))
+plotSoilRelationGraph(tp, graph.mode = 'directed', edge.arrow.size=0.5, g.layout = layout_with_lgl)
+```
+
 
 A quick summary of horizon depth mid-points (e.g., average depth of horizon) can help in organizing the various designations and possibly give some clues as to how they can be grouped. The following plot is called a [box and whisker plot](http://en.wikipedia.org/wiki/Box_plot).
 
@@ -204,10 +216,21 @@ Apply GHL pattern-matching rules, save to a new column called `genhz`, and cross
 ```{r generalize-hz-names-2}
 pedons$genhz <- generalize.hz(pedons$hzname, n, p)
 # cross-tabulate original horizon designations and GHL
-addmargins(table(pedons$genhz, pedons$hzname))
+tab <- table(pedons$genhz, pedons$hzname)
+addmargins(tab)
 ```
 
 In the above cross-tabulation, we can see that a couple of original designations were not matched (`not-used` in the table)  by our REGEX rules, namely, BA, Bw, and Oi horizons. For this example, we are going to  assume that those horizons are not common enough for inclusion in our set of GHL.
+
+It is also possible to display GHL assignment as a network [graph](https://en.wikipedia.org/wiki/Graph_(mathematics)).
+```{r generalize-hz-names-3, fig.width=6, fig.height=6, out.width="80%"}
+# convert contingency table -> adj. matrix
+m <- genhzTableToAdjMat(tab)
+# plot using a function from the sharpshootR package
+par(mar=c(1,1,1,1))
+plotSoilRelationGraph(m, graph.mode = 'directed', edge.arrow.size=0.5)
+```
+
 
 ## Evaluation of Generalized Horizon Labels
 
