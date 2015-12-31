@@ -23,11 +23,10 @@ D.E. Beaudette
 
 
 ## Introduction
-This tutorial decribes one approach to summarizing raster data (e.g. slope, aspect, PRISM data, etc.) according to delineations of a specific map unit. The examples outlined below are a good starting point for a more rigorous examination of map unit variability for the purposes of SDJR, quality control, or DSM project. You will need to adjust file paths to raster and vector data sources below, in order to follow along with your own data.
+This tutorial describes a simple process for visualizing patterns in categorical data associated with pedon data.
 
 ### Adapting Content to Your Data
 Copy and paste blocks of code in this tutorial into a new R Studio script file (*ctrl + shift + n* makes a new file), edit, and then run. Running lines or blocks of code in an RStudio script file is as simple as moving the cursor to the line (or selecting a block) of code and press *ctrl + enter*.
-
 
 ## Setup R Environment
 This step is only required the **first time** you open R. These packages will be available via `library()` in later sessions.
@@ -68,8 +67,8 @@ v <- c('lithic.contact', 'paralithic.contact', 'argillic.horizon',
 x <- diagnosticPropertyPlot(loafercreek, v, k=5, grid.label='bedrock_kind', dend.label = 'taxonname')
 x <- diagnosticPropertyPlot(loafercreek, v, k=5, grid.label='pedon_id', dend.label = 'taxonname')
 
-x <- diagnosticPropertyPlot2(loafercreek, v, k=3, grid.label='pedon_id')
-x <- diagnosticPropertyPlot2(loafercreek, v, k=3, grid.label='taxonname')
+x <- diagnosticPropertyPlot2(loafercreek, v, k=5, grid.label='pedon_id')
+x <- diagnosticPropertyPlot2(loafercreek, v, k=5, grid.label='taxonname')
 
 
 ## binary + multinominal categories

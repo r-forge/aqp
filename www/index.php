@@ -76,6 +76,8 @@ echo $contents; } ?>
 
 <li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/sharpshootR/component-relation-graph.html?root=aqp">Component Relation Graphs</a></li>
 
+<li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/sharpshootR/diagnostic-property-plot.html?root=aqp">A Novel Display of Categorical Data</a></li>
+
 <li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/sharpshootR/OSD-dendrogram.html?root=aqp">OSD Dendrogram</a></li>
 
 <li>USDA-NRCS Data Sources<ol>
