@@ -107,7 +107,7 @@ plotSoilRelationGraph(tp, graph.mode = 'directed', edge.arrow.size=0.5)
 
 # try some other examples, seems logical
 tp <- hzTransitionProbabilities(pedons, 'hzname')
-tp <- hzTransitionProbabilities(pedons, 'genhz')
+# tp <- hzTransitionProbabilities(pedons, 'genhz')
 
 # abuse sharpshootR code
 # sometimes default layout doesn't look so good
