@@ -121,6 +121,21 @@ res <- SDA_query(q)
 head(res)
 ```
 
+Cross tabulate the occurrence of components named "Auburn" and "Dunstone" with survey areasymbol.
+```{r basic-SDA-4}
+q <- "SELECT areasymbol, component.mukey, cokey, comppct_r, compname, compkind, taxclname
+FROM legend
+INNER JOIN mapunit ON mapunit.lkey = legend.lkey
+LEFT OUTER JOIN component ON component.mukey = mapunit.mukey
+WHERE compname IN ('Auburn', 'Dunstone')
+AND areasymbol != 'US'
+ORDER BY areasymbol, compname"
+
+res <- SDA_query(q)
+
+xtabs(~ areasymbol + compname, data=res)
+```
+
 ### Queries Using Simple Spatial Filters
 
 Get the map unit key and name at a single, manually-defined point (-121.77100 37.368402).
