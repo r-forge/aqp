@@ -101,7 +101,7 @@ depths(sp4) <- id ~ top + bottom
 # abuse sharpshootR code to display as graph
 par(mar=c(0,0,0,0), mfcol=c(1,2))
 plot(sp4)
-plotSoilRelationGraph(tp, graph.mode = 'directed', edge.arrow.size=0.5)
+plotSoilRelationGraph(tp, graph.mode = 'directed', edge.arrow.size=0.5, edge.scaling.factor=2, vertex.label.cex=0.75, vertex.label.family='sans')
 
 
 

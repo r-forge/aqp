@@ -134,7 +134,7 @@ Constructing a graph of transitions from one horizon to the next ("transition pr
 ```{r transition-probabilities, fig.width=6, fig.height=6, out.width="80%", htmlcap='Graph constructed from transition probabilities.'}
 tp <- hzTransitionProbabilities(pedons, 'hzname')
 par(mar=c(1,1,1,1))
-plotSoilRelationGraph(tp, graph.mode = 'directed', edge.arrow.size=0.5, g.layout = layout_with_lgl)
+plotSoilRelationGraph(tp, graph.mode = 'directed', edge.arrow.size=0.5, edge.scaling.factor=2, vertex.label.cex=0.75, vertex.label.family='sans')
 ```
 
 
