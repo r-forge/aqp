@@ -57,6 +57,9 @@ Specifying paths in R must be done with either a single forward slash (/) or two
     + dsn='path_to_parent_directory' (note trailing "/" is omitted)
     + layer='filename' (note trailing ".shp" is omitted)
     + example: `readOGR(dsn='E:/gis_data', layer='ca630_a', stringsAsFactors = FALSE)`
+ * **SDA** (polygons loaded from the live SSURGO data via Soil Data Access)
+    + geometry must be specified using SQL
+    + [examples here](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/SDA-tutorial-2.html?root=aqp)
 
 After loading and optionally filtering-out a single map unit, a unique ID is assigned to each polygon. This ID can later be used to reference polygons are associatiated with raster values outside of some ideal range.
 
