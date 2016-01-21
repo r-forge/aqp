@@ -14,14 +14,19 @@ opts_chunk$set(message=FALSE, warning=FALSE, background='#F7F7F7', fig.align='ce
 options(width=100, stringsAsFactors=FALSE)
 ```
 
-# Tips on getting data from NASIS into R
+# Tips on getting pedon data from NASIS into R
 `r format(Sys.time(), "%Y-%m-%d")`
 <br>D.E. Beaudette, J.M. Skovlin, S. Roecker
 
 > This tutorial is based on essential background material described in the [soilDB](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/soilDB-Intro.html?root=aqp) and related [NASIS ODBC connection](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/setup_local_nasis.html?root=aqp) tutorials. If you have not reviewed those tutorials, please do so before proceeding.
 
 ## Introduction
-The `soilDB` package contains a number of **convenience functions** (usually having a prefix of "fetch") for extracting data from commonly used databases, performing basic quality control checks, and returning the result as a [SoilProfileCollection](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/aqp/aqp-intro.html?root=aqp) object. In order to simplify the process of stitching-together the many linked (and sometimes nested) tables associated with pedon data in NASIS, the convenience function `fetchNASIS()` must make a number of assumptions about the data. This document describes how those assumptions can be adjusted and how they may affect subsequent data analysis.
+The `soilDB` package contains a number of **convenience functions** (usually having a prefix of "fetch") for extracting data from commonly used databases, performing basic quality control checks, and returning the result as a [SoilProfileCollection](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/aqp/aqp-intro.html?root=aqp) object. In order to simplify the process of stitching-together the many linked (and sometimes nested) tables associated with data in NASIS, convenience functions (e.g. `fetchNASIS()` or `fetchNASIS_component_data()`) must make a number of assumptions about the data. This document describes how those assumptions can be adjusted and how they may affect subsequent data analysis.
+
+
+## Component Data
+Please see the [related tutorial on loading NASIS component data into R](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/NASIS-component-data.html?root=aqp).
+
 
 ## Pedon Data
 Pedon data are extracted from the selected set using the `fetchNASIS()` convenience function. The resulting object is a distillation of the complex NASIS representation of a pedon into "site", "horizon", and "diagnostic" attributes. [elaborate as needed]. 
@@ -156,80 +161,6 @@ title("Pedons with pmkind matching regular expression 'till'\nand not matching '
 Please see the [SoilProfileCollection tutorial](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/aqp/aqp-intro.html?root=aqp) for additional ideas on how to manipulate the data returned by `fetchNASIS()`.
 
 
-## Component Data ##
-
-
-This is still a work in progress...
-```{r, fig.width=9, fig.height=9}
-library(igraph)
-
-# Pangea query "ES - Load Mapunits by Ecosite not additional": R028BY029NV
-
-# DMU + component tables
-# there should be no duplicate coiids in this
-d.c <- get_component_data_from_NASIS_db()
-
-# map unit + correlation + legend map unit
-# there may be duplication:
-# 1. "not representative"
-# 2. "additional"
-# 3. old-style joins
-d.m <- get_component_correlation_data_from_NASIS_db()
-# check:
-if(exists('multiple.mu.per.dmu', envir=soilDB.env))
-  d.m[d.m$dmuiid %in% get('multiple.mu.per.dmu', envir=soilDB.env), ]
-
-
-# ESD data, possibly > 1 / coiid
-d.esd <- get_component_esd_data_from_NASIS_db()
-# check
-if(exists('multiple.ecosite.per.coiid', envir=soilDB.env))
-  d.esd[d.esd$coiid %in% get('multiple.ecosite.per.coiid', envir=soilDB.env), ]
-
-# component pedons, possibly > 1 / coiid, pedons may be used more than once
-d.copedon <- get_copedon_from_NASIS_db()
-# check for pedons used in more than 1 component
-d.copedon$pedon_id[which(table(d.copedon$peiid) > 1)]
-
-# component horizon data
-d.hz <- get_component_horizon_data_from_NASIS_db()
-
-# horizon + component data
-d <- fetchNASIS_component_data()
-
-
-
-### check DMU -- MU relationship ###
-
-
-# extract edges of graph DMU -- MU
-e <- d.m[, c('dmuiid', 'nationalmusym')]
-
-# create vertex attributes
-v <- rbind(cbind(name=e[, 1], color='RoyalBlue', label.font=1, label.cex=0.75), cbind(name=e[, 2], color='Orange', label.font=2, label.cex=0.85))
-v <- as.data.frame(v, stringsAsFactors = FALSE)
-v$label.font <- as.integer(v$label.font)
-v$label.cex <- as.numeric(v$label.cex)
-
-# optionally flag DMUs that connect to multiple MU
-if(exists('multiple.mu.per.dmu', envir=soilDB.env)) {
-  dupe.dmu <- get('multiple.mu.per.dmu', envir=soilDB.env)
-  v$color[which(v$name %in% dupe.dmu)] <- 'Yellow' 
-}
-
-
-# create graph
-g <- graph.data.frame(e, directed=FALSE, vertices = unique(v))
-V(g)$size <- 5 * sqrt(degree(g))
-
-# check
-par(mar=c(0,0,0,0))
-set.seed(10101)
-plot(g, vertex.label.color='black')
-legend('topright', legend = c('Natl. musym', 'DMU', 'flagged DMU'), pt.bg=c('Orange', 'RoyalBlue', 'Yellow'), pch=21, pt.cex=2)
-
-
-```
 
 ----------------------------
 This document is based on `aqp` version `r utils::packageDescription("aqp", field="Version")` and `soilDB` version `r utils::packageDescription("soilDB", field="Version")`.
