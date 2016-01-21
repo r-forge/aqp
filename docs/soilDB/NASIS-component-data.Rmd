@@ -27,7 +27,7 @@ options(width=100, stringsAsFactors=FALSE)
 The `soilDB` package contains a number of **convenience functions** (usually having a prefix of "fetch") for extracting data from commonly used databases, performing basic quality control checks, and returning the result as a [SoilProfileCollection](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/aqp/aqp-intro.html?root=aqp) object. In order to simplify the process of stitching-together the many linked (and sometimes nested) tables associated with data in NASIS, convenience functions (e.g. `fetchNASIS()` or `fetchNASIS_component_data()`) must make a number of assumptions about the data. This document describes how those assumptions can be adjusted and how they may affect subsequent data analysis.
 
 ## Pedon Data
-Please see the [related tutorial on loading NASIS component data into R](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/fetchNASIS-mini-tutorial.html?root=aqp).
+Please see the [related tutorial on loading NASIS pedon data into R](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/fetchNASIS-mini-tutorial.html?root=aqp).
 
 
 ## Component Data
@@ -121,6 +121,7 @@ nc.esd <- get_component_esd_data_from_NASIS_db
 ```
 
 
+Additional tutorials are available at the [AQP project website](http://aqp.r-forge.r-project.org/).
 
 
 ## Example Applications
@@ -166,6 +167,7 @@ set.seed(10101)
 plot(g, vertex.label.color='black', vertex.label.family='sans',  edge.arrow.size=0.5)
 legend('bottomleft', legend = c('MU (national musym)', 'DMU (dmu description)', 'flagged DMU (dmu description)'), pt.bg=c('Orange', 'RoyalBlue', 'Yellow'), pch=21, pt.cex=2, cex=0.85, bty='n')
 ```
+
 
 ### Rank Component Records Based on Horizon Data Population
 Rank data map units that contain a major component named "Amador" based on the degree to which component horizon data has been populated.
