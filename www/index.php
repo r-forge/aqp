@@ -87,7 +87,9 @@ echo $contents; } ?>
 
 <li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/KSSL-demo.html?root=aqp">getting/comparing KSSL data</a></li>
 
-<li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/fetchNASIS-mini-tutorial.html?root=aqp">Tips on getting data from NASIS into R</a></li>
+<li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/fetchNASIS-mini-tutorial.html?root=aqp">Loading NASIS pedon data</a></li>
+
+<li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/NASIS-component-data.html?root=aqp">Loading NASIS component data</a></li>
 
 <li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/export-points-from-NASIS.html?root=aqp">Export NASIS pedon data to SHP file</a></li>
 
