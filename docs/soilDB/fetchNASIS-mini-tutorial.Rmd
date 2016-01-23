@@ -29,9 +29,9 @@ Please see the [related tutorial on loading NASIS component data into R](https:/
 
 
 ## Pedon Data
-Pedon data are extracted from the selected set using the `fetchNASIS()` convenience function. The resulting object is a distillation of the complex NASIS representation of a pedon into "site", "horizon", and "diagnostic" attributes. [elaborate as needed]. 
+Pedon data are extracted from the selected set using the `fetchNASIS()` convenience function. The resulting object is a distillation of the complex NASIS representation of a pedon into "site-level", "horizon-level", and "diagnostic" attributes. In the process of creating this simplified representation of pedon data we've tried to include the most often used data related to soil pedons.  The SPC is not comprehensive and does not include all the attributes that may related data in NASIS. [elaborate as needed]
 
-Load up your local database and selected set with some pedons and follow along with the code blocks  NASIS queries should "target" the tables:
+Load up your local database and selected set with some pedon data and follow along with the code blocks.  Any NASIS queries used to load data into your selected set should always "target" the following tables:
 
  * Site
  * Pedon
@@ -76,8 +76,8 @@ title("Pedons with landform.string matching regular expression 'glacial'", cex.m
 # locate pedons with "till" in the parent material kind field
 idx <- grep('till', p$pmkind, ignore.case = TRUE)
 till <- p[idx, ]
-# remove those pedons with "unspecified" in the parent material kind field
-# note the use of invert=TRUE
+# apply an additional filter and remove those pedons from this group that have "unspecified" in the parent material kind field
+# note the use of invert=TRUE within grep()
 idx <- grep('unspecified', till$pmkind, ignore.case = TRUE, invert = TRUE)
 till <- till[idx, ]
 
