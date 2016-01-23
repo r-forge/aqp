@@ -194,7 +194,7 @@ plot(p.mu.polys[which(p.mu.polys$mukey %in% setdiff(p.mu.polys$mukey, res$mukey)
 lines(p.buff, col='red', lwd=2)
 plot(extent(bbox(p.buff)), add=TRUE, col='RoyalBlue')
 points(p, col='orange', pch=15)
-legend('bottomleft', legend=c('query point', '1000m buffer', 'buffer BBOX', 'intersecting polgons', 'overlapping polygons'), col=c('orange', 'red', 'royalblue', 'black', 'grey'), lwd=c(NA, 2, 2, 2, 2), pch=c(15, NA, NA, NA, NA))
+legend('bottomleft', legend=c('query point', '1000m buffer', 'buffer BBOX', 'intersected polygons', 'overlapping polygons'), col=c('orange', 'red', 'royalblue', 'black', 'grey'), lwd=c(NA, 2, 2, 2, 2), pch=c(15, NA, NA, NA, NA))
 box()
 ```
 
@@ -202,10 +202,16 @@ box()
 Get some component data for a manually-defined bounding box, defined in WGS84 geographic coordinates.
 ```{r sda-spatial-query-basics-2}
 # define a bounding box: xmin, xmax, ymin, ymax
+#
+#         +-------------------(ymax, xmax)
+#         |                        |
+#         |                        |
+#     (ymin, xmin) ----------------+
+
 b <- c(-120.9, -120.8, 37.7, 37.8)
 # convert bounding box to WKT
 p <- writeWKT(as(extent(b), 'SpatialPolygons'))
-# compose query, using WKT BBOX as filtering critera
+# compose query, using WKT BBOX as filtering criteria
 q <- paste0("SELECT mukey, cokey, compname, comppct_r
             FROM component 
             WHERE mukey IN (SELECT DISTINCT mukey FROM SDA_Get_Mukey_from_intersection_with_WktWgs84('", p, "') )
@@ -228,7 +234,7 @@ p <- SpatialPoints(cbind(-121.77100, 37.368402), proj4string = CRS('+proj=longla
 SDA_make_spatial_query(p)
 ```
 
-The second function `SDA_query_features()` will iterate over the features of a `Spatial*` (Points, Lines, Polygons) object, send a query to SDA, and set of return the results as a `data.frame` object. This time, our example set of 2 points will also have some fake pedons IDs.
+The second function `SDA_query_features()` will iterate over the features of a `Spatial*` (Points, Lines, Polygons) object, send a query to SDA, and return a set of the results as a `data.frame` object. This time, our example set of 2 points will also have some fake pedons IDs.
 ```{r sda-spatial-query-helper-functions-examples-2, results='hide'}
 # the query points are in geographic coordinates with WGS84 datum
 p <- SpatialPointsDataFrame(cbind(c(-121, -122), c(37, 37)), data=data.frame(pedon_id=1:2), proj4string = CRS('+proj=longlat +datum=WGS84'))
@@ -245,6 +251,7 @@ auburn <- fetchKSSL('auburn')
 auburn <- subsetProfiles(auburn, s='!is.na(x) & !is.na(y)')
 # init spatial information
 coordinates(auburn) <- ~ x + y
+# define projection
 proj4string(auburn) <- '+proj=longlat +datum=NAD83'
 
 # extract "site data"
@@ -252,7 +259,7 @@ auburn.sp <- as(auburn, 'SpatialPointsDataFrame')
 # perform SDA query on each "site", result is a data.frame
 mu.data <- SDA_query_features(auburn.sp, id='pedlabsampnum')
 
-# join results to original SoilProfileCollection using 'pedlabsamnum'
+# join results to original SoilProfileCollection using 'pedlabsampnum'
 site(auburn) <- mu.data
 ```
 
