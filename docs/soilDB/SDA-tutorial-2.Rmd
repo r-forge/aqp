@@ -25,7 +25,7 @@ This is a short tutorial on how to interact with the [Soil Data Access (SDA) web
 
 XXXX
 
-Follow along with the blocks of code below by copying / pasting into a new R "script" document. Each block of command can be run by pasting into the R console, or by "stepping through" lines of code by moving the cursor to the top of a block (in the R script panel) and repeatedly pressing ctrl + enter.
+Follow along with the blocks of code below by copying / pasting into a new R "script" document. Each block of commands can be run by pasting them into the R console, or by "stepping through" lines of code by moving the cursor to the top of a block (in the R script panel) and repeatedly pressing ctrl + enter.
 
 ### Install Required R Packages
 You only need to do this once. If you haven't installed these packages, then copy the code below and paste into the RStudio "console" pane.
