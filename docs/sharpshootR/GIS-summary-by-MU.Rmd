@@ -89,7 +89,9 @@ mu$pID <- seq(from=1, to=length(mu))
 
 
 ## Raster Data
-Raster data sources should be in a file format the can be read by the GDAL library; GeoTiFF, ArcGrid, or ERDAS formats are typically a safe option. Several raster data sources are used in this example:
+Raster data sources should be in a file format the can be read by the GDAL library; GeoTiFF, ArcGrid, or ERDAS formats are typically a safe option. There is currently no way to read raster data from an ESRI FileGeodatabase. 
+
+Several raster data sources are used in this example:
  
  * "maat": 800 meter resolution, mean annual air temperature (1981--2010 PRISM) [UTM zone 10]
  * "ppt": 800 meter resolution, mean annual precipitation (1981--2010 PRISM) [UTM zone 10]
@@ -110,13 +112,29 @@ raster.list <- list(maat=raster('E:/gis_data/prism/tavg_1981_2010.tif'),
 ```
 
 
-Depending on the number of raster files, resolution, extent, and amount of memory on your workstation, it may be possible to load all of the rasters into RAM. It is worth trying because the performance gain can be significant. If you do not have enough memory, consider closing other applications and trying again.
-```{r load-raster-data-2}
-# estimate required RAM
-est <- sum(sapply(raster.list, ncell) * 1.1) / 1000 / 1000
-# load into RAM, if the estimated size of all rasters is smaller than available memory
-if(est < memory.size())
-  raster.list <- lapply(raster.list, readAll)
+Depending on the number of raster files, resolution, extent, and amount of memory on your workstation, it may be possible to load all of the rasters into RAM. It is worth trying because the performance gain can be significant. If you do not have enough memory, consider closing other applications and trying again. The following code will attempt to load all raster layers into memory, one at a time.
+```{r load-raster-data-2, results='show'}
+# estimate required RAM, in MB, descending order
+raster.storage.mb <- sort((sapply(raster.list, ncell) * 1.1) / 1000 / 1000)
+# iterate over rasters and read into memory if possible
+for(i in 1:length(raster.storage.mb)) {
+  # update available memory
+  mem.available.mb <- memory.size()
+  # current raster
+  r.i <- raster.storage.mb[i]
+  r.i.name <- names(r.i)
+  # load current raster into RAM if it will fit
+  if(r.i < mem.available.mb) {
+    # only load rasters that are not already in RAM
+    if(! inMemory(raster.list[[r.i.name]]) ){
+      raster.list[[r.i.name]] <- readAll(raster.list[[r.i.name]])
+      print(paste0(r.i.name, ' raster loaded into RAM')) 
+    }
+  }
+  else
+    print(paste0(r.i.name, ' raster NOT loaded into RAM')) 
+}
+
 ```
 
 
