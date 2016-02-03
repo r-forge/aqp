@@ -19,7 +19,7 @@ Viewing Pedon Data from NASIS in Google Earth
 `r format(Sys.time(), "%Y-%m-%d")`
 Jay Skovlin
 
-This document demonstrates how to use the [soilDB](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/soilDB-Intro.html?root=aqp) package to export pedon locations from the local NASIS database to generate KML files for viewing in Google Earth.
+This document demonstrates how to use the [soilDB](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/soilDB-Intro.html?root=aqp) package to export pedon locations from a local NASIS database and then use the [plotKML](https://cran.r-project.org/web/packages/plotKML/plotKML.pdf) package to generate KML files for viewing in Google Earth.  
 
 ### Setup Local NASIS DB
  1. load selected set with pedons and sites of interest
@@ -28,7 +28,7 @@ This document demonstrates how to use the [soilDB](https://r-forge.r-project.org
 
 
 ### Install R Packages
-With a recent version of R, it should be possible to get all of the packages that this tutorial depends on with the following commands. Note that you only have to do this once.
+With a recent version of R, it should be possible to get all of the packages that this tutorial depends on with the following commands. Note that you only need to do this once.
 ```{r install-deps, eval=FALSE}
 # run these commands in the R console
 install.packages('soilDB', dep=TRUE) # stable version from CRAN + dependencies
@@ -59,22 +59,22 @@ f <- fetchNASIS()
 good.idx <- which(!is.na(f$x_std) & !is.na(f$y_std))
 f <- f[good.idx, ]
 
-# init coordinates from WGS84 decimal degrees
+# initialize coordinates from WGS84 decimal degrees
 coordinates(f) <- ~ x_std + y_std
-# assign projection string
+# assign the appropriate projection string
 proj4string(f) <- '+proj=longlat +datum=WGS84'
 
-# extract only site data
+# extract only site-level data
 s <- as(f, 'SpatialPointsDataFrame')
 
-# graphical check
+# graphically check by plotting them in R
 par(mar=c(1,1,1,1))
 plot(s)
 
-# subsetting to columns from the site data that may useful as labels
+# subset to columns from the site data that may useful as labels
 s <- s[, c("site_id", "pedon_id", "obs_date", "pedlabsampnum", "taxonname", "hillslope_pos", "elev_field", "slope_field", "aspect_field", "plantassocnm", "bedrckdepth", "bedrock_kind", 'pmkind', 'pmorigin')]
 
-# generate KML file of site locations
+# generate a basic KML file of site locations with site_id specified as the placemark labels
 # set KML file path
 kml_file_path <- 'C:/temp/R_sites.kml'
 kml_open(file.name=kml_file_path, folder.name='Sites', overwrite=TRUE)
@@ -82,6 +82,7 @@ kml_layer.SpatialPoints(s, title='Sites', colour='royalblue', labels=site_id, sh
 kml_close(kml_file_path)
 
 # could also be scripted this way using the plotKML() which automatically wraps the above functions
+# notice that in this version, the paste function is used to concatenate the site_id and taxonname for labels
 plotKML(s, colour_scale=rep('royalblue', 2), points_names=paste(s$site_id, s$taxonname, sep=", "), folder.name="Sites", file.name="R_sites.kml")
 ```
 
@@ -89,18 +90,18 @@ plotKML(s, colour_scale=rep('royalblue', 2), points_names=paste(s$site_id, s$tax
 ![GE_image](./GE_example1.jpg)
 
 
-### Building spacetime into Pedon data KML files using site observation date information
-The following example uses the site observation date/time field to animate a KML file using the timeslider option in Google Earth.  This can be useful if you are interested in viewing the chronologic order in which pedons were sampled.
+### Building timestamps into Pedon data KML files using site observation date information
+The following example uses the site observation date/time field to animate a KML file using the timeslider option in Google Earth.  This can be useful if you are interested in viewing the chronologic order in which pedons were sampled for an area.
 
 ```{r example2, eval=FALSE}
-# set the timespan begin and end option and use paste to concatenate site_id with taxonname fields
+# set the timespan begin and end parameters and use paste to concatenate site_id with taxonname fields as the labels
 plotKML(s, colour_scale=rep('royalblue', 2), points_names=paste(s$site_id, s$taxonname, sep=", "), folder.name="Sites_date-time", file.name='R_sites_with_date-time.kml', TimeSpan.begin=format(s$obs_date, "%Y-%m-%d"), TimeSpan.end=format(s$obs_date, "%Y-%m-%d"))
 ```
 ### Embedding a link to NASIS pedon description report into KML files
-The following KML uses the observation date/time field to animate the KML file using the timeslider option in Google Earth.  This can be handy if you are interested in viewing the chronologic order in which pedons were sampled.
+The script below builds a URL to a web-based NASIS pedon description report for each site and then embeds the link within each placemark balloon in the resulting KML file.  This demonstrates some of the potential of what could be embedded within kml files. Notice that the other attributes in the subset of site-level data above also appear within the placemark balloon.
 
 ```{r example3, eval=FALSE}
-# build URL to NASIS Web Pedon Description Report
+# build URL to NASIS Web Pedon Description Report and add this as a column to our site data
 s$report_link <- paste('<a href="https://nasis.sc.egov.usda.gov/NasisReportsWebSite/limsreport.aspx?report_name=Pedon+Description+html+(userpedid)&pedon_id=', s$pedon_id, '">Pedon Description Report</a>', sep='')
 
 kml_file_path <- 'C:/temp/R_sites_with_report_link.kml'
