@@ -23,7 +23,7 @@ D.E. Beaudette
 
 
 ## Introduction
-This tutorial decribes one approach to summarizing raster data (e.g. slope, aspect, PRISM data, etc.) according to delineations of a specific map unit. The examples outlined below are a good starting point for a more rigorous examination of map unit variability for the purposes of SDJR, quality control, or DSM project. You will need to adjust file paths to raster and vector data sources below, in order to follow along with your own data.
+This tutorial decribes one approach to summarizing raster data (e.g. slope, aspect, PRISM data, etc.) according to delineations of a specific map unit. The examples outlined below are a good starting point for a more rigorous examination of map unit variability for the purposes of SDJR, quality control, MLRA update work, or DSM project. You will need to adjust file paths to raster and vector data sources below, in order to follow along with your own data.
 
 ### Adapting Content to Your Data
 Copy and paste blocks of code in this tutorial into a new R Studio script file (*ctrl + shift + n* makes a new file), edit, and then run. Running lines or blocks of code in an RStudio script file is as simple as moving the cursor to the line (or selecting a block) of code and press *ctrl + enter*.
@@ -45,7 +45,7 @@ install.packages('sharpshootR', repos="http://R-Forge.R-project.org", type='sour
 
 
 ## Map Unit Data
-Map unit polyons can be loaded from shapefile, "file" geodatabase, or any other OGR-compatible data source. When working with large data sets it can be advantageous to export a subset of polygons using an external GIS application. In this example, the subsetting operations is performed in R. Be sure to adjust the file path below to point to a file containing map unit polygons.
+Map unit polyons can be loaded from shapefile, "file" geodatabase, [SDA](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/SDA-tutorial.html?root=aqp), or any other [OGR-compatible](http://www.gdal.org/) data source. When working with a large number of polygons it can be advantageous to work with a subset generated using an external GIS application. In this example, the subsetting operations is performed in R. Be sure to adjust the path below to point to a file containing map unit polygons.
 
 Specifying paths in R must be done with either a single forward slash (/) or two backslashes (\\\\) between directories. Specifying the path to a shapefile or other data source also requires specialised syntax:
 
@@ -70,6 +70,7 @@ library(raster)
 library(plyr)
 library(reshape2)
 library(sharpshootR)
+library(lattice)
 
 # load map unit polygons
 # Shapefile Example
@@ -128,7 +129,7 @@ Sampling of map unit polygons is performed with the `constantDensitySampling()` 
  * `min.samples`: minimum number of samples required per polygon
  * `polygon.id`: column containing a unique polygon ID
  
-
+The following code will only work if the coordiante reference system of the map unit polygons and sampled raster (slope in this case) are the same. In this example the two data sets are both using the UTM zone 10, NAD83 coordinate system.
 ```{r generate-sampling-points, fig.width=6, fig.height=5.5}
 # sample each polygon at a constant density, 1 point per acre
 s <- constantDensitySampling(mu, n.pts.per.ac=1, min.samples=1, polygon.id='pID')
@@ -139,6 +140,7 @@ p.example <- mu[which(mu$pID == 2), ]
 s.example <- s[which(s$pID == 2), ]
 
 # graphical check of a single polygon
+# note: polygons and raster must use the same coordinate reference system
 par(mar=c(1,1,4,1))
 # plotting the raster named "slope", you may need to adjust depending on your raster data
 plot(raster.list[['slope']], ext=extent(p.example), axes=FALSE)
@@ -170,23 +172,48 @@ d <- subset(d, subset=variable != 'aspect')
 ```
 
 
+### Check Distributions
+Sometimes it is useful to see the distribution of each sampled raster. [Density plots](https://en.wikipedia.org/wiki/Density_estimation) are a modern alternative to the [histogram](https://en.wikipedia.org/wiki/Histogram) and useful for investigating univariate distributions. The x-axis units are defined by the raster layer named in the panel "strips". The y-axis units are based on relative proportion or frequency. The 5th, 50th, and 95th percentiles are printed in red, near the bottom edge of each panel.
+```{r bw-plot, fig.width=8, fig.height=7}
+densityplot(~ value | variable, data=d, scales=list(relation='free'), plot.points=FALSE, col='black', panel=function(x, ...) {
+  panel.densityplot(x, ...)
+  p.stats <- quantile(x, probs=c(0.05, 0.5, 0.95), na.rm = TRUE)
+  panel.text(x=p.stats, y=0, round(p.stats), pch=15, col='red')
+})
+```
+
+
+
 ## Summarize Raster Stats Over All Delineations
-[Quantiles](https://en.wikipedia.org/wiki/Quantile) are a convenient and (mostly) assumption-free method for describing distributions. In this tutorial the 5th, 50th, and 95th percentiles are used to represent "low", "RV", and "high" values. [Quartile coefficient of dispersion](https://en.wikipedia.org/wiki/Quartile_coefficient_of_dispersion) (QCD).
+[Quantiles](https://en.wikipedia.org/wiki/Quantile) are a convenient and (mostly) assumption-free method for describing distributions. In this tutorial the 5th, 25th, 50th, 75thm and 95th percentiles are used to summarize distributions. The 5th, 50th (median), and 95th percentiles are good candidates for "low", "RV", and "high" values. An estimate of variation relative to central tendancy is computed using the [meadian absolute deviation (MAD)](https://en.wikipedia.org/wiki/Median_absolute_deviation) divided by the median. This value is commonly refered to as the MADM. The natural logarithm of the absolute value of MADM yields an index of variation, scaled by central tendancy, that is useful for comparison of populations that have drastically different scales. For example, precipitation in mm vs. slope in percent. Smaller values suggest less variability.
 ```{r summarize-samples, fig.width=6, fig.height=7}
-stats <- ddply(d, 'variable', function(i) {
-  # compute 5th, 50th, and 95th percentiles
-  q <- quantile(i$value, probs=c(0.05, 0.5, 0.95), na.rm = TRUE)
-  # round
+# define summarizing function
+summary.function <- function(i, p=c(0.05, 0.25, 0.5, 0.75, 0.95)) {
+   # remove NA
+  v <- na.omit(i$value)
+  # compute quantiles
+  q <- quantile(v, probs=p)
   q <- round(q)
-  q2 <- quantile(i$value, probs=c(0.25, 0.75), na.rm=TRUE)
-  QCD <- (q2[2] - q2[1]) / (q2[2] + q2[1])
   res <- data.frame(t(q))
-  if(nrow(res) > 0)
-    res$QCD <- QCD
-  # assign reasonable names (quantiles)
-  names(res) <- c('q05', 'q50', 'q95', 'QCD')
-  return(res)
-  })
+  # compute spread around central tendancy, but only if there are > 1 samples
+  if(nrow(res) > 0) {
+    # MADM: MAD / median
+    # take the natural log of absolute values of MADM
+    res$log_abs_madm <- log(abs(mad(v) / median(v)))
+    # 0's become -Inf: convert to 0
+    res$log_abs_madm[which(is.infinite(res$log_abs_madm))] <- 0
+    
+    # assign reasonable names (quantiles)
+    names(res) <- c(paste0('Q', p * 100), 'log_abs_madm')
+    return(res)
+  }
+  # return NULL if there are < 1 samples
+  else
+    return(NULL)
+  }
+
+# apply summary function to samples collected from each raster
+stats <- ddply(d, 'variable', summary.function)
 
 # print stats to screen
 stats
@@ -194,25 +221,19 @@ stats
 
 
 ## Summarize Raster Stats by Polygon
-Sometimes it is useful to summarize raster data for *each* polygon. in this case the median value of each raster sampled is retained.
+Sometimes it is useful to summarize raster data for *each* polygon. The summary function defined above is used here as well.
 ```{r summarize-by-poly-4}
-# compute median values by polygon
-poly.stats <- ddply(d, c('pID', 'variable'), function(i) {
-  # q25, q50, q75
-  q <- quantile(i$value, probs=c(0.05, 0.5, 0.95), na.rm = TRUE)
-  QCD <- (q[3] - q[1]) / (q[3] + q[1])
-  res <- data.frame(m=round(q[2]), QCD=round(QCD, 5))
-  return(res)  
-})
+# compute summaries
+poly.stats <- ddply(d, c('pID', 'variable'), summary.function)
 
 # convert to wide format, keeping median value
-poly.stats.wide.1 <- dcast(poly.stats, pID ~ variable, value.var = 'm')
-# convert to wide format, keeping QCD
-poly.stats.wide.2 <- dcast(poly.stats, pID ~ variable, value.var = 'QCD')
+poly.stats.wide.1 <- dcast(poly.stats, pID ~ variable, value.var = 'Q50')
+# convert to wide format, keeping log_abs_madm
+poly.stats.wide.2 <- dcast(poly.stats, pID ~ variable, value.var = 'log_abs_madm')
 
 # add a suffix to variable names so that we can combine
-names(poly.stats.wide.1)[-1] <- paste0(names(poly.stats.wide.1)[-1], '_med')
-names(poly.stats.wide.2)[-1] <- paste0(names(poly.stats.wide.2)[-1], '_QCD')
+names(poly.stats.wide.1)[-1] <- paste0(names(poly.stats.wide.1)[-1], '_Q50')
+names(poly.stats.wide.2)[-1] <- paste0(names(poly.stats.wide.2)[-1], '_log_abs_madm')
 
 # join median + QCD stats for each polygon
 poly.stats.wide <- join(poly.stats.wide.1, poly.stats.wide.2, by='pID')
@@ -239,7 +260,7 @@ writeOGR(mu, dsn='.', layer='polygons-with-stats', driver='ESRI Shapefile', over
 Aspect angle is a circular value and thus requires a specialized approach to computing quantiles. A graphical depiction helps with interpretation.
 ```{r summarize-aspect, fig.width=6, fig.height=6}
 par(mar=c(0,0,0,0))
-circ.stats <- aspect.plot(d.circ$value, q=c(0.05, 0.5, 0.95), plot.title='xxx', pch=NA, bg='RoyalBlue', col='black', arrow.col=c('grey', 'red', 'grey'), stack=FALSE, p.bw=90)
+circ.stats <- aspect.plot(d.circ$value, q=c(0.05, 0.5, 0.95), plot.title='7089', pch=NA, bg='RoyalBlue', col='black', arrow.col=c('grey', 'red', 'grey'), stack=FALSE, p.bw=90)
 
 print(round(circ.stats))
 ```
@@ -250,9 +271,10 @@ print(round(circ.stats))
 The following code chunks highlight some additional ways in which the sampled raster values can be used to perform quality control or gain additional insight into map unit variability.
 
 
-Locate polygons with >15% of samples outside of 5th-95th percentiles.
+Locate polygons with >15% of samples outside of 5th-95th percentile range.
 ```{r summarize-by-poly-2, fig.width=7, fig.height=7}
-polygons.to.check <- ddply(d, 'variable', function(i) {
+# define function to check for polygons with p.crit fraction of samples outside of range
+f.check <- function(i, p.crit=0.15) {
   
   # convert to values -> quantiles
   e.i <- ecdf(i$value)
@@ -264,10 +286,13 @@ polygons.to.check <- ddply(d, 'variable', function(i) {
   tab <- sort(prop.table(table(i$pID[out.idx])), decreasing = TRUE)
   df <- data.frame(pID=names(tab), prop.outside.range=round(unlist(tab), 2))
   # keep only those with > 15% of samples outside of range
-  df <- df[which(df$prop > 0.15), ] 
+  df <- df[which(df$prop > p.crit), ] 
 
   return(df)
-})
+}
+
+# apply across raster values, to all polygons
+polygons.to.check <- ddply(d, 'variable', f.check)
 
 # print details on flagged polygons
 polygons.to.check
@@ -292,21 +317,35 @@ writeOGR(mu[check.idx, ], dsn='.', layer='flagged_polygons', driver='ESRI Shapef
 
 
 Sort polygons based on similarity of sampled raster values.
-```{r summarize-by-poly-5, eval=FALSE}
+```{r summarize-by-poly-5, eval=TRUE, fig.width=6, fig.height=6, results='hide'}
 # additional libraries
 library(cluster)
 library(MASS)
 
 # eval numerical distance
 p.dist <- daisy(poly.stats.wide[, -1], stand=TRUE)
-# map to 2D space via Sammon Mapping
+# may need to tinker with number of clusters, 3 seems about right here
+# cluster using divisive heirachical method
+# the clustering vector is in the same order as our polygons
+clusters <- cutree(diana(p.dist), 3)
+
+# map distance matrix to 2D space via Sammon Mapping
 p.sammon <- sammon(p.dist)
 
 # plot
-par(mar=c(1,1,1,1))
+par(mar=c(1,1,3,1))
 plot(p.sammon$points, type='n', axes=FALSE, asp=1)
-text(p.sammon$points, labels = poly.stats.wide$pID, cex=0.5)
+abline(h=0, v=0, lty=2, col='grey')
+text(p.sammon$points, labels = poly.stats.wide$pID, cex=0.5, col=clusters)
 box()
+title('Polygon IDs Organized According to Similarity of Raster Values')
+
+# save clustering vector to original polygons, and map
+mu$cluster <- clusters
+par(mar=c(1,1,3,1))
+plot(mu, col=mu$cluster, border=mu$cluster)
+box()
+title('Polygons Grouped According to Similarity of Raster Values')
 ```
 
 
@@ -314,7 +353,6 @@ box()
 1. scoring polygon bases on deviation from slope class limits
 2. use gdalUtils to extract specific map unit polygons from large geodatabases (requires working GDAL installation)
 3. generalized approach for comparing map units
-4. use polygon data from SDA
 
 ----------------------------
 This document is based on `sharpshootR` version `r utils::packageDescription("sharpshootR", field="Version")`.
