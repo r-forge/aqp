@@ -23,7 +23,7 @@ D.E. Beaudette
 
 
 ## Introduction
-This tutorial decribes one approach to summarizing raster data (e.g. slope, aspect, PRISM data, etc.) according to delineations of a specific map unit. The examples outlined below are a good starting point for a more rigorous examination of map unit variability for the purposes of SDJR, quality control, MLRA update work, or DSM project. You will need to adjust file paths to raster and vector data sources below, in order to follow along with your own data.
+This tutorial describes one approach to summarizing raster data (e.g. slope, aspect, PRISM data, etc.) according to delineations of a specific map unit. The examples outlined below are a good starting point for a more rigorous examination of map unit variability for the purposes of SDJR, quality control, MLRA update work, or DSM project. You will need to adjust file paths to raster and vector data sources below, in order to follow along with your own data.
 
 ### Adapting Content to Your Data
 Copy and paste blocks of code in this tutorial into a new R Studio script file (*ctrl + shift + n* makes a new file), edit, and then run. Running lines or blocks of code in an RStudio script file is as simple as moving the cursor to the line (or selecting a block) of code and press *ctrl + enter*.
@@ -40,14 +40,15 @@ install.packages('reshape2', dep=TRUE)
 install.packages('rgdal', dep=TRUE)
 install.packages('raster', dep=TRUE)
 install.packages('sharpshootR', dep=TRUE) # stable version from CRAN + dependencies
-install.packages('sharpshootR', repos="http://R-Forge.R-project.org", type='source') # most recent copy from r-forge
+# most recent copy from r-forge
+install.packages('sharpshootR', repos="http://R-Forge.R-project.org", type='source') 
 ```
 
 
 ## Map Unit Data
-Map unit polyons can be loaded from shapefile, "file" geodatabase, [SDA](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/SDA-tutorial.html?root=aqp), or any other [OGR-compatible](http://www.gdal.org/) data source. When working with a large number of polygons it can be advantageous to work with a subset generated using an external GIS application. In this example, the subsetting operations is performed in R. Be sure to adjust the path below to point to a file containing map unit polygons.
+Map unit polygons can be loaded from shapefile, "file" geodatabase, [SDA](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/SDA-tutorial.html?root=aqp), or any other [OGR-compatible](http://www.gdal.org/) data source. When working with a large number of polygons it can be advantageous to work with a subset generated using an external GIS application. In this example, the subsetting operations is performed in R. Be sure to adjust the path below to point to a file containing map unit polygons.
 
-Specifying paths in R must be done with either a single forward slash (/) or two backslashes (\\\\) between directories. Specifying the path to a shapefile or other data source also requires specialised syntax:
+Specifying paths in R must be done with either a single forward slash (/) or two backslashes (\\\\) between directories. Specifying the path to a shapefile or other data source also requires specialized syntax:
 
  * **file geodatabase** (E:/gis_data/FG_CA630.gdb)
     + dsn="path_to_file/file.gdb"
@@ -61,7 +62,7 @@ Specifying paths in R must be done with either a single forward slash (/) or two
     + geometry must be specified using SQL
     + [examples here](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/SDA-tutorial-2.html?root=aqp)
 
-After loading and optionally filtering-out a single map unit, a unique ID is assigned to each polygon. This ID can later be used to reference polygons are associatiated with raster values outside of some ideal range.
+After loading and optionally filtering-out a single map unit, a unique ID is assigned to each polygon. This ID can later be used to reference polygons that are associated with raster values outside of some ideal range.
 
 ```{r get-mu-data, fig.width=6, fig.height=7, results='hide'}
 # load required packages
@@ -139,7 +140,7 @@ for(i in 1:length(raster.storage.mb)) {
 
 
 ## Generate Sampling Points
-As long as within-polygon variability (elevation, slope, aspect, etc.) is realitvely low, it is possible to generate reasonable summaries of these values using a subset of those pixels that fall within each polygon. Sampling each polygon at a constant density (e.g. 1 sample per ac.) ensures that summaries of raster data are not biased by polygon size. It is important to select a sampling density based extent and size of map unit delineations relative to raster data resolution. For example, a lower density (1 sample per 10 ac.) would be sufficient for summarizing broad-scale variation in climate, while a higher density (2 samples per ac.) would be required to capture finer-scale variation in slope.
+As long as within-polygon variability (elevation, slope, aspect, etc.) is relatively low, it is possible to generate reasonable summaries of these values using a subset of those pixels that fall within each polygon. Sampling each polygon at a constant density (e.g. 1 sample per ac.) ensures that summaries of raster data are not biased by polygon size. It is important to select a sampling density based extent and size of map unit delineations relative to raster data resolution. For example, a lower density (1 sample per 10 ac.) would be sufficient for summarizing broad-scale variation in climate, while a higher density (2 samples per ac.) would be required to capture finer-scale variation in slope.
 
 Sampling of map unit polygons is performed with the `constantDensitySampling()` function from the sharpshootR package. Relevant arguments to this function include:
 
@@ -147,7 +148,7 @@ Sampling of map unit polygons is performed with the `constantDensitySampling()` 
  * `min.samples`: minimum number of samples required per polygon
  * `polygon.id`: column containing a unique polygon ID
  
-The following code will only work if the coordiante reference system of the map unit polygons and sampled raster (slope in this case) are the same. In this example the two data sets are both using the UTM zone 10, NAD83 coordinate system.
+The following code will only work if the coordinate reference system of the map unit polygons and sampled raster (slope in this case) are the same. In this example the two data sets are both using the UTM zone 10, NAD83 coordinate system.
 ```{r generate-sampling-points, fig.width=6, fig.height=5.5}
 # sample each polygon at a constant density, 1 point per acre
 s <- constantDensitySampling(mu, n.pts.per.ac=1, min.samples=1, polygon.id='pID')
@@ -172,7 +173,7 @@ title('Sampling Points, Polygon #2\nSlope Raster')
 ## Extract Raster Data at Sample Points
 The following code iterates over each raster, extracts values at sample points, and combines into a single object, `d`. Sample points are automatically transformed to the spatial reference system of each raster by the `extract()` function. Note that samples from "continuous" data sources (elev, slope, etc.) are split from "circular" data sources (aspect).
 ```{r extract-at-points, fig.width=6, fig.height=7}
-# init a list to store results
+# initialize a list to store results
 l <- list()
 
 for(i in seq_along(raster.list)) {
@@ -180,7 +181,7 @@ for(i in seq_along(raster.list)) {
   l[[i.name]] <- data.frame(value=extract(raster.list[[i]], s), pID=s$pID)
   }
 
-# convert to DF and fix default naming of raster column
+# convert to dataframe and fix default naming of raster column
 d <- ldply(l)
 names(d)[1] <- 'variable'
 
@@ -203,7 +204,7 @@ densityplot(~ value | variable, data=d, scales=list(relation='free'), plot.point
 
 
 ## Summarize Raster Stats Over All Delineations
-[Quantiles](https://en.wikipedia.org/wiki/Quantile) are a convenient and (mostly) assumption-free method for describing distributions. In this tutorial the 5th, 25th, 50th, 75thm and 95th percentiles are used to summarize distributions. The 5th, 50th (median), and 95th percentiles are good candidates for "low", "RV", and "high" values. An estimate of variation relative to central tendancy is computed using the [meadian absolute deviation (MAD)](https://en.wikipedia.org/wiki/Median_absolute_deviation) divided by the median. This value is commonly refered to as the MADM. The natural logarithm of the absolute value of MADM yields an index of variation, scaled by central tendancy, that is useful for comparison of populations that have drastically different scales. For example, precipitation in mm vs. slope in percent. Smaller values suggest less variability.
+[Quantiles](https://en.wikipedia.org/wiki/Quantile) are a convenient and (mostly) assumption-free method for describing distributions. In this tutorial the 5th, 25th, 50th, 75thm and 95th percentiles are used to summarize distributions. The 5th, 50th (median), and 95th percentiles are good candidates for "low", "RV", and "high" values. An estimate of variation relative to central tendency is computed using the [median absolute deviation (MAD)](https://en.wikipedia.org/wiki/Median_absolute_deviation) divided by the median. This value is commonly referred to as the MADM. The natural logarithm of the absolute value of MADM yields an index of variation, scaled by central tendency, that is useful for comparison of populations that have drastically different scales. For example, precipitation in mm vs. slope in percent. Smaller values suggest less variability.
 ```{r summarize-samples, fig.width=6, fig.height=7}
 # define summarizing function
 summary.function <- function(i, p=c(0.05, 0.25, 0.5, 0.75, 0.95)) {
@@ -213,7 +214,7 @@ summary.function <- function(i, p=c(0.05, 0.25, 0.5, 0.75, 0.95)) {
   q <- quantile(v, probs=p)
   q <- round(q)
   res <- data.frame(t(q))
-  # compute spread around central tendancy, but only if there are > 1 samples
+  # compute spread around central tendency, but only if there are > 1 samples
   if(nrow(res) > 0) {
     # MADM: MAD / median
     # take the natural log of absolute values of MADM
