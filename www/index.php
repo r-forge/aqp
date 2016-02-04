@@ -80,6 +80,8 @@ echo $contents; } ?>
 
 <li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/sharpshootR/OSD-dendrogram.html?root=aqp">OSD Dendrogram</a></li>
 
+<li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/aqp/hz-transition-probabilities.html?root=aqp">Horizon Transition Probabilities</a></li>
+
 <li>USDA-NRCS Data Sources<ol>
 <li><a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/soilDB-Intro.html?root=aqp">getting soils data from USDA-NCSS databases</a></li>
 
