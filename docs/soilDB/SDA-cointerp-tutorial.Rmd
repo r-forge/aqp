@@ -39,7 +39,7 @@ library(reshape2)
 library(lattice)
 
 # beware, there are hard limits (10k rows) on what can be returned by SDA
-q <- "SELECT component.cokey, compname, mrulename, interplr, interphr 
+q <- "SELECT component.cokey, compname, mrulename, interplr, interplrc
 FROM component INNER JOIN cointerp ON component.cokey = cointerp.cokey
 WHERE compname IN ('Auburn', 'Dunstone', 'Hanford')
 AND seqnum = 0
@@ -75,8 +75,23 @@ s <- ddply(x, c('mrulename', 'compname'), summarize,
            rv=quantile(interplr, probs=0.5, na.rm=TRUE), 
            high=quantile(interplr, probs=0.95, na.rm=TRUE))
 
-kable(dcast(s, mrulename ~ compname, value.var = 'rv'), caption = "Median Fuzzy Ratings")
+knitr::kable(dcast(s, mrulename ~ compname, value.var = 'rv'), caption = "Median Fuzzy Ratings")
 ```
+
+
+What about the categorical ratings?
+```{r}
+knitr::kable(xtabs(~ interplrc + compname , data=x, subset= mrulename == 'ENG - Construction Materials; Topsoil'), caption="ENG - Construction Materials; Topsoil")
+
+knitr::kable(xtabs(~ interplrc + compname , data=x, subset= mrulename == 'AGR - California Revised Storie Index (CA)'), caption = "AGR - California Revised Storie Index (CA)'")
+
+knitr::kable(xtabs(~ interplrc + compname , data=x, subset= mrulename == 'ENG - Septic Tank Absorption Fields'), caption = "ENG - Septic Tank Absorption Fields")
+
+knitr::kable(xtabs(~ interplrc + compname , data=x, subset= mrulename == 'ENG - Sewage Lagoons'), caption = "ENG - Sewage Lagoons")
+```
+
+
+
 
 
 To be continued.
