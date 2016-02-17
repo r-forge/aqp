@@ -85,8 +85,9 @@ v <- c('lithic.contact', 'paralithic.contact', 'argillic.horizon',
        'ochric.epipedon', 'mollic.epipedon', 'mod.deep', 'deep', 'very.deep', levels(loafercreek$hillslope_pos))
 
 # should work as before
-x <- diagnosticPropertyPlot(loafercreek, v, k=5, grid.label='bedrock_kind', dend.label = 'taxonname')
-x <- diagnosticPropertyPlot2(loafercreek, v, k=5, grid.label='bedrock_kind')
+# use the 'sort.vars = FALSE' option to set the order of the variable names to the order they are listed in 'v'
+x <- diagnosticPropertyPlot(loafercreek, v, k=5, grid.label='bedrock_kind', dend.label = 'taxonname', sort.vars = FALSE)
+x <- diagnosticPropertyPlot2(loafercreek, v, k=5, grid.label='bedrock_kind', sort.vars = FALSE)
 ```
 
 
