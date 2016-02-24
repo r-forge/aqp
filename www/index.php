@@ -134,6 +134,10 @@ echo $contents; } ?>
 
 <p><b>Sample Figures</b></p>
 
+<img src="soils-by-pigments.png" border="0">
+
+<img src="soil-color-transition-probabilities.png" border="0">
+
 <img src="tp-example.png" border="0">
 
 <img src="MO-soils-aqp-demo.png" border="0">
