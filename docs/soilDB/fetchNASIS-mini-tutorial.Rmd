@@ -123,6 +123,9 @@ Some of the assumptions made by `fetchNASIS()` can be adjusted using arguments t
 * `rmHzErrors = TRUE`
 Setting this value to `TRUE` (the default) will enable checks for horizon depth consistency. Consider setting this argument to `FALSE` if you aren't concerned about horizon depth errors, or know that your selected set contains many combination horizons. Note that any pedons flagged as having horizon depths errors (`rmHzErrors = TRUE`) will be omitted from the data returned by `fetchNASIS()`.
 
+* `soilColorState='moist'`
+By default, **moist** soil colors are used to generate R-compatible colors and stored in the horizon-level attribute "soil_color". Possible values for this argument are 'moist' and 'dry'.
+
 * `nullFragsAreZero = TRUE`
 Setting this value to `TRUE` (the default) will convert NULL rock fragment volumes to 0s. This is typically the right assumption as rock fragment data are typically populated *only* when observed. If you know that your data contain a combination of *ommited* information (e.g. there are no rock fragment volumes populated) then consider setting this argument to `FALSE`. Note that this argument will have significant effects on the rock fragment data returned by `fetchNASIS()` as illustrated below:
 
