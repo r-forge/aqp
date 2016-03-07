@@ -20,6 +20,7 @@ D.E. Beaudette
 <br>
 `r format(Sys.time(), "%Y-%m-%d")`
 
+# TODO: copy user site ID + depth over to $soiltemp for plotting
 
 
 ## Introduction
@@ -77,13 +78,13 @@ head(as.data.frame(x$sensors)[, c('user_site_id', 'name', 'serial_number', 'MAST
 ### Plot Data
 Note that there are gaps in the data: between site visits and lack of synchronization of site visits with start/end of the year.
 ```{r plot-time-series, fig.width=10, fig.height=7}
-xyplot(sensor_value ~ date_time | id, data=x$soiltemp, type=c('l', 'g'), as.table=TRUE, layout=c(1,6), xlab='Date', ylab='Deg C')
+xyplot(sensor_value ~ date_time | sid, data=x$soiltemp, type=c('l', 'g'), as.table=TRUE, layout=c(1,6), xlab='Date', ylab='Deg C')
 ```
 
 
 Another approach for investigating data gaps, blue: data, grey: no data.
 ```{r plot-time-series-levelplot, fig.width=9, fig.height=9}
-levelplot(factor(!is.na(sensor_value)) ~ doy * factor(year) | id, 
+levelplot(factor(!is.na(sensor_value)) ~ doy * factor(year) | sid, 
 data=x$soiltemp, layout=c(1,6), col.regions=c('grey', 'RoyalBlue'), cuts=1, 
 colorkey=FALSE, as.table=TRUE, scales=list(alternating=3, cex=0.75), 
 par.strip.text=list(cex=0.85), strip=strip.custom(bg='yellow'), 
@@ -95,7 +96,7 @@ This style of plotting data can be useful for making comparisons between years.
 # generate some better colors
 cols <- colorRampPalette(rev(brewer.pal(11, 'RdYlBu')), space='Lab', interpolate='spline')
 
-levelplot(sensor_value ~ doy * factor(year) | id, main='Daily Soil Temperature at 50cm\nDeg. C',
+levelplot(sensor_value ~ doy * factor(year) | sid, main='Daily Soil Temperature at 50cm\nDeg. C',
 data=x$soiltemp, layout=c(1,6), col.regions=cols,
 colorkey=list(space='top'), as.table=TRUE, scales=list(alternating=3, cex=0.75), 
 par.strip.text=list(cex=0.85), strip=strip.custom(bg='grey'), 
