@@ -20,8 +20,6 @@ D.E. Beaudette
 <br>
 `r format(Sys.time(), "%Y-%m-%d")`
 
-# TODO: copy user site ID + depth over to $soiltemp for plotting
-
 
 ## Introduction
 This document demonstrates how to use the [soilDB](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/docs/soilDB/soilDB-Intro.html?root=aqp) package to download data from the Henry Mount soil climate database. Soil climate data are routinely collected by SSO staff via buried sensor/data-logger devices ("hobos") and now above ground weather stations. The Henry Mount Soil Climate database was established to assist with the management and analysis of these data.
@@ -67,6 +65,9 @@ library(lattice)
 library(RColorBrewer)
 
 x <- fetchHenry(project='CA792', gran = 'day')
+
+# check object structure:
+str(x)
 ```
 
 Quick listing of essiential site-level data. "Functional years" is the number of years of non-missing data, after grouping data by Julian day. "Complete years" is the number of years that have 365 days of non-missing data. "dslv" is the number of days since the data-logger was last visited.
