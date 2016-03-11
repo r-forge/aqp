@@ -41,8 +41,9 @@ install.packages('soilDB', repos="http://R-Forge.R-project.org", type='source') 
 ## Getting and Viewing Data
 Soil climate data can be queried by:
  
- * project (typically a soil survey area, 'CA630')
+ * project (typically a soil survey area, "CA630")
  * NASIS user site ID (e.g. "2006CA7920001")
+ * MLRA soil survey office (e.g. "2-SON")
 
 and optionally filtered by:
 
